@@ -53,7 +53,7 @@
                                 <Entry Placeholder="Database Name" PlaceholderColor="#879baa" StyleClass="form-control" ReturnType="Next" x:Name="entDatabase"/>
                             </StackLayout>
                         </Frame>
-                        <Label Text="IP Address" StyleClass="lbl-login" IsVisible="True">
+                        <Label Text="Server IP Address" StyleClass="lbl-login" IsVisible="True">
                             <Label.FontFamily>
                                 <OnPlatform x:TypeArguments="x:String">
                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
