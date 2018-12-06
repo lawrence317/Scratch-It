@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:TBSMobile.Data"
+             x:Class="TBSMobile.View.RetailerList"
+             NavigationPage.HasBackButton="False"
+             Title="Retailer"
+             StyleClass="retailer">
+    <ContentPage.Resources>
+        <StyleSheet Source="/Stylesheet/globalstylesheet.css" />
+    </ContentPage.Resources>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="plus.png" Text="Add Retailer Outlet" Order="Primary" x:Name="addRetailerOutlet" Activated="addRetailerOutlet_Activated"/>
+        <ToolbarItem Text="Sort By Name" Order="Secondary" x:Name="sbName" Activated="sbName_Activated"/>
+        <ToolbarItem Text="Sort By Street" Order="Secondary" x:Name="sbStreet" Activated="sbStreet_Activated"/>
+        <ToolbarItem Text="Sort By Barangay" Order="Secondary" x:Name="sbBarangay" Activated="sbBarangay_Activated"/>
+        <ToolbarItem Text="Sort By District" Order="Secondary" x:Name="sbDistrict" Activated="sbDistrict_Activated"/>
+        <ToolbarItem Text="Sort By City" Order="Secondary" x:Name="sbCity" Activated="sbCity_Activated"/>
+        <ToolbarItem Text="Sort By Province" Order="Secondary" x:Name="sbProvince" Activated="sbProvince_Activated"/>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout StyleClass="search-field" MinimumHeightRequest="80">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60*" />
+                        <ColumnDefinition Width="40*" />
+                    </Grid.ColumnDefinitions>
+                    <Frame Grid.Row="0" Grid.Column="0" StyleClass="fieldFrame" x:Name="SearchFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                        <local:CustomEntry Placeholder="Search..." x:Name="Search" TextChanged="Search_TextChanged" StyleClass="prospectSearch">
+                            <local:CustomEntry.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String">
+                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                </OnPlatform>
+                            </local:CustomEntry.FontFamily>
+                        </local:CustomEntry>
+                    </Frame>
+                    <Frame  Grid.Row="0" Grid.Column="1" StyleClass="fieldFrame" x:Name="CategoryFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                        <local:CustomPicker x:Name="searchCategory" Title="Search Category">
+                            <local:CustomPicker.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String">
+                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                </OnPlatform>
+                            </local:CustomPicker.FontFamily>
+                            <local:CustomPicker.Items>
+                                <x:String>Retailer Name</x:String>
+                                <x:String>Outlet Name</x:String>
+                                <x:String>Street</x:String>
+                                <x:String>Barangay</x:String>
+                                <x:String>District</x:String>
+                                <x:String>City</x:String>
+                                <x:String>Province</x:String>
+                            </local:CustomPicker.Items>
+                        </local:CustomPicker>
+                    </Frame>
+                </Grid>
+            </StackLayout>
+            <StackLayout>
+                <ListView IsPullToRefreshEnabled="True" SeparatorVisibility="None" Refreshing="lstRetailer_Refreshing" x:Name="lstRetailer" ItemTapped="lstRetailer_ItemTapped" ItemSelected="lstRetailer_ItemSelected" HasUnevenRows="True">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Frame StyleClass="lstframe" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                                    <StackLayout StyleClass="lstContainer" VerticalOptions="CenterAndExpand">
+                                        <Label StyleClass="lstName" Text="{Binding FileAs}">
+                                            <Label.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                                </OnPlatform>
+                                            </Label.FontFamily>
+                                        </Label>
+                                        <Label StyleClass="lstSubName" Text="{Binding Landmark}">
+                                            <Label.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Label.FontFamily>
+                                        </Label>
+                                    </StackLayout>
+                                </Frame>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

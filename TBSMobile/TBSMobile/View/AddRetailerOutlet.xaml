@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:TBSMobile.Data"
+             x:Class="TBSMobile.View.AddRetailerOutlet"
+             NavigationPage.HasBackButton="False"
+             Title="Add Retailer Outlet"
+             StyleClass="aro"
+             BackgroundColor="#f2f4f6">
+    <ContentPage.Resources>
+        <StyleSheet Source="/Stylesheet/globalstylesheet.css" />
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical">
+            <Frame StyleClass="fafFrame" CornerRadius="5">
+                <StackLayout Orientation="Vertical" HeightRequest="550">
+                    <ScrollView>
+                        <StackLayout>
+                            <StackLayout x:Name="fafPage1">
+                                <Label Text="Retailer Name" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="RetailerNameFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry x:Name="NameSearch" StyleClass="fieldForm" Focused="NameSearch_Focused" Unfocused="NameSearch_Unfocused" TextChanged="NameSearch_TextChanged">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <ListView x:Name="lstName" ItemTapped="lstName_ItemTapped" IsVisible="False" HeightRequest="50">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <ViewCell>
+                                                <StackLayout StyleClass="lstSuggestion" VerticalOptions="CenterAndExpand">
+                                                    <Label StyleClass="lstSuggest" Text="{Binding FileAs}">
+                                                        <Label.FontFamily>
+                                                            <OnPlatform x:TypeArguments="x:String">
+                                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                            </OnPlatform>
+                                                        </Label.FontFamily>
+                                                    </Label>
+                                                </StackLayout>
+                                            </ViewCell>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Entry IsVisible="False" TextChanged="entContact_TextChanged" StyleClass="fieldForm" x:Name="entContact"/>
+                                <Label Text="Please choose a retailer" x:Name="namevalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Temporary Retailer Code" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="RetailerCodeFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry IsEnabled="False" StyleClass="fieldForm" x:Name="entRetailerCode">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the temporary retailer code" x:Name="codevalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Outlet Name" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="OutletNameFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Unfocused="entLandmark_Unfocused" x:Name="entLandmark">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the outlet name" x:Name="outletnamevalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Province" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="ProvinceFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry x:Name="provinceSearch" StyleClass="fieldForm" Focused="provinceSearch_Focused" Unfocused="provinceSearch_Unfocused" TextChanged="provinceSearch_TextChanged">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <ListView x:Name="lstProvince" IsVisible="False" HeightRequest="50" ItemTapped="lstProvince_ItemTapped">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <ViewCell>
+                                                <StackLayout StyleClass="lstSuggestion" VerticalOptions="CenterAndExpand">
+                                                    <Label StyleClass="lstSuggest" Text="{Binding Province}">
+                                                        <Label.FontFamily>
+                                                            <OnPlatform x:TypeArguments="x:String">
+                                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                            </OnPlatform>
+                                                        </Label.FontFamily>
+                                                    </Label>
+                                                </StackLayout>
+                                            </ViewCell>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <Entry IsVisible="False" IsEnabled="False" x:Name="entProvinceCode"/>
+                                <Label Text="Please choose a province" x:Name="provincevalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Town/City/Municipality" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="TownFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomPicker x:Name="townPicker" SelectedIndexChanged="townPicker_SelectedIndexChanged" Unfocused="townPicker_Unfocused" ItemDisplayBinding="{Binding DisplayText}" StyleClass="fieldForm" IsEnabled="False">
+                                        <local:CustomPicker.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomPicker.FontFamily>
+                                    </local:CustomPicker>
+                                </Frame>
+
+                                <Entry IsVisible="False" IsEnabled="False" x:Name="entTownCode"/>
+                                <Label Text="Please choose the city/town/municipality" x:Name="cityvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Street" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="StreetFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Unfocused="entStreet_Unfocused" x:Name="entStreet">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the street" x:Name="streetvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Barangay" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="BarangayFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Unfocused="entBarangay_Unfocused" x:Name="entBarangay">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the barangay" x:Name="barangayvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="District" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="DistrictFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" x:Name="entDistrict">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the district" x:Name="districtvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Country" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="CountryFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry Text="Philippines" IsEnabled="False" StyleClass="fieldForm" Unfocused="entCountry_Unfocused" x:Name="entCountry">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the country" x:Name="countryvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+
+                                <Label Text="Mobile Number" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="MobileFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Keyboard="Telephone" x:Name="entMobile">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+
+                                <Label Text="Telephone 1" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="Telephone1Frame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Keyboard="Telephone" x:Name="entTelephone1">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+
+                                <Label Text="Telephone 2" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="Telephone2Frame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" Keyboard="Telephone" x:Name="entTelephone2">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+
+                                <Label Text="Email Address" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="EMAIL" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" x:Name="entEmail" Keyboard="Email">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Entry IsVisible="False" IsEnabled="False" StyleClass="fieldForm" Text="0.000,0.000" x:Name="entLocation"/>
+                                <StackLayout x:Name="page1nav">
+                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAdd" Text="Add" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+                        </StackLayout>
+                    </ScrollView>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

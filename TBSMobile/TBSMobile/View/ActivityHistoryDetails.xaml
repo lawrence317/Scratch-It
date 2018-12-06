@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:TBSMobile.Data"
+             x:Class="TBSMobile.View.ActivityHistoryDetails"
+             NavigationPage.HasBackButton="False"
+             Title="Activity History Details"
+             StyleClass="ahd">
+    <ContentPage.Resources>
+        <StyleSheet Source="/Stylesheet/globalstylesheet.css" />
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout>
+                <Grid RowSpacing="0">
+                    <Frame StyleClass="detailsFrame" Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Activity Number" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblCafNo">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="1" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Retailer Name" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRetailerName">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Retailer Code" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRetailerCode">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="3" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="On-site Location" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRetailerLocation">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Activity Date" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblDate">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="5" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Activity Start Time" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblStartTime">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Activity End Time" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblEndTime">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="7" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Rekorida" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRekorida">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Merchandizing" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblMerchandizing">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="9" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Trade Check" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" Grid.Row="10" Grid.Column="0" x:Name="lblTradeCheck">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Others" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblOthers">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="11" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Other Concern" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblOtherConcern">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="12" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="Remarks" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRemarks">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                </Grid>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
