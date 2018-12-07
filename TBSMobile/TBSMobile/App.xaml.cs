@@ -22,6 +22,7 @@ namespace TBSMobile
 		protected override void OnStart ()
 		{
             AppCenter.Start("android=f1c045bb-85c1-4ff2-a0e1-292ec5415af0;" + "uwp={Your UWP App secret here};" + "ios={Your iOS App secret here}", typeof(Analytics), typeof(Crashes), typeof(Distribute));
+            Analytics.SetEnabledAsync(true);
         }
 
 		protected override void OnSleep ()
