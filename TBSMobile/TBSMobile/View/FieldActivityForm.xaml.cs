@@ -1123,7 +1123,7 @@ namespace TBSMobile.View
 
                                         var current = DateTime.Parse(current_datetime);
 
-                                        string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastSync = '" + current + "', LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
+                                        string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "',  LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
                                         await conn.ExecuteAsync(retailer_group_sql);
 
                                         var caf_insert = new CAFTable
@@ -1203,7 +1203,7 @@ namespace TBSMobile.View
 
                                     var current = DateTime.Parse(current_datetime);
 
-                                    string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastSync = '" + current + "', LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
+                                    string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
                                     await conn.ExecuteAsync(retailer_group_sql);
 
                                     var caf_insert = new CAFTable
