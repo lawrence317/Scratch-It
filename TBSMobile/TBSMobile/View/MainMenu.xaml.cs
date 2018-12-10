@@ -1,17 +1,12 @@
 ﻿using Plugin.Connectivity;
+using Plugin.Geolocator;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using static Xamarin.Forms.Button;
-using static Xamarin.Forms.Button.ButtonContentLayout;
 
 namespace TBSMobile.View
 {
@@ -83,7 +78,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -108,8 +103,22 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                        
+                        var locator = CrossGeolocator.Current;
+                        locator.DesiredAccuracy = 15;
 
-                        await Navigation.PushAsync(new FieldActivityForm(host, database, contact, ipaddress, pingipaddress));
+                        if (!locator.IsGeolocationAvailable)
+                        {
+                            await DisplayAlert("GPS Error", "GPS location not available", "Ok");
+                        }
+                        else if (!locator.IsGeolocationEnabled)
+                        {
+                            await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
+                        }
+                        else
+                        {
+                            await Navigation.PushAsync(new FieldActivityForm(host, database, contact, ipaddress, pingipaddress));
+                        }
                     }
                     else
                     {
@@ -119,7 +128,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -150,7 +159,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -181,7 +190,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -214,7 +223,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -301,7 +310,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }

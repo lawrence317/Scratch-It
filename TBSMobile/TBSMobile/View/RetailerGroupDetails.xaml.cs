@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AppCenter.Crashes;
+using System;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -41,36 +42,43 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         public void GetRetailerGroupDetails(string code)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getContact = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblretailergroup WHERE RetailerCode=?", code);
-            var contactResultCount = getContact.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getContact.Result[0];
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince WHERE ProvinceID=?", contactResult.PresProvince);
-                var provinceResult = getProvince.Result[0];
+                var getContact = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblretailergroup WHERE RetailerCode=?", code);
+                var contactResultCount = getContact.Result.Count;
 
-                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
-                var townResult = getTown.Result[0];
+                if (contactResultCount > 0)
+                {
+                    var contactResult = getContact.Result[0];
 
-                lblAddress.Text = contactResult.PresBarangay + ", " + contactResult.PresStreet + ", " + townResult.Town + ", " + provinceResult.Province + ", " + contactResult.PresCountry + " - " + contactResult.PresDistrict;
-                lblLandmark.Text = contactResult.Landmark;
-                lblTelephone1.Text = contactResult.Telephone1;
-                lblTelephone2.Text = contactResult.Telephone2;
-                lblMobile.Text = contactResult.Mobile;
-                lblEmail.Text = contactResult.Email;
-                lblLocation.Text = contactResult.GPSCoordinates;
+                    var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince WHERE ProvinceID=?", contactResult.PresProvince);
+                    var provinceResult = getProvince.Result[0];
+
+                    var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
+                    var townResult = getTown.Result[0];
+
+                    lblAddress.Text = contactResult.PresBarangay + ", " + contactResult.PresStreet + ", " + townResult.Town + ", " + provinceResult.Province + ", " + contactResult.PresCountry + " - " + contactResult.PresDistrict;
+                    lblLandmark.Text = contactResult.Landmark;
+                    lblTelephone1.Text = contactResult.Telephone1;
+                    lblTelephone2.Text = contactResult.Telephone2;
+                    lblMobile.Text = contactResult.Mobile;
+                    lblEmail.Text = contactResult.Email;
+                    lblLocation.Text = contactResult.GPSCoordinates;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
     }

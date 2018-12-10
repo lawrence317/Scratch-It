@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using Plugin.Media;
@@ -63,7 +64,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -218,7 +219,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        await DisplayAlert("Error", ex.Message, "Ok");
+                        Crashes.TrackError(ex);
                     }
                 }
             }
@@ -254,7 +255,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -446,7 +447,7 @@ namespace TBSMobile.View
                                         }
                                         catch (Exception ex)
                                         {
-                                            await DisplayAlert("Sending Error", ex.Message, "Got it");
+                                            Crashes.TrackError(ex);
                                         }
                                     }
                                     else
@@ -493,7 +494,7 @@ namespace TBSMobile.View
                                         }
                                         catch (Exception ex)
                                         {
-                                            await DisplayAlert("Error", ex.Message, "ok");
+                                            Crashes.TrackError(ex);
                                         }
 
                                         await DisplayAlert("Prospect retailer was saved offline", "Prospect retailer has been saved offline connect to the server to send your activity", "Got it");
@@ -544,7 +545,7 @@ namespace TBSMobile.View
                                     }
                                     catch (Exception ex)
                                     {
-                                        await DisplayAlert("Error", ex.Message, "ok");
+                                        Crashes.TrackError(ex);
                                     }
 
                                     await DisplayAlert("Prospect retailer was saved offline", "Prospect retailer has been saved offline connect to the server to send your activity", "Got it");
@@ -561,14 +562,14 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         private void entFirstName_Unfocused(object sender, FocusEventArgs e)
         {
-            if (entFirstName.Text == null || entFirstName.Text == "")
+            if (string.IsNullOrEmpty(entFirstName.Text))
             {
                 firstnamevalidator.IsVisible = true;
                 FirstNameFrame.BorderColor = Color.FromHex("#e74c3c");
@@ -582,7 +583,7 @@ namespace TBSMobile.View
 
         private void entMiddleName_Unfocused(object sender, FocusEventArgs e)
         {
-            if (entMiddleName.Text == null || entMiddleName.Text == "")
+            if (string.IsNullOrEmpty(entMiddleName.Text))
             {
                 middlenamevalidator.IsVisible = true;
                 MiddleNameFrame.BorderColor = Color.FromHex("#e74c3c");
@@ -596,7 +597,7 @@ namespace TBSMobile.View
 
         private void entLastName_Unfocused(object sender, FocusEventArgs e)
         {
-            if (entLastName.Text == null || entLastName.Text == "")
+            if (string.IsNullOrEmpty(entLastName.Text))
             {
                 lastnamevalidator.IsVisible = true;
                 LastNameFrame.BorderColor = Color.FromHex("#e74c3c");
@@ -725,7 +726,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -764,7 +765,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -803,7 +804,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -842,39 +843,46 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
         public void province_search()
         {
-            var keyword = provinceSearch.Text;
-
-            if (!string.IsNullOrEmpty(keyword))
+            try
             {
-                lstProvince.IsVisible = true;
+                var keyword = provinceSearch.Text;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
-                var getProvince = conn.QueryAsync<ProvinceTable>(sql);
-                var resultCount = getProvince.Result.Count;
-
-                if (resultCount > 0)
+                if (!string.IsNullOrEmpty(keyword))
                 {
-                    var result = getProvince.Result;
-                    lstProvince.HeightRequest = (resultCount * 45);
-                    lstProvince.ItemsSource = result;
+                    lstProvince.IsVisible = true;
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
+                    var getProvince = conn.QueryAsync<ProvinceTable>(sql);
+                    var resultCount = getProvince.Result.Count;
+
+                    if (resultCount > 0)
+                    {
+                        var result = getProvince.Result;
+                        lstProvince.HeightRequest = (resultCount * 45);
+                        lstProvince.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstProvince.IsVisible = false;
+                    }
                 }
                 else
                 {
                     lstProvince.IsVisible = false;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                lstProvince.IsVisible = false;
+                Crashes.TrackError(ex);
             }
         }
 
@@ -904,32 +912,39 @@ namespace TBSMobile.View
 
         private void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
-            provincevalidator.IsVisible = false;
-
-            ProvinceTable item = (ProvinceTable)e.Item;
-
-            provinceSearch.Text = item.Province;
-            entProvinceCode.Text = item.ProvinceID;
-            lstProvince.IsVisible = false;
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
-
-            if (getTown != null && getTown.Count > 0)
+            try
             {
-                townPicker.ItemsSource = getTown;
-                townPicker.IsEnabled = true;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+                provincevalidator.IsVisible = false;
+
+                ProvinceTable item = (ProvinceTable)e.Item;
+
+                provinceSearch.Text = item.Province;
+                entProvinceCode.Text = item.ProvinceID;
+                lstProvince.IsVisible = false;
+
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
+
+                if (getTown != null && getTown.Count > 0)
+                {
+                    townPicker.ItemsSource = getTown;
+                    townPicker.IsEnabled = true;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
+                else
+                {
+                    townPicker.IsEnabled = false;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                townPicker.IsEnabled = false;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                Crashes.TrackError(ex);
             }
         }
     }

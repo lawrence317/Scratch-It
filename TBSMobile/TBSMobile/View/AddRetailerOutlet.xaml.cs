@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using System;
 using System.Collections.Generic;
@@ -83,7 +84,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -311,7 +312,7 @@ namespace TBSMobile.View
                                         }
                                         catch (Exception ex)
                                         {
-                                            await DisplayAlert("Sending Error", ex.Message, "Got it");
+                                            Crashes.TrackError(ex);
                                         }
                                     }
                                     else
@@ -385,7 +386,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        await DisplayAlert("Error", ex.Message, "Ok");
+                        Crashes.TrackError(ex);
                     }
                 }
                 
@@ -439,27 +440,34 @@ namespace TBSMobile.View
 
         private void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            ContactsTable item = (ContactsTable)e.Item;
-
-            NameSearch.Text = item.FileAs;
-            lstName.IsVisible = false;
-
-            outletnamevalidator.IsVisible = false;
-            OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCode = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE FileAs=?", NameSearch.Text);
-            var resultCount = getCode.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                for (int i = 0; i < resultCount; i++)
+                ContactsTable item = (ContactsTable)e.Item;
+
+                NameSearch.Text = item.FileAs;
+                lstName.IsVisible = false;
+
+                outletnamevalidator.IsVisible = false;
+                OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
+
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCode = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE FileAs=?", NameSearch.Text);
+                var resultCount = getCode.Result.Count;
+
+                if (resultCount > 0)
                 {
-                    var result = getCode.Result[i];
-                    entContact.Text = result.ContactID.ToString();
+                    for (int i = 0; i < resultCount; i++)
+                    {
+                        var result = getCode.Result[i];
+                        entContact.Text = result.ContactID.ToString();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -470,33 +478,40 @@ namespace TBSMobile.View
 
         public void search()
         {
-            var keyword = NameSearch.Text;
-
-            if (!string.IsNullOrEmpty(keyword))
+            try
             {
-                lstName.IsVisible = true;
+                var keyword = NameSearch.Text;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
-                var getUser = conn.QueryAsync<ContactsTable>(sql);
-                var resultCount = getUser.Result.Count;
-
-                if (resultCount > 0)
+                if (!string.IsNullOrEmpty(keyword))
                 {
-                    var result = getUser.Result;
-                    lstName.HeightRequest = (resultCount * 45);
-                    lstName.ItemsSource = result;
+                    lstName.IsVisible = true;
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
+                    var getUser = conn.QueryAsync<ContactsTable>(sql);
+                    var resultCount = getUser.Result.Count;
+
+                    if (resultCount > 0)
+                    {
+                        var result = getUser.Result;
+                        lstName.HeightRequest = (resultCount * 45);
+                        lstName.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstName.IsVisible = false;
+                    }
                 }
                 else
                 {
                     lstName.IsVisible = false;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                lstName.IsVisible = false;
+                Crashes.TrackError(ex);
             }
         }
 
@@ -598,33 +613,40 @@ namespace TBSMobile.View
 
         public void province_search()
         {
-            var keyword = provinceSearch.Text;
-
-            if (!string.IsNullOrEmpty(keyword))
+            try
             {
-                lstProvince.IsVisible = true;
+                var keyword = provinceSearch.Text;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
-                var getProvince = conn.QueryAsync<ProvinceTable>(sql);
-                var resultCount = getProvince.Result.Count;
-
-                if (resultCount > 0)
+                if (!string.IsNullOrEmpty(keyword))
                 {
-                    var result = getProvince.Result;
-                    lstProvince.HeightRequest = (resultCount * 45);
-                    lstProvince.ItemsSource = result;
+                    lstProvince.IsVisible = true;
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
+                    var getProvince = conn.QueryAsync<ProvinceTable>(sql);
+                    var resultCount = getProvince.Result.Count;
+
+                    if (resultCount > 0)
+                    {
+                        var result = getProvince.Result;
+                        lstProvince.HeightRequest = (resultCount * 45);
+                        lstProvince.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstProvince.IsVisible = false;
+                    }
                 }
                 else
                 {
                     lstProvince.IsVisible = false;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                lstProvince.IsVisible = false;
+                Crashes.TrackError(ex);
             }
         }
 
@@ -654,32 +676,39 @@ namespace TBSMobile.View
 
         private void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
-            provincevalidator.IsVisible = false;
-
-            ProvinceTable item = (ProvinceTable)e.Item;
-
-            provinceSearch.Text = item.Province;
-            entProvinceCode.Text = item.ProvinceID;
-            lstProvince.IsVisible = false;
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
-
-            if (getTown != null && getTown.Count > 0)
+            try
             {
-                townPicker.ItemsSource = getTown;
-                townPicker.IsEnabled = true;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+                provincevalidator.IsVisible = false;
+
+                ProvinceTable item = (ProvinceTable)e.Item;
+
+                provinceSearch.Text = item.Province;
+                entProvinceCode.Text = item.ProvinceID;
+                lstProvince.IsVisible = false;
+
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
+
+                if (getTown != null && getTown.Count > 0)
+                {
+                    townPicker.ItemsSource = getTown;
+                    townPicker.IsEnabled = true;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
+                else
+                {
+                    townPicker.IsEnabled = false;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                townPicker.IsEnabled = false;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                Crashes.TrackError(ex);
             }
         }
     }

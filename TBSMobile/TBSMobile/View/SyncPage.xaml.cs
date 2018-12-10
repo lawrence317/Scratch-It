@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using System;
@@ -350,7 +351,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.Write("Syncing user error " + ex.Message);
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -358,7 +359,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing user Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -444,7 +445,7 @@ namespace TBSMobile.View
                             }
                             catch (Exception ex)
                             {
-                                Console.Write("Syncing User Error " + ex.Message);
+                                Crashes.TrackError(ex);
                             }
                         }
                     }
@@ -504,7 +505,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing User Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -512,7 +513,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing User Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -802,7 +803,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.Write("Syncing retailer error " + ex.Message);
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -810,7 +811,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing retailer Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -977,7 +978,7 @@ namespace TBSMobile.View
                             }
                             catch (Exception ex)
                             {
-                                Console.Write("Syncing Retailer Error " + ex.Message);
+                                Crashes.TrackError(ex);
                             }
                         }
                     }
@@ -1091,7 +1092,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Retailer Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -1099,7 +1100,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Retailer Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -1282,7 +1283,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.Write("Syncing retailer group error " + ex.Message);
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -1290,7 +1291,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing retailer group error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -1406,7 +1407,7 @@ namespace TBSMobile.View
                             }
                             catch (Exception ex)
                             {
-                                Console.Write("Syncing Retailer Group Error " + ex.Message);
+                                Crashes.TrackError(ex);
                             }
                         }
                     }
@@ -1486,7 +1487,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Retailer Group Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -1494,7 +1495,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Retailer Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -1607,7 +1608,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing CAF Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -1690,7 +1691,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing CAF Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -1698,7 +1699,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing CAF Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -1767,7 +1768,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing CAF Activities Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -1826,7 +1827,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing CAF Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -1834,7 +1835,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing CAF Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -1973,7 +1974,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.Write("Syncing subscription error " + ex.Message);
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -1981,7 +1982,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing subscription Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -2071,7 +2072,7 @@ namespace TBSMobile.View
                             }
                             catch (Exception ex)
                             {
-                                Console.Write("Syncing Subscription Error " + ex.Message);
+                                Crashes.TrackError(ex);
                             }
                         }
                     }
@@ -2134,7 +2135,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Subscription Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -2142,7 +2143,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Subscription Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -2258,7 +2259,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    Console.Write("Syncing Email error " + ex.Message);
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -2266,7 +2267,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.Write("Syncing Email Error " + ex.Message);
+                                    Crashes.TrackError(ex);
                                 }
 
                                 var update_sql = "UPDATE  tblUserEmail SET LastSync='" + current_datetime + "' WHERE ContactID='" + contact + "'";
@@ -2346,7 +2347,7 @@ namespace TBSMobile.View
                             }
                             catch (Exception ex)
                             {
-                                Console.Write("Syncing Email Error " + ex.Message);
+                                Crashes.TrackError(ex);
                             }
                         }
                     }
@@ -2400,7 +2401,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Email Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -2408,7 +2409,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Email Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -2485,7 +2486,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Province Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
                     else
@@ -2538,7 +2539,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Province Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -2546,7 +2547,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Province Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else
@@ -2625,7 +2626,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Town Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
                     else
@@ -2680,7 +2681,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Console.Write("Syncing Town Error " + ex.Message);
+                            Crashes.TrackError(ex);
                         }
                     }
 
@@ -2688,7 +2689,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("Syncing Town Error " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
             else

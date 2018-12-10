@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
@@ -77,7 +78,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -99,19 +100,26 @@ namespace TBSMobile.View
 
         public void getRecipients()
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getRecipient = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID=?", contact);
-            var resultCount = getRecipient.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                for (int i = 0; i < resultCount; i++)
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getRecipient = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID=?", contact);
+                var resultCount = getRecipient.Result.Count;
+
+                if (resultCount > 0)
                 {
-                    var result = getRecipient.Result[i];
-                    entrecipient.Text = result.Email;
+                    for (int i = 0; i < resultCount; i++)
+                    {
+                        var result = getRecipient.Result[i];
+                        entrecipient.Text = result.Email;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -156,7 +164,7 @@ namespace TBSMobile.View
             }
             else
             {
-                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(20), null, true);
+                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(15), null, true);
                 entLocation.Text = position.Latitude + "," + position.Longitude;
             }
         }
@@ -178,135 +186,43 @@ namespace TBSMobile.View
 
         private void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            ContactsTable item = (ContactsTable)e.Item;
-
-            entRetailer.Text = item.ContactID;
-            NameSearch.Text = item.FileAs;
-            lstName.IsVisible = false;
-
-            entRetailerCode.Text = null;
-            entEmployeeNumber.Text = null;
-            entStreet.Text = null;
-            entBarangay.Text = null;
-            provinceSearch.Text = null;
-            entProvinceCode.Text = null;
-            entTownCode.Text = null;
-            townPicker.SelectedIndex = -1;
-            entDistrict.Text = null;
-            entCountry.Text = null;
-            entTelephone1.Text = null;
-            entTelephone2.Text = null;
-            entMobile.Text = null;
-            entEmail.Text = null;
-            entLandmark.Text = null;
-
-            codePicker.IsEnabled = false;
-            entStreet.IsEnabled = false;
-            entBarangay.IsEnabled = false;
-            provinceSearch.IsEnabled = false;
-            townPicker.IsEnabled = false;
-            entDistrict.IsEnabled = false;
-            entCountry.IsEnabled = false;
-            entTelephone1.IsEnabled = false;
-            entTelephone2.IsEnabled = false;
-            entMobile.IsEnabled = false;
-            entEmail.IsEnabled = false;
-            entLandmark.IsEnabled = false;
-            btnGotoPage2.IsEnabled = false;
-
-            outletvalidator.IsVisible = false;
-            outletnamevalidator.IsVisible = false;
-            streetvalidator.IsVisible = false;
-            barangayvalidator.IsVisible = false;
-            cityvalidator.IsVisible = false;
-            provincevalidator.IsVisible = false;
-            countryvalidator.IsVisible = false;
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE ContactID=?", item.ContactID);
-            var resultCount = getCode.Result.Count;
-            if (resultCount > 0)
+            try
             {
-                var result = getCode.Result;
-                codePicker.ItemsSource = result;
-            }
-            else
-            {
+                ContactsTable item = (ContactsTable)e.Item;
+
+                entRetailer.Text = item.ContactID;
+                NameSearch.Text = item.FileAs;
                 lstName.IsVisible = false;
-            }
-        }
 
-        public void name_search()
-        {
-            var keyword = NameSearch.Text;
+                entRetailerCode.Text = null;
+                entEmployeeNumber.Text = null;
+                entStreet.Text = null;
+                entBarangay.Text = null;
+                provinceSearch.Text = null;
+                entProvinceCode.Text = null;
+                entTownCode.Text = null;
+                townPicker.SelectedIndex = -1;
+                entDistrict.Text = null;
+                entCountry.Text = null;
+                entTelephone1.Text = null;
+                entTelephone2.Text = null;
+                entMobile.Text = null;
+                entEmail.Text = null;
+                entLandmark.Text = null;
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                lstName.IsVisible = true;
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
-                var getUser = conn.QueryAsync<ContactsTable>(sql);
-                var resultCount = getUser.Result.Count;
-
-                if (resultCount > 0)
-                {
-                    var result = getUser.Result;
-                    lstName.HeightRequest = (resultCount * 45);
-                    lstName.ItemsSource = result;
-                }
-                else
-                {
-                    lstName.IsVisible = false;
-                    codePicker.IsEnabled = false;
-                }
-            }
-            else
-            {
-                lstName.IsVisible = false;
                 codePicker.IsEnabled = false;
-            }
-        }
-
-        private void codePicker_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (codePicker.SelectedIndex > -1)
-            {
-                var pickedRetailerCode = codePicker.Items[codePicker.SelectedIndex];
-                string[] picked = pickedRetailerCode.Split(new char[] { '-' });
-                string code;
-
-                if (picked[0] == "TP")
-                {
-                    code = picked[0] + "-" + picked[1];
-                }
-                else
-                {
-                    code = picked[0];
-                }
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
-                var resultCount = getCode.Result.Count;
-
-                entStreet.IsEnabled = true;
-                entBarangay.IsEnabled = true;
-                provinceSearch.IsEnabled = true;
-                townPicker.IsEnabled = true;
-                entDistrict.IsEnabled = true;
-                entCountry.IsEnabled = true;
-                entLandmark.IsEnabled = true;
-                entTelephone1.IsEnabled = true;
-                entTelephone2.IsEnabled = true;
-                entMobile.IsEnabled = true;
-                entEmail.IsEnabled = true;
-                btnGotoPage2.IsEnabled = true;
+                entStreet.IsEnabled = false;
+                entBarangay.IsEnabled = false;
+                provinceSearch.IsEnabled = false;
+                townPicker.IsEnabled = false;
+                entDistrict.IsEnabled = false;
+                entCountry.IsEnabled = false;
+                entTelephone1.IsEnabled = false;
+                entTelephone2.IsEnabled = false;
+                entMobile.IsEnabled = false;
+                entEmail.IsEnabled = false;
+                entLandmark.IsEnabled = false;
+                btnGotoPage2.IsEnabled = false;
 
                 outletvalidator.IsVisible = false;
                 outletnamevalidator.IsVisible = false;
@@ -316,96 +232,210 @@ namespace TBSMobile.View
                 provincevalidator.IsVisible = false;
                 countryvalidator.IsVisible = false;
 
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE ContactID=?", item.ContactID);
+                var resultCount = getCode.Result.Count;
                 if (resultCount > 0)
                 {
-                    var result = getCode.Result.FirstOrDefault();
-                    entRetailerCode.Text = result.RetailerCode;
-                    entEmployeeNumber.Text = result.Coordinator;
-                    entStreet.Text = result.PresStreet;
-                    entBarangay.Text = result.PresBarangay;
-                    entProvinceCode.Text = result.PresProvince;
+                    var result = getCode.Result;
+                    codePicker.ItemsSource = result;
+                }
+                else
+                {
+                    lstName.IsVisible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
 
-                    var getProvincesql = "SELECT * FROM tblProvince WHERE ProvinceID = '" + result.PresProvince + "'";
-                    var getProvince = conn.QueryAsync<ProvinceTable>(getProvincesql);
-                    var provinceresultCount = getProvince.Result.Count;
+        public void name_search()
+        {
+            try
+            {
+                var keyword = NameSearch.Text;
 
-                    if(provinceresultCount > 0)
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    lstName.IsVisible = true;
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
+                    var getUser = conn.QueryAsync<ContactsTable>(sql);
+                    var resultCount = getUser.Result.Count;
+
+                    if (resultCount > 0)
                     {
-                        var prvresult = getProvince.Result[0];
-                        provinceSearch.Text = prvresult.Province;
-                        lstProvince.IsVisible = false;
+                        var result = getUser.Result;
+                        lstName.HeightRequest = (resultCount * 45);
+                        lstName.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstName.IsVisible = false;
+                        codePicker.IsEnabled = false;
+                    }
+                }
+                else
+                {
+                    lstName.IsVisible = false;
+                    codePicker.IsEnabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        private void codePicker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (codePicker.SelectedIndex > -1)
+                {
+                    var pickedRetailerCode = codePicker.Items[codePicker.SelectedIndex];
+                    string[] picked = pickedRetailerCode.Split(new char[] { '-' });
+                    string code;
+
+                    if (picked[0] == "TP")
+                    {
+                        code = picked[0] + "-" + picked[1];
+                    }
+                    else
+                    {
+                        code = picked[0];
                     }
 
-                    //var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince").Result;
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
 
-                    //if (getProvince != null && getProvince.Count > 0)
-                    //{
-                    //    provinceSearch.ItemsSource = getProvince;
-                    //    var provincedata = (provinceSearch.ItemsSource as List<ProvinceTable>).FindIndex(p => p.ProvinceID == result.PresProvince);
-                    //    provinceSearch.SelectedIndex = provincedata;
+                    var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
+                    var resultCount = getCode.Result.Count;
 
-                    //    entProvinceCode.Text = result.PresProvince;
+                    entStreet.IsEnabled = true;
+                    entBarangay.IsEnabled = true;
+                    provinceSearch.IsEnabled = true;
+                    townPicker.IsEnabled = true;
+                    entDistrict.IsEnabled = true;
+                    entCountry.IsEnabled = true;
+                    entLandmark.IsEnabled = true;
+                    entTelephone1.IsEnabled = true;
+                    entTelephone2.IsEnabled = true;
+                    entMobile.IsEnabled = true;
+                    entEmail.IsEnabled = true;
+                    btnGotoPage2.IsEnabled = true;
 
-                    //    if (!string.IsNullOrEmpty(result.PresProvince))
-                    //    {
-                    //        townPicker.IsEnabled = true;
-                    //    }
-                    //    else
-                    //    {
-                    //        townPicker.IsEnabled = false;
-                    //        entTownCode.Text = null;
-                    //    } 
-                    //}
+                    outletvalidator.IsVisible = false;
+                    outletnamevalidator.IsVisible = false;
+                    streetvalidator.IsVisible = false;
+                    barangayvalidator.IsVisible = false;
+                    cityvalidator.IsVisible = false;
+                    provincevalidator.IsVisible = false;
+                    countryvalidator.IsVisible = false;
 
-                    if (!string.IsNullOrEmpty(result.PresProvince))
+                    if (resultCount > 0)
                     {
-                        var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", result.PresProvince).Result;
+                        var result = getCode.Result.FirstOrDefault();
+                        entRetailerCode.Text = result.RetailerCode;
+                        entEmployeeNumber.Text = result.Coordinator;
+                        entStreet.Text = result.PresStreet;
+                        entBarangay.Text = result.PresBarangay;
+                        entProvinceCode.Text = result.PresProvince;
 
-                        if (getTown != null && getTown.Count > 0)
+                        var getProvincesql = "SELECT * FROM tblProvince WHERE ProvinceID = '" + result.PresProvince + "'";
+                        var getProvince = conn.QueryAsync<ProvinceTable>(getProvincesql);
+                        var provinceresultCount = getProvince.Result.Count;
+
+                        if (provinceresultCount > 0)
                         {
-                            townPicker.ItemsSource = getTown;
-
-                            var towndata = (townPicker.ItemsSource as List<TownTable>).FindIndex(t => t.TownID == result.PresTown);
-                            townPicker.SelectedIndex = towndata;
-
-                            entTownCode.Text = result.PresTown;
+                            var prvresult = getProvince.Result[0];
+                            provinceSearch.Text = prvresult.Province;
+                            lstProvince.IsVisible = false;
                         }
-                    }
 
-                    entDistrict.Text = result.PresDistrict;
+                        //var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince").Result;
 
-                    if (!string.IsNullOrEmpty(result.GPSCoordinates))
-                    {
-                        if (result.GPSCoordinates == "0.000,0.000")
+                        //if (getProvince != null && getProvince.Count > 0)
+                        //{
+                        //    provinceSearch.ItemsSource = getProvince;
+                        //    var provincedata = (provinceSearch.ItemsSource as List<ProvinceTable>).FindIndex(p => p.ProvinceID == result.PresProvince);
+                        //    provinceSearch.SelectedIndex = provincedata;
+
+                        //    entProvinceCode.Text = result.PresProvince;
+
+                        //    if (!string.IsNullOrEmpty(result.PresProvince))
+                        //    {
+                        //        townPicker.IsEnabled = true;
+                        //    }
+                        //    else
+                        //    {
+                        //        townPicker.IsEnabled = false;
+                        //        entTownCode.Text = null;
+                        //    } 
+                        //}
+
+                        if (!string.IsNullOrEmpty(result.PresProvince))
                         {
-                            GetGPS();
+                            var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", result.PresProvince).Result;
+
+                            if (getTown != null && getTown.Count > 0)
+                            {
+                                townPicker.ItemsSource = getTown;
+
+                                var towndata = (townPicker.ItemsSource as List<TownTable>).FindIndex(t => t.TownID == result.PresTown);
+                                townPicker.SelectedIndex = towndata;
+
+                                entTownCode.Text = result.PresTown;
+                            }
+                        }
+
+                        entDistrict.Text = result.PresDistrict;
+
+                        if (!string.IsNullOrEmpty(result.GPSCoordinates))
+                        {
+                            if (result.GPSCoordinates == "0.000,0.000")
+                            {
+                                GetGPS();
+                            }
+                            else
+                            {
+                                entLocation.Text = result.GPSCoordinates;
+                            }
                         }
                         else
                         {
-                            entLocation.Text = result.GPSCoordinates;
+                            GetGPS();
                         }
-                    }
-                    else
-                    {
-                        GetGPS();
-                    }
 
-                    if (string.IsNullOrEmpty(result.PresCountry))
-                    {
-                        entCountry.Text = "Philippines";
-                    }
-                    else
-                    {
-                        entCountry.Text = result.PresCountry;
-                    }
+                        if (string.IsNullOrEmpty(result.PresCountry))
+                        {
+                            entCountry.Text = "Philippines";
+                        }
+                        else
+                        {
+                            entCountry.Text = result.PresCountry;
+                        }
 
-                    entLandmark.Text = result.Landmark;
-                    entTelephone1.Text = result.Telephone1;
-                    entTelephone2.Text = result.Telephone2;
-                    entMobile.Text = result.Mobile;
-                    entEmail.Text = result.Email;
+                        entLandmark.Text = result.Landmark;
+                        entTelephone1.Text = result.Telephone1;
+                        entTelephone2.Text = result.Telephone2;
+                        entMobile.Text = result.Mobile;
+                        entEmail.Text = result.Email;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+            
         }
 
         private void swOthers_Toggled(object sender, ToggledEventArgs e)
@@ -467,7 +497,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -506,7 +536,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -545,7 +575,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -584,7 +614,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -701,7 +731,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        await DisplayAlert("Error", ex.Message, "Ok");
+                        Crashes.TrackError(ex);
                     }
                 }
             }
@@ -736,7 +766,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -828,7 +858,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        await DisplayAlert("Error", ex.Message, "Ok");
+                        Crashes.TrackError(ex);
                     }
                 }
             }
@@ -863,7 +893,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1113,7 +1143,7 @@ namespace TBSMobile.View
                                         }
                                         catch (Exception ex)
                                         {
-                                            await DisplayAlert(" Sending Error ", ex.Message, "Got it");
+                                            Crashes.TrackError(ex);
                                         }
                                     }
                                     else
@@ -1329,7 +1359,7 @@ namespace TBSMobile.View
                                         }
                                         catch (Exception ex)
                                         {
-                                            await DisplayAlert(" Sending Error ", ex.Message, "Got it");
+                                            Crashes.TrackError(ex);
                                         }
                                     }
                                     else
@@ -1464,7 +1494,7 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            await DisplayAlert("Error", ex.Message, "ok");
+                            Crashes.TrackError(ex);
                         }
                     }
                     else
@@ -1475,7 +1505,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1607,35 +1637,42 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(entRetailer.Text))
+            try
             {
-                codePicker.IsEnabled = false;
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE ContactID=?", entRetailer.Text);
-                var resultCount = getCode.Result.Count;
-
-                if (resultCount > 0)
+                if (!string.IsNullOrEmpty(entRetailer.Text))
                 {
-                    var result = getCode.Result;
-                    codePicker.ItemsSource = result;
-                }
-                else
-                {
-                    lstName.IsVisible = false;
-                }
+                    codePicker.IsEnabled = false;
 
-                codePicker.Focus();
-                codePicker.Unfocus();
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE ContactID=?", entRetailer.Text);
+                    var resultCount = getCode.Result.Count;
+
+                    if (resultCount > 0)
+                    {
+                        var result = getCode.Result;
+                        codePicker.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstName.IsVisible = false;
+                    }
+
+                    codePicker.Focus();
+                    codePicker.Unfocus();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1667,33 +1704,40 @@ namespace TBSMobile.View
 
         public void province_search()
         {
-            var keyword = provinceSearch.Text;
-
-            if (!string.IsNullOrEmpty(keyword))
+            try
             {
-                lstProvince.IsVisible = true;
+                var keyword = provinceSearch.Text;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
-                var getProvince = conn.QueryAsync<ProvinceTable>(sql);
-                var resultCount = getProvince.Result.Count;
-
-                if (resultCount > 0)
+                if (!string.IsNullOrEmpty(keyword))
                 {
-                    var result = getProvince.Result;
-                    lstProvince.HeightRequest = (resultCount * 45);
-                    lstProvince.ItemsSource = result;
+                    lstProvince.IsVisible = true;
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
+                    var getProvince = conn.QueryAsync<ProvinceTable>(sql);
+                    var resultCount = getProvince.Result.Count;
+
+                    if (resultCount > 0)
+                    {
+                        var result = getProvince.Result;
+                        lstProvince.HeightRequest = (resultCount * 45);
+                        lstProvince.ItemsSource = result;
+                    }
+                    else
+                    {
+                        lstProvince.IsVisible = false;
+                    }
                 }
                 else
                 {
                     lstProvince.IsVisible = false;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                lstProvince.IsVisible = false;
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1723,32 +1767,39 @@ namespace TBSMobile.View
 
         private void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
-            provincevalidator.IsVisible = false;
-
-            ProvinceTable item = (ProvinceTable)e.Item;
-
-            provinceSearch.Text = item.Province;
-            entProvinceCode.Text = item.ProvinceID;
-            lstProvince.IsVisible = false;
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
-
-            if (getTown != null && getTown.Count > 0)
+            try
             {
-                townPicker.ItemsSource = getTown;
-                townPicker.IsEnabled = true;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+                provincevalidator.IsVisible = false;
+
+                ProvinceTable item = (ProvinceTable)e.Item;
+
+                provinceSearch.Text = item.Province;
+                entProvinceCode.Text = item.ProvinceID;
+                lstProvince.IsVisible = false;
+
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
+
+                if (getTown != null && getTown.Count > 0)
+                {
+                    townPicker.ItemsSource = getTown;
+                    townPicker.IsEnabled = true;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
+                else
+                {
+                    townPicker.IsEnabled = false;
+                    townPicker.SelectedIndex = -1;
+                    entTownCode.Text = null;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                townPicker.IsEnabled = false;
-                townPicker.SelectedIndex = -1;
-                entTownCode.Text = null;
+                Crashes.TrackError(ex);
             }
         }
     }

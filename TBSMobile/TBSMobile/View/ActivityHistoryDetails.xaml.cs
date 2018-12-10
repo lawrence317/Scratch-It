@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AppCenter.Crashes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,154 +52,203 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         public void GetCafDetails(string caf)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE CAFNo=?", caf);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                lblCafNo.Text = contactResult.CAFNo;
-                lblRetailerCode.Text = contactResult.CustomerID;
-                lblDate.Text = contactResult.CAFDate.ToString("MM/dd/yyyy");
-                lblStartTime.Text = contactResult.StartTime.ToString("hh:mm:ss");
-                lblEndTime.Text = contactResult.EndTime.ToString("hh:mm:ss");
-                lblOtherConcern.Text = contactResult.OtherConcern;
-                lblRemarks.Text = contactResult.Remarks;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE CAFNo=?", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    var contactResult = getCaf.Result[0];
+                    lblCafNo.Text = contactResult.CAFNo;
+                    lblRetailerCode.Text = contactResult.CustomerID;
+                    lblDate.Text = contactResult.CAFDate.ToString("MM/dd/yyyy");
+                    lblStartTime.Text = contactResult.StartTime.ToString("hh:mm:ss");
+                    lblEndTime.Text = contactResult.EndTime.ToString("hh:mm:ss");
+                    lblOtherConcern.Text = contactResult.OtherConcern;
+                    lblRemarks.Text = contactResult.Remarks;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetRekorida(string caf)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Rekorida'", caf);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                if(contactResult.ActivitySwitch == 1)
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Rekorida'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
                 {
-                    lblRekorida.Text = "True";
+                    var contactResult = getCaf.Result[0];
+                    if (contactResult.ActivitySwitch == 1)
+                    {
+                        lblRekorida.Text = "True";
+                    }
+                    else
+                    {
+                        lblRekorida.Text = "False";
+                    }
                 }
-                else
-                {
-                    lblRekorida.Text = "False";
-                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetMerchandizing(string caf)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Merchandizing'", caf);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                if (contactResult.ActivitySwitch == 1)
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Merchandizing'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
                 {
-                    lblMerchandizing.Text = "True";
+                    var contactResult = getCaf.Result[0];
+                    if (contactResult.ActivitySwitch == 1)
+                    {
+                        lblMerchandizing.Text = "True";
+                    }
+                    else
+                    {
+                        lblMerchandizing.Text = "False";
+                    }
                 }
-                else
-                {
-                    lblMerchandizing.Text = "False";
-                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetTradeCheck(string caf)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Trade Check'", caf);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                if (contactResult.ActivitySwitch == 1)
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Trade Check'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
                 {
-                    lblTradeCheck.Text = "True";
+                    var contactResult = getCaf.Result[0];
+                    if (contactResult.ActivitySwitch == 1)
+                    {
+                        lblTradeCheck.Text = "True";
+                    }
+                    else
+                    {
+                        lblTradeCheck.Text = "False";
+                    }
                 }
-                else
-                {
-                    lblTradeCheck.Text = "False";
-                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetOthers(string caf)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Others'", caf);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                if (contactResult.ActivitySwitch == 1)
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Others'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
                 {
-                    lblOthers.Text = "True";
+                    var contactResult = getCaf.Result[0];
+                    if (contactResult.ActivitySwitch == 1)
+                    {
+                        lblOthers.Text = "True";
+                    }
+                    else
+                    {
+                        lblOthers.Text = "False";
+                    }
                 }
-                else
-                {
-                    lblOthers.Text = "False";
-                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetLocation(string code)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                lblRetailerLocation.Text = contactResult.GPSCoordinates;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getCaf = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    var contactResult = getCaf.Result[0];
+                    lblRetailerLocation.Text = contactResult.GPSCoordinates;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetRetailerName(string code)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getCaf = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
-            var contactResultCount = getCaf.Result.Count;
-
-            if (contactResultCount > 0)
+            try
             {
-                var contactResult = getCaf.Result[0];
-                var getName = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID=?", contactResult.ContactID);
-                var nameResultCount = getName.Result.Count;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                if(nameResultCount > 0)
+                var getCaf = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=?", code);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
                 {
-                    var nameResult = getName.Result[0];
-                    lblRetailerName.Text = nameResult.FileAs;
+                    var contactResult = getCaf.Result[0];
+                    var getName = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID=?", contactResult.ContactID);
+                    var nameResultCount = getName.Result.Count;
+
+                    if (nameResultCount > 0)
+                    {
+                        var nameResult = getName.Result[0];
+                        lblRetailerName.Text = nameResult.FileAs;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
     }

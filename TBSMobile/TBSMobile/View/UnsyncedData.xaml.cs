@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AppCenter.Crashes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,113 +60,144 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         public void GetRetailerGroup(string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
-            var resultCount = getRetailer.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getRetailer.Result;
-                lstRetailerGroup.ItemsSource = result;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                lstRetailerGroup.IsVisible = true;
-                retailerIndicator.IsVisible = false;
+                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var resultCount = getRetailer.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getRetailer.Result;
+                    lstRetailerGroup.ItemsSource = result;
+
+                    lstRetailerGroup.IsVisible = true;
+                    retailerIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstRetailerGroup.IsVisible = false;
+                    retailerIndicator.IsVisible = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                lstRetailerGroup.IsVisible = false;
-                retailerIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetActivity(string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFNo ASC", contact);
-            var resultCount = getActivity.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getActivity.Result;
-                lstActivity.ItemsSource = result;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                lstActivity.IsVisible = true;
-                activityIndicator.IsVisible = false;
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFNo ASC", contact);
+                var resultCount = getActivity.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getActivity.Result;
+                    lstActivity.ItemsSource = result;
+
+                    lstActivity.IsVisible = true;
+                    activityIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstActivity.IsVisible = false;
+                    activityIndicator.IsVisible = true;
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                lstActivity.IsVisible = false;
-                activityIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
         }
 
         public void GetProspectRetailer(string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
-            var resultCount = getProspect.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getProspect.Result;
-                lstProspect.ItemsSource = result;
 
-                lstProspect.IsVisible = true;
-                prospectIndicator.IsVisible = false;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var resultCount = getProspect.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getProspect.Result;
+                    lstProspect.ItemsSource = result;
+
+                    lstProspect.IsVisible = true;
+                    prospectIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstProspect.IsVisible = false;
+                    prospectIndicator.IsVisible = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                lstProspect.IsVisible = false;
-                prospectIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
         }
 
         private async void lstActivity_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+            try
+            {
+                var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
-            if (string.IsNullOrEmpty(appdate))
-            {
-                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-            }
-            else
-            {
-                try
+                if (string.IsNullOrEmpty(appdate))
                 {
-                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                }
+                else
+                {
+                    try
                     {
-                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
-                        CAFTable item = (CAFTable)e.Item;
-
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new ActivityHistoryDetails(item))
+                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                         {
-                            BarBackgroundColor = Color.FromHex("#f1c40f")
-                        });
+                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                            CAFTable item = (CAFTable)e.Item;
+
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new ActivityHistoryDetails(item))
+                            {
+                                BarBackgroundColor = Color.FromHex("#f1c40f")
+                            });
+                        }
+                        else
+                        {
+                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                            await Navigation.PopToRootAsync();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                        await Navigation.PopToRootAsync();
+                        Crashes.TrackError(ex);
                     }
                 }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", ex.Message, "Ok");
-                }
+
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -176,62 +208,78 @@ namespace TBSMobile.View
 
         private void lstActivity_Refreshing(object sender, EventArgs e)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFNo ASC", contact);
-            var resultCount = getActivity.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getActivity.Result;
-                lstActivity.ItemsSource = result;
 
-                lstActivity.IsVisible = true;
-                activityIndicator.IsVisible = false;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFNo ASC", contact);
+                var resultCount = getActivity.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getActivity.Result;
+                    lstActivity.ItemsSource = result;
+
+                    lstActivity.IsVisible = true;
+                    activityIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstActivity.IsVisible = false;
+                    activityIndicator.IsVisible = true;
+                }
+
+                lstActivity.EndRefresh();
             }
-            else
+            catch (Exception ex)
             {
-                lstActivity.IsVisible = false;
-                activityIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
-
-            lstActivity.EndRefresh();
         }
 
         private async void lstProspect_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+            try
+            {
+                var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
-            if (string.IsNullOrEmpty(appdate))
-            {
-                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-            }
-            else
-            {
-                try
+                if (string.IsNullOrEmpty(appdate))
                 {
-                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                }
+                else
+                {
+                    try
                     {
-                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
-                        ContactsTable item = (ContactsTable)e.Item;
-
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new ProspectRetailerDetails(item))
+                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                         {
-                            BarBackgroundColor = Color.FromHex("#f1c40f")
-                        });
+                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                            ContactsTable item = (ContactsTable)e.Item;
+
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new ProspectRetailerDetails(item))
+                            {
+                                BarBackgroundColor = Color.FromHex("#f1c40f")
+                            });
+                        }
+                        else
+                        {
+                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                            await Navigation.PopToRootAsync();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                        await Navigation.PopToRootAsync();
+                        Crashes.TrackError(ex);
                     }
                 }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", ex.Message, "Ok");
-                }
+
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -242,62 +290,77 @@ namespace TBSMobile.View
 
         private void lstProspect_Refreshing(object sender, EventArgs e)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
-            var resultCount = getProspect.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getProspect.Result;
-                lstProspect.ItemsSource = result;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                lstProspect.IsVisible = true;
-                prospectIndicator.IsVisible = false;
+                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var resultCount = getProspect.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getProspect.Result;
+                    lstProspect.ItemsSource = result;
+
+                    lstProspect.IsVisible = true;
+                    prospectIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstProspect.IsVisible = false;
+                    prospectIndicator.IsVisible = true;
+                }
+
+                lstProspect.EndRefresh();
+
             }
-            else
+            catch (Exception ex)
             {
-                lstProspect.IsVisible = false;
-                prospectIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
-
-            lstProspect.EndRefresh();
         }
 
         private async void lstRetailerGroup_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+            try
+            {
+                var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
-            if (string.IsNullOrEmpty(appdate))
-            {
-                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-            }
-            else
-            {
-                try
+                if (string.IsNullOrEmpty(appdate))
                 {
-                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                }
+                else
+                {
+                    try
                     {
-                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
-                        RetailerGroupTable item = (RetailerGroupTable)e.Item;
-
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupDetails(item))
+                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                         {
-                            BarBackgroundColor = Color.FromHex("#f1c40f")
-                        });
+                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                            RetailerGroupTable item = (RetailerGroupTable)e.Item;
+
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupDetails(item))
+                            {
+                                BarBackgroundColor = Color.FromHex("#f1c40f")
+                            });
+                        }
+                        else
+                        {
+                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                            await Navigation.PopToRootAsync();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                        await Navigation.PopToRootAsync();
+                        Crashes.TrackError(ex);
                     }
                 }
-                catch (Exception ex)
-                {
-                    await DisplayAlert("Error", ex.Message, "Ok");
-                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -308,27 +371,35 @@ namespace TBSMobile.View
 
         private void lstRetailerGroup_Refreshing(object sender, EventArgs e)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
-            var resultCount = getRetailer.Result.Count;
-
-            if (resultCount > 0)
+            try
             {
-                var result = getRetailer.Result;
-                lstRetailerGroup.ItemsSource = result;
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
 
-                lstRetailerGroup.IsVisible = true;
-                retailerIndicator.IsVisible = false;
+                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var resultCount = getRetailer.Result.Count;
+
+                if (resultCount > 0)
+                {
+                    var result = getRetailer.Result;
+                    lstRetailerGroup.ItemsSource = result;
+
+                    lstRetailerGroup.IsVisible = true;
+                    retailerIndicator.IsVisible = false;
+                }
+                else
+                {
+                    lstRetailerGroup.IsVisible = false;
+                    retailerIndicator.IsVisible = true;
+                }
+
+                lstRetailerGroup.EndRefresh();
+
             }
-            else
+            catch (Exception ex)
             {
-                lstRetailerGroup.IsVisible = false;
-                retailerIndicator.IsVisible = true;
+                Crashes.TrackError(ex);
             }
-
-            lstRetailerGroup.EndRefresh();
         }
 
         private void carouselPage_CurrentPageChanged(object sender, EventArgs e)

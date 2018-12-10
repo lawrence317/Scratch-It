@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using Plugin.DeviceInfo;
@@ -55,7 +56,7 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    await DisplayAlert("Error", ex.Message, "Ok");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -101,7 +102,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", ex.Message, "Ok");
+                Crashes.TrackError(ex);
             }
         }
 
@@ -121,7 +122,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                DisplayAlert("Error", ex.Message, "Ok");
+                Crashes.TrackError(ex);
             }
         }
 
@@ -143,7 +144,7 @@ namespace TBSMobile.View
             //Check if hostname, database, username, password is not empty
             if (string.IsNullOrEmpty(hostName) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(ipaddress) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
-                if (entUser.Text == null || entUser.Text == "")
+                if (string.IsNullOrEmpty(userName))
                 {
                     usernameFrame.BorderColor = Color.FromHex("#e74c3c");
                 }
@@ -152,7 +153,7 @@ namespace TBSMobile.View
                     usernameFrame.BorderColor = Color.FromHex("#f2f2f5");
                 }
 
-                if (entPassword.Text == null || entPassword.Text == "")
+                if (string.IsNullOrEmpty(password))
                 {
                     passwordFrame.BorderColor = Color.FromHex("#e74c3c");
                 }
@@ -262,7 +263,7 @@ namespace TBSMobile.View
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    await DisplayAlert("Login Error", ex.Message, "Ok");
+                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
@@ -400,7 +401,7 @@ namespace TBSMobile.View
                                 }
                                 catch (Exception ex)
                                 {
-                                    await DisplayAlert("Login Error", ex.Message, "Ok");
+                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -541,7 +542,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        await DisplayAlert("Login Error", ex.Message, "Ok");
+                        Crashes.TrackError(ex);
                     }
                 }
             }
@@ -574,11 +575,6 @@ namespace TBSMobile.View
             {
                 passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
             }
-        }
-
-        private void entIPAddress_Unfocused(object sender, FocusEventArgs e)
-        {
-
         }
     }
 }
