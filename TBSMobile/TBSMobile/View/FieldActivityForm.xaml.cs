@@ -153,7 +153,7 @@ namespace TBSMobile.View
             Position position = null;
 
             var locator = CrossGeolocator.Current;
-            locator.DesiredAccuracy = 20;
+            locator.DesiredAccuracy = 25;
 
             if (!locator.IsGeolocationAvailable)
             {
