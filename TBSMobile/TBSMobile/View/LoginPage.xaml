@@ -62,7 +62,7 @@
                         </Label>
                         <Frame StyleClass="lpframe" x:Name="ipaddressFrame" CornerRadius="5" BorderColor="#f2f2f5" HasShadow="False" IsVisible="True">
                             <StackLayout>
-                                <local:CustomEntry  Unfocused="entIPAddress_Unfocused" StyleClass="form-control" ReturnType="Next" x:Name="entIPAddress">
+                                <local:CustomEntry StyleClass="form-control" ReturnType="Next" x:Name="entIPAddress">
                                     <local:CustomEntry.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
                                             <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

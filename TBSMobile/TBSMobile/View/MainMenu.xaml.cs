@@ -1,4 +1,6 @@
-﻿using Plugin.Connectivity;
+﻿using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using Plugin.Connectivity;
 using Plugin.Geolocator;
 using System;
 using System.Net;
@@ -117,6 +119,7 @@ namespace TBSMobile.View
                         }
                         else
                         {
+                            Analytics.TrackEvent("Opened Field Activity Form");
                             await Navigation.PushAsync(new FieldActivityForm(host, database, contact, ipaddress, pingipaddress));
                         }
                     }
@@ -149,6 +152,7 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
+                        Analytics.TrackEvent("Opened Add Prospect Retailer Form");
                         await Navigation.PushAsync(new ProspectRetailerList(host, database, contact, ipaddress, pingipaddress));
                     }
                     else
@@ -180,6 +184,7 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
+                        Analytics.TrackEvent("Opened Add Retailer Outlet Form");
                         await Navigation.PushAsync(new RetailerList(host, database, contact, ipaddress, pingipaddress));
                     }
                     else
@@ -213,6 +218,7 @@ namespace TBSMobile.View
 
                         Preferences.Set("username", String.Empty, "private_prefs");
                         Preferences.Set("password", String.Empty, "private_prefs");
+                        Analytics.TrackEvent("Logged Out");
                         await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                     else

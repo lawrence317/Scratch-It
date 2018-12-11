@@ -1,4 +1,5 @@
-﻿using Microsoft.AppCenter.Crashes;
+﻿using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using Plugin.Geolocator;
@@ -1623,6 +1624,8 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
                         var selected = entRetailer.Text;
+
+                        Analytics.TrackEvent("Opened Add Retailer Outlet");
 
                         await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, pingipaddress, selected))
                         {

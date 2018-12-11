@@ -4,6 +4,10 @@ using Android.Content.PM;
 using Android.OS;
 using Android;
 using Android.Views;
+using Microsoft.AppCenter.Distribute;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace TBSMobile.Droid
 {
@@ -23,6 +27,9 @@ namespace TBSMobile.Droid
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
+
+            AppCenter.Start("8fb4b039-f3b8-4910-9cb2-041eb9b80177", typeof(Analytics), typeof(Crashes), typeof(Distribute));
+
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
             {
