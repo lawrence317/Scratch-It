@@ -164,13 +164,15 @@ namespace TBSMobile.Data
 
     public class SyncFunction
     {
+        public string status;
+
         public static async void SyncUser(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
             var reply = ping.Send(new IPAddress(pingipaddress), 1500);
 
             if (reply.Status == IPStatus.Success)
-            {
+            { 
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -583,7 +585,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + crcoordinator + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1499,7 +1501,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE EmployeeID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1648,7 +1650,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient client = new HttpClient();

@@ -259,9 +259,9 @@ namespace TBSMobile.View
 
                                 if (reply.Status == IPStatus.Success)
                                 {
+                                    SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
                                     lblStatus.Text = "Online - Connected to server";
                                     lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
-                                    SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
                                 }
                                 else
                                 {

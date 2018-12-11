@@ -46,7 +46,7 @@ namespace TBSMobile.View
             {
                 var ping = new Ping();
                 var reply = ping.Send(new IPAddress(pingipaddress), 1500);
-
+                
                 if (reply.Status == IPStatus.Success)
                 {
                     SyncUser(host, database, contact, ipaddress, pingipaddress);
@@ -651,7 +651,7 @@ namespace TBSMobile.View
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + crcoordinator + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1600,7 +1600,7 @@ namespace TBSMobile.View
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE EmployeeID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1760,7 +1760,7 @@ namespace TBSMobile.View
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient client = new HttpClient();
@@ -1900,7 +1900,7 @@ namespace TBSMobile.View
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE  tblSubscription SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblSubscription SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
