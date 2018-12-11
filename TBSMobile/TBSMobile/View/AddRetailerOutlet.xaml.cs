@@ -696,8 +696,7 @@ namespace TBSMobile.View
                 {
                     townPicker.ItemsSource = getTown;
                     townPicker.IsEnabled = true;
-                    townPicker.SelectedIndex = -1;
-                    entTownCode.Text = null;
+                    townPicker.SelectedIndex = 0;
                 }
                 else
                 {

@@ -153,7 +153,7 @@ namespace TBSMobile.View
             Position position = null;
 
             var locator = CrossGeolocator.Current;
-            locator.DesiredAccuracy = 15;
+            locator.DesiredAccuracy = 20;
 
             if (!locator.IsGeolocationAvailable)
             {
@@ -165,7 +165,7 @@ namespace TBSMobile.View
             }
             else
             {
-                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(15), null, true);
+                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(300), null, true);
                 entLocation.Text = position.Latitude + "," + position.Longitude;
             }
         }
@@ -202,7 +202,7 @@ namespace TBSMobile.View
                 provinceSearch.Text = null;
                 entProvinceCode.Text = null;
                 entTownCode.Text = null;
-                townPicker.SelectedIndex = -1;
+                townPicker.SelectedIndex = 0;
                 entDistrict.Text = null;
                 entCountry.Text = null;
                 entTelephone1.Text = null;
@@ -1790,8 +1790,7 @@ namespace TBSMobile.View
                 {
                     townPicker.ItemsSource = getTown;
                     townPicker.IsEnabled = true;
-                    townPicker.SelectedIndex = -1;
-                    entTownCode.Text = null;
+                    townPicker.SelectedIndex = 0;
                 }
                 else
                 {
