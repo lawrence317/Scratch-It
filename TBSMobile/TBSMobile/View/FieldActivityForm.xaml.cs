@@ -165,7 +165,7 @@ namespace TBSMobile.View
             }
             else
             {
-                position = await locator.GetPositionAsync(TimeSpan.FromSeconds(300), null, true);
+                position = await locator.GetPositionAsync(null, null, true);
                 entLocation.Text = position.Latitude + "," + position.Longitude;
             }
         }
