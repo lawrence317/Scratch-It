@@ -244,7 +244,7 @@ namespace TBSMobile.View
                                 var telephone2 = entTelephone2.Text;
                                 var email = entEmail.Text;
                                 var location = entLocation.Text;
-                                var DateTime.Parse(current_datetime) = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
@@ -300,8 +300,8 @@ namespace TBSMobile.View
                                                 Email = email,
                                                 GPSCoordinates = location,
                                                 Coordinator = contact,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime),
                                             };
 
                                             await conn.InsertAsync(retailer_group_insert);
@@ -337,7 +337,7 @@ namespace TBSMobile.View
                                             Email = email,
                                             GPSCoordinates = location,
                                             Coordinator = contact,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
+                                            LastUpdated = DateTime.Parse(current_datetime),
                                         };
 
                                         await conn.InsertOrReplaceAsync(retailer_group_insert);
@@ -368,7 +368,7 @@ namespace TBSMobile.View
                                         Email = email,
                                         GPSCoordinates = location,
                                         Coordinator = contact,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
+                                        LastUpdated = DateTime.Parse(current_datetime),
                                     };
 
                                     await conn.InsertOrReplaceAsync(retailer_group_insert);

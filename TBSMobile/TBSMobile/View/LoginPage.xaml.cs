@@ -278,7 +278,7 @@ namespace TBSMobile.View
                                     var result = getUser.Result.Count;
                                     var logType = "Login";
                                     var logDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                                    var DateTime.Parse(current_datetime) = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
                                     if (result < 1)
                                     {
@@ -339,8 +339,8 @@ namespace TBSMobile.View
                                                         LogType = logType,
                                                         Log = "",
                                                         LogDate = DateTime.Parse(logDate),
-                                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                        LastSync = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                        LastUpdated = DateTime.Parse(current_datetime),
+                                                        LastSync = DateTime.Parse(current_datetime)
                                                     };
 
                                                     await conn.InsertAsync(logs_insert);
@@ -384,8 +384,8 @@ namespace TBSMobile.View
                                                     LogType = logType,
                                                     Log = "",
                                                     LogDate = DateTime.Parse(logDate),
-                                                    LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                    LastSync = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                    LastUpdated = DateTime.Parse(current_datetime),
+                                                    LastSync = DateTime.Parse(current_datetime)
                                                 };
 
                                                 await conn.InsertAsync(logs_insert);
@@ -419,7 +419,7 @@ namespace TBSMobile.View
                         var result = getUser.Result.Count;
                         var logType = "Login";
                         var logDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                        var DateTime.Parse(current_datetime) = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
                         if (result < 1)
                         {
@@ -480,8 +480,8 @@ namespace TBSMobile.View
                                             LogType = logType,
                                             Log = "",
                                             LogDate = DateTime.Parse(logDate),
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                            LastSync = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime),
+                                            LastSync = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(logs_insert);
@@ -525,8 +525,8 @@ namespace TBSMobile.View
                                         LogType = logType,
                                         Log = "",
                                         LogDate = DateTime.Parse(logDate),
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                        LastSync = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime),
+                                        LastSync = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(logs_insert);

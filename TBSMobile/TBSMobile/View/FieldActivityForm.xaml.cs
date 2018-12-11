@@ -952,7 +952,7 @@ namespace TBSMobile.View
                                 int merchandizing;
                                 int tradecheck;
                                 int others;
-                                var DateTime.Parse(current_datetime) = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
                                 if (swRekorida.IsToggled == true)
                                 {
@@ -1055,7 +1055,7 @@ namespace TBSMobile.View
                                                 { "Others", others },
                                                 { "OtherConcern", otherconcern },
                                                 { "Remarks", remarks },
-                                                { "LastUpdated", DateTime.Parse(DateTime.Parse(current_datetime)) }
+                                                { "LastUpdated", DateTime.Parse(current_datetime) }
                                             };
 
                                             HttpClient client = new HttpClient();
@@ -1065,7 +1065,7 @@ namespace TBSMobile.View
                                             var db = DependencyService.Get<ISQLiteDB>();
                                             var conn = db.GetConnection();
 
-                                            string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastSync = '" + DateTime.Parse(DateTime.Parse(current_datetime)) + "', LastUpdated = '" + DateTime.Parse(DateTime.Parse(current_datetime)) + "' WHERE RetailerCode = '" + retailerCode + "'";
+                                            string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastSync = '" + DateTime.Parse(current_datetime) + "', LastUpdated = '" + DateTime.Parse(current_datetime) + "' WHERE RetailerCode = '" + retailerCode + "'";
                                             await conn.ExecuteAsync(retailer_group_sql);
 
                                             var caf_insert = new CAFTable
@@ -1086,8 +1086,8 @@ namespace TBSMobile.View
                                                 MobileVideo = videourl,
                                                 Remarks = remarks,
                                                 OtherConcern = otherconcern,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertAsync(caf_insert);
@@ -1098,8 +1098,8 @@ namespace TBSMobile.View
                                                 ContactID = employeeNumber,
                                                 Activity = "Rekorida",
                                                 ActivitySwitch = rekorida,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertAsync(rekorida_insert);
@@ -1110,8 +1110,8 @@ namespace TBSMobile.View
                                                 ContactID = employeeNumber,
                                                 Activity = "Merchandizing",
                                                 ActivitySwitch = merchandizing,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertAsync(merchandizing_insert);
@@ -1122,8 +1122,8 @@ namespace TBSMobile.View
                                                 ContactID = employeeNumber,
                                                 Activity = "Trade Check",
                                                 ActivitySwitch = tradecheck,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertAsync(trade_check_insert);
@@ -1134,8 +1134,8 @@ namespace TBSMobile.View
                                                 ContactID = employeeNumber,
                                                 Activity = "Others",
                                                 ActivitySwitch = others,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertAsync(others_insert);
@@ -1152,7 +1152,7 @@ namespace TBSMobile.View
                                         var db = DependencyService.Get<ISQLiteDB>();
                                         var conn = db.GetConnection();
 
-                                        var current = DateTime.Parse(DateTime.Parse(current_datetime));
+                                        var current = DateTime.Parse(current_datetime);
 
                                         string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "',  LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
                                         await conn.ExecuteAsync(retailer_group_sql);
@@ -1175,7 +1175,7 @@ namespace TBSMobile.View
                                             MobileVideo = videourl,
                                             Remarks = remarks,
                                             OtherConcern = otherconcern,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(caf_insert);
@@ -1186,7 +1186,7 @@ namespace TBSMobile.View
                                             ContactID = employeeNumber,
                                             Activity = "Rekorida",
                                             ActivitySwitch = rekorida,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(rekorida_insert);
@@ -1197,7 +1197,7 @@ namespace TBSMobile.View
                                             ContactID = employeeNumber,
                                             Activity = "Merchandizing",
                                             ActivitySwitch = merchandizing,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(merchandizing_insert);
@@ -1208,7 +1208,7 @@ namespace TBSMobile.View
                                             ContactID = employeeNumber,
                                             Activity = "Trade Check",
                                             ActivitySwitch = tradecheck,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(trade_check_insert);
@@ -1219,7 +1219,7 @@ namespace TBSMobile.View
                                             ContactID = employeeNumber,
                                             Activity = "Others",
                                             ActivitySwitch = others,
-                                            LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                            LastUpdated = DateTime.Parse(current_datetime)
                                         };
 
                                         await conn.InsertAsync(others_insert);
@@ -1232,7 +1232,7 @@ namespace TBSMobile.View
                                     var db = DependencyService.Get<ISQLiteDB>();
                                     var conn = db.GetConnection();
 
-                                    var current = DateTime.Parse(DateTime.Parse(current_datetime));
+                                    var current = DateTime.Parse(current_datetime);
 
                                     string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
                                     await conn.ExecuteAsync(retailer_group_sql);
@@ -1255,7 +1255,7 @@ namespace TBSMobile.View
                                         MobileVideo = videourl,
                                         Remarks = remarks,
                                         OtherConcern = otherconcern,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(caf_insert);
@@ -1266,7 +1266,7 @@ namespace TBSMobile.View
                                         ContactID = employeeNumber,
                                         Activity = "Rekorida",
                                         ActivitySwitch = rekorida,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(rekorida_insert);
@@ -1277,7 +1277,7 @@ namespace TBSMobile.View
                                         ContactID = employeeNumber,
                                         Activity = "Merchandizing",
                                         ActivitySwitch = merchandizing,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(merchandizing_insert);
@@ -1288,7 +1288,7 @@ namespace TBSMobile.View
                                         ContactID = employeeNumber,
                                         Activity = "Trade Check",
                                         ActivitySwitch = tradecheck,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(trade_check_insert);
@@ -1299,7 +1299,7 @@ namespace TBSMobile.View
                                         ContactID = employeeNumber,
                                         Activity = "Others",
                                         ActivitySwitch = others,
-                                        LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                        LastUpdated = DateTime.Parse(current_datetime)
                                     };
 
                                     await conn.InsertAsync(others_insert);
@@ -1321,8 +1321,8 @@ namespace TBSMobile.View
                                             {
                                                 { "ContactID", contact },
                                                 { "Email", recipients },
-                                                { "LastSync", DateTime.Parse(DateTime.Parse(current_datetime)) },
-                                                { "LastUpdated", DateTime.Parse(DateTime.Parse(current_datetime)) }
+                                                { "LastSync", DateTime.Parse(current_datetime) },
+                                                { "LastUpdated", DateTime.Parse(current_datetime) }
                                             };
 
                                             HttpClient client2 = new HttpClient();
@@ -1339,8 +1339,8 @@ namespace TBSMobile.View
                                                 {
                                                     ContactID = employeeNumber,
                                                     Email = recipients,
-                                                    LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                    LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
                                                 };
 
                                                 await conn.InsertOrReplaceAsync(email_update);
@@ -1351,8 +1351,8 @@ namespace TBSMobile.View
                                                 {
                                                     ContactID = employeeNumber,
                                                     Email = recipients,
-                                                    LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                    LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
                                                 };
 
                                                 await conn.InsertOrReplaceAsync(insert_email);
@@ -1376,8 +1376,8 @@ namespace TBSMobile.View
                                             {
                                                 ContactID = employeeNumber,
                                                 Email = recipients,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertOrReplaceAsync(email_update);
@@ -1388,8 +1388,8 @@ namespace TBSMobile.View
                                             {
                                                 ContactID = employeeNumber,
                                                 Email = recipients,
-                                                LastSync = DateTime.Parse(DateTime.Parse(current_datetime)),
-                                                LastUpdated = DateTime.Parse(DateTime.Parse(current_datetime))
+                                                LastSync = DateTime.Parse(current_datetime),
+                                                LastUpdated = DateTime.Parse(current_datetime)
                                             };
 
                                             await conn.InsertOrReplaceAsync(insert_email);
