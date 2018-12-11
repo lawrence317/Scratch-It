@@ -29,7 +29,7 @@
             <StackLayout VerticalOptions="CenterAndExpand">
                 <Frame StyleClass="loginframe" CornerRadius="5" BorderColor="Transparent" HasShadow="False">
                     <StackLayout>
-                        <Frame StyleClass="lpframe" x:Name="hostFrame" CornerRadius="5" BorderColor="#f2f2f5" HasShadow="False"  IsVisible="False">
+                        <Frame StyleClass="lpframe" x:Name="hostFrame" CornerRadius="5" BorderColor="#f2f2f5" HasShadow="False"  IsVisible="True">
                             <StackLayout>
                                 <Label Text="HOST NAME" StyleClass="lbl-login">
                                     <Label.FontFamily>
@@ -41,7 +41,7 @@
                                 <local:CustomEntry Placeholder="Host Name" PlaceholderColor="#879baa" StyleClass="form-control" ReturnType="Next" x:Name="entHost"/>
                             </StackLayout>
                         </Frame>
-                        <Frame StyleClass="lpframe" x:Name="databaseFrame" CornerRadius="5" BorderColor="#f2f2f5" HasShadow="False" IsVisible="False">
+                        <Frame StyleClass="lpframe" x:Name="databaseFrame" CornerRadius="5" BorderColor="#f2f2f5" HasShadow="False" IsVisible="True">
                             <StackLayout>
                                 <Label Text="DATABASE NAME" StyleClass="lbl-login">
                                     <Label.FontFamily>
