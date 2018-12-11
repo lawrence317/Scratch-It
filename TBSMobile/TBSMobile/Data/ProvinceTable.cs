@@ -19,7 +19,7 @@ namespace TBSMobile.Data
         {
             get
             {
-                return $"{ProvinceID}-{Province}";
+                return $"{ProvinceID}/{Province}";
             }
         }
     }

@@ -23,7 +23,7 @@ namespace TBSMobile.View
         public UnsyncedData (string host, string database, string contact, string ipaddress, byte[] pingipaddress)
 		{
 			InitializeComponent ();
-            ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#f1c40f");
+            ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#2ecc71");
             this.contact = contact;
             this.host = host;
             this.database = database;

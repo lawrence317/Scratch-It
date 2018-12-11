@@ -214,7 +214,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblUser SET LastSync='" + current_datetime + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblUser SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -582,7 +582,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + current_datetime + "' WHERE Coordinator='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1097,7 +1097,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblRetailerGroup SET LastSync='" + current_datetime + "' WHERE RetailerCode='" + crretailerCode + "'";
+                                    var crupdate_sql = "UPDATE tblRetailerGroup SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE RetailerCode='" + crretailerCode + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1498,7 +1498,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + current_datetime + "' WHERE EmployeeID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE EmployeeID='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -1647,7 +1647,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + current_datetime + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient client = new HttpClient();
@@ -1776,7 +1776,7 @@ namespace TBSMobile.Data
                                         { "LastUpdated", crlastUpdated }
                                     };
 
-                                    var crupdate_sql = "UPDATE  tblSubscription SET LastSync='" + current_datetime + "' WHERE ContactID='" + contact + "'";
+                                    var crupdate_sql = "UPDATE  tblSubscription SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
                                     await conn.ExecuteAsync(crupdate_sql);
 
                                     HttpClient crclient = new HttpClient();
@@ -2127,7 +2127,7 @@ namespace TBSMobile.Data
                                     Crashes.TrackError(ex);
                                 }
 
-                                var update_sql = "UPDATE  tblUserEmail SET LastSync='" + current_datetime + "' WHERE ContactID='" + contact + "'";
+                                var update_sql = "UPDATE  tblUserEmail SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
                                 await conn.ExecuteAsync(update_sql);
                             }
                         }

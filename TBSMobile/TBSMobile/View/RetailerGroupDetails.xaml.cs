@@ -62,18 +62,43 @@ namespace TBSMobile.View
                     var contactResult = getContact.Result[0];
 
                     var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince WHERE ProvinceID=?", contactResult.PresProvince);
-                    var provinceResult = getProvince.Result[0];
+                    var getProvinceResultCount = getProvince.Result.Count;
+
+                    var province = "";
+
+                    if (getProvinceResultCount > 0)
+                    {
+                        var provinceResult = getProvince.Result[0];
+                        province = provinceResult.Province;
+                    }
+                    else
+                    {
+                        province = "N/A";
+                    }
+                    
+                    var town = "";
 
                     var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
-                    var townResult = getTown.Result[0];
+                    var getTownResultCount = getProvince.Result.Count;
+                    if (getProvinceResultCount > 0)
+                    {
+                        var townResult = getTown.Result[0];
+                        town = townResult.Town;
+                    }
+                    else
+                    {
+                        town = "N/A";
+                    }
 
-                    lblAddress.Text = contactResult.PresBarangay + ", " + contactResult.PresStreet + ", " + townResult.Town + ", " + provinceResult.Province + ", " + contactResult.PresCountry + " - " + contactResult.PresDistrict;
+                    lblAddress.Text = contactResult.PresBarangay + ", " + contactResult.PresStreet + ", " + town + ", " + province + ", " + contactResult.PresCountry + " - " + contactResult.PresDistrict;
                     lblLandmark.Text = contactResult.Landmark;
                     lblTelephone1.Text = contactResult.Telephone1;
                     lblTelephone2.Text = contactResult.Telephone2;
                     lblMobile.Text = contactResult.Mobile;
                     lblEmail.Text = contactResult.Email;
                     lblLocation.Text = contactResult.GPSCoordinates;
+                    lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy hh:mm:ss");
+                    lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy hh:mm:ss");
                 }
             }
             catch (Exception ex)

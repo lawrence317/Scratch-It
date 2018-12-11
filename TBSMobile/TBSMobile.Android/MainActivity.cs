@@ -28,7 +28,7 @@ namespace TBSMobile.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
 
-            AppCenter.Start("8fb4b039-f3b8-4910-9cb2-041eb9b80177", typeof(Analytics), typeof(Crashes), typeof(Distribute));
+            AppCenter.Start("423c8020-f1af-4fba-b62f-c07e1fb382b6", typeof(Analytics), typeof(Crashes), typeof(Distribute));
 
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)

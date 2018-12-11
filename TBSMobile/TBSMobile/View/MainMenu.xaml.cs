@@ -320,5 +320,37 @@ namespace TBSMobile.View
                 }
             }
         }
+
+        private async void btnAH_Clicked(object sender, EventArgs e)
+        {
+            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+
+            if (string.IsNullOrEmpty(appdate))
+            {
+                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+            }
+            else
+            {
+                try
+                {
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    {
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        Analytics.TrackEvent("Opened Activity History");
+                        await Navigation.PushAsync(new ActivityHistoryList(host, database, contact, ipaddress, pingipaddress));
+                    }
+                    else
+                    {
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+        }
     }
 }

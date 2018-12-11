@@ -22,28 +22,35 @@
                     </OnPlatform>
                 </Label.FontFamily>
             </Label>
-            <Button StyleClass="btnFAF" ContentLayout="Top, 0" Image="fieldactivity.png" Text="Field Activity"  Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" x:Name="btnFAF" Clicked="btnFAF_Clicked" BorderRadius="0">
+            <Button StyleClass="btnFAF" ContentLayout="Top, 0" Image="fieldactivity.png" Text="Field Activity"  Grid.Row="1" Grid.Column="0" x:Name="btnFAF" Clicked="btnFAF_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                     </OnPlatform>
                 </Button.FontFamily>
             </Button>
-            <Button StyleClass="btnAH" ContentLayout="Top, 0" Image="activityhistory.png" Text="Unsynced Data" Grid.Row="2" Grid.Column="0" x:Name="btnUI" Clicked="btnUI_Clicked" BorderRadius="0">
+            <Button StyleClass="btnPR" ContentLayout="Top, 0" Image="prospectretailer.png" Text="Prospect Retailer" Grid.Row="1" Grid.Column="1" x:Name="btnPR" Clicked="btnPR_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                     </OnPlatform>
                 </Button.FontFamily>
             </Button>
-            <Button StyleClass="btnPR" ContentLayout="Top, 0" Image="prospectretailer.png" Text="Prospect Retailer" Grid.Row="2" Grid.Column="1" x:Name="btnPR" Clicked="btnPR_Clicked" BorderRadius="0">
+            <Button StyleClass="btnRO" ContentLayout="Top, 0" Image="retaileroutlet.png" Text="Retailer Outlet" Grid.Row="2" Grid.Column="0" x:Name="btnRetailer" Clicked="btnRetailer_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                     </OnPlatform>
                 </Button.FontFamily>
             </Button>
-            <Button StyleClass="btnRO" ContentLayout="Top, 0" Image="retaileroutlet.png" Text="Retailer Outlet" Grid.Row="3" Grid.Column="0" x:Name="btnRetailer" Clicked="btnRetailer_Clicked" BorderRadius="0">
+            <Button StyleClass="btnAH" ContentLayout="Top, 0" Image="activityhistory.png" Text="Activity History" Grid.Row="2" Grid.Column="1" x:Name="btnAH" Clicked="btnAH_Clicked" BorderRadius="0">
+                <Button.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String">
+                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                    </OnPlatform>
+                </Button.FontFamily>
+            </Button>
+            <Button StyleClass="btnUI" ContentLayout="Top, 0" Image="unsynceditem.png" Text="Unsynced Data" Grid.Row="3" Grid.Column="0" x:Name="btnUI" Clicked="btnUI_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

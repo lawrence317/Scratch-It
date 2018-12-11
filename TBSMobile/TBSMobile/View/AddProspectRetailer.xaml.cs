@@ -670,7 +670,7 @@ namespace TBSMobile.View
             if (townPicker.SelectedIndex > -1)
             {
                 var pickedTown = townPicker.Items[townPicker.SelectedIndex];
-                string[] picked = pickedTown.Split(new char[] { '-' });
+                string[] picked = pickedTown.Split(new char[] { '/' });
                 string tid = picked[0];
 
                 entTownCode.Text = tid;

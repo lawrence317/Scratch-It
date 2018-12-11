@@ -22,7 +22,7 @@ namespace TBSMobile
 
 		protected override void OnStart ()
 		{
-            AppCenter.Start("android=8fb4b039-f3b8-4910-9cb2-041eb9b80177;", typeof(Analytics), typeof(Crashes), typeof(Distribute));
+            AppCenter.Start("android=423c8020-f1af-4fba-b62f-c07e1fb382b6;", typeof(Analytics), typeof(Crashes), typeof(Distribute));
             Analytics.SetEnabledAsync(true);
 
             Distribute.ReleaseAvailable = OnReleaseAvailable;
@@ -33,17 +33,17 @@ namespace TBSMobile
                 string versionCodeOrBuildNumber = releaseDetails.Version;
                 string releaseNotes = releaseDetails.ReleaseNotes;
                 Uri releaseNotesUrl = releaseDetails.ReleaseNotesUrl;
-                
+
                 var title = "Version " + versionName + " available!";
                 Task answer;
-                
+
                 if (releaseDetails.MandatoryUpdate)
                 {
                     answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install");
                 }
                 else
                 {
-                    answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install", "Maybe tomorrow...");
+                    answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install", "Ask Later");
                 }
                 answer.ContinueWith((task) =>
                 {
@@ -56,7 +56,7 @@ namespace TBSMobile
                         Distribute.NotifyUpdateAction(UpdateAction.Postpone);
                     }
                 });
-                
+
                 return true;
             }
         }

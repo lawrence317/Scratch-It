@@ -21,7 +21,7 @@ namespace TBSMobile.Data
         {
             get
             {
-                return $"{TownID}-{Town}";
+                return $"{TownID}/{Town}";
             }
         }
     }

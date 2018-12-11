@@ -88,7 +88,7 @@
     background-color: #feffff;
 }
 
-.btnFAF, .btnPR, .btnRO, .btnLogout, .btnAH {
+.btnFAF, .btnPR, .btnRO, .btnLogout, .btnAH, .btnUI {
     color: #feffff;
     font-size: 22;
     padding-top: 40;
@@ -114,7 +114,11 @@
     background-color: #f1c40f;
 }
 
-.faf, .prd, .rod, .aro, .ahd{
+.btnUI {
+    background-color: #2ecc71;
+}
+
+.faf, .prd, .rod, .aro, .ahd {
     padding: 15;
 }
 
