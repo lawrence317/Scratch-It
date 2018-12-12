@@ -233,7 +233,7 @@ namespace TBSMobile.View
                     
                     if(resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblUser WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblUser WHERE ContactID = '" + contact + "' AND Deleted != '1'";
                         var getUserChanges = conn.QueryAsync<UserTable>(changessql);
                         var changesresultCount = getUserChanges.Result.Count;
 
@@ -542,7 +542,7 @@ namespace TBSMobile.View
 
                     if(resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND Deleted != '1'";
                         var getContactsChanges = conn.QueryAsync<ContactsTable>(changessql);
                         var changesresultCount = getContactsChanges.Result.Count;
 
@@ -1128,7 +1128,7 @@ namespace TBSMobile.View
 
                     if(resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND Deleted != '1'";
                         var getOutletChanges = conn.QueryAsync<RetailerGroupTable>(changessql);
                         var changesresultCount = getOutletChanges.Result.Count;
 
@@ -1524,7 +1524,7 @@ namespace TBSMobile.View
 
                     if(resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblCaf WHERE EmployeeID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblCaf WHERE EmployeeID = '" + contact + "' AND Deleted != '1'";
                         var getCAFChanges = conn.QueryAsync<CAFTable>(changessql);
                         var changesresultCount = getCAFChanges.Result.Count;
 
@@ -1728,7 +1728,7 @@ namespace TBSMobile.View
                     
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND Deleted != '1'";
                         var getActivityChanges = conn.QueryAsync<ActivityTable>(changessql);
                         var changesresultCount = getActivityChanges.Result.Count;
 
@@ -1864,7 +1864,7 @@ namespace TBSMobile.View
                     
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblSubscription WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblSubscription WHERE ContactID = '" + contact + "' AND Deleted != '1'";
                         var getSubscriptionChanges = conn.QueryAsync<SubscriptionTable>(changessql);
                         var changesresultCount = getSubscriptionChanges.Result.Count;
 
@@ -2172,7 +2172,7 @@ namespace TBSMobile.View
                     
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND Deleted != '1'";
                         var getEmailChanges = conn.QueryAsync<UserEmailTable>(changessql);
                         var changesresultCount = getEmailChanges.Result.Count;
 
