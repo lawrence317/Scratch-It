@@ -167,10 +167,10 @@ namespace TBSMobile.Data
         public static async void SyncUser(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
-            { 
+            {
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -183,7 +183,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblUser WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND  Deleted != '1'";
+                        var changessql = "SELECT * FROM tblUser WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getUserChanges = conn.QueryAsync<UserTable>(changessql);
                         var changesresultCount = getUserChanges.Result.Count;
 
@@ -191,65 +191,87 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < changesresultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var result = getUserChanges.Result[i];
-                                    var cruserID = result.UserID;
-                                    var cruserPassword = result.UserPassword;
-                                    var cruserStatus = result.UserStatus;
-                                    var cruserType = result.UserType;
-                                    var crdeleted = result.Deleted;
-                                    var crlastUpdated = result.LastUpdated;
-
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=LX7swp";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
+                                    try
                                     {
-                                        { "ContactID", contact },
-                                        { "UserID", cruserID },
-                                        { "UserPassword", cruserPassword },
-                                        { "UserStatus", cruserStatus },
-                                        { "UserType", cruserType },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        var result = getUserChanges.Result[i];
+                                        var cruserID = result.UserID;
+                                        var cruserPassword = result.UserPassword;
+                                        var cruserStatus = result.UserStatus;
+                                        var cruserType = result.UserType;
+                                        var crdeleted = result.Deleted;
+                                        var crlastUpdated = result.LastUpdated;
 
-                                    var crupdate_sql = "UPDATE tblUser SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
-
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent))
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=LX7swp";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
                                         {
-                                            var cruserresult = JsonConvert.DeserializeObject<List<UserData>>(crcontent);
+                                            { "ContactID", contact },
+                                            { "UserID", cruserID },
+                                            { "UserPassword", cruserPassword },
+                                            { "UserStatus", cruserStatus },
+                                            { "UserType", cruserType },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
 
-                                            for (i = 0; i < cruserresult.Count; i++)
+                                        var crupdate_sql = "UPDATE tblUser SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                        if (crresponse.IsSuccessStatusCode)
+                                        {
+                                            var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(crcontent))
                                             {
-                                                try
+                                                var cruserresult = JsonConvert.DeserializeObject<List<UserData>>(crcontent);
+
+                                                for (i = 0; i < cruserresult.Count; i++)
                                                 {
-                                                    var critem = cruserresult[i];
-                                                    var crcontactID = critem.ContactID;
-                                                    var cruID = critem.UserID;
-                                                    var cruPassword = critem.UserPassword;
-                                                    var cruType = critem.UserType;
-                                                    var cruStatus = critem.UserStatus;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblUser WHERE ContactID = '" + crcontactID + "'";
-                                                    var crgetUser = conn.QueryAsync<UserTable>(crsql);
-                                                    var crresultCount = crgetUser.Result.Count;
-
-                                                    if (crresultCount > 0)
+                                                    try
                                                     {
-                                                        if (crlastUpdated > crgetUser.Result[0].LastUpdated)
+                                                        var critem = cruserresult[i];
+                                                        var crcontactID = critem.ContactID;
+                                                        var cruID = critem.UserID;
+                                                        var cruPassword = critem.UserPassword;
+                                                        var cruType = critem.UserType;
+                                                        var cruStatus = critem.UserStatus;
+                                                        var crlSync = DateTime.Parse(current_datetime);
+                                                        var crlUpdated = critem.LastUpdated;
+                                                        var crdltd = critem.Deleted;
+
+                                                        var crsql = "SELECT * FROM tblUser WHERE ContactID = '" + crcontactID + "'";
+                                                        var crgetUser = conn.QueryAsync<UserTable>(crsql);
+                                                        var crresultCount = crgetUser.Result.Count;
+
+                                                        if (crresultCount > 0)
                                                         {
-                                                            var chuser = new UserTable
+                                                            if (crlastUpdated > crgetUser.Result[0].LastUpdated)
+                                                            {
+                                                                var chuser = new UserTable
+                                                                {
+                                                                    ContactID = crcontactID,
+                                                                    UserID = cruserID,
+                                                                    UserPassword = cruserPassword,
+                                                                    UserType = cruserType,
+                                                                    UserStatus = cruserStatus,
+                                                                    LastSync = crlSync,
+                                                                    LastUpdated = crlastUpdated,
+                                                                    Deleted = crdltd
+                                                                };
+
+                                                                await conn.InsertOrReplaceAsync(chuser);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var cheuser = new UserTable
                                                             {
                                                                 ContactID = crcontactID,
                                                                 UserID = cruserID,
@@ -261,51 +283,35 @@ namespace TBSMobile.Data
                                                                 Deleted = crdltd
                                                             };
 
-                                                            await conn.InsertOrReplaceAsync(chuser);
+                                                            await conn.InsertOrReplaceAsync(cheuser);
                                                         }
-                                                    }
-                                                    else
-                                                    {
-                                                        var cheuser = new UserTable
+
+                                                        var cruser = new UserTable
                                                         {
                                                             ContactID = crcontactID,
-                                                            UserID = cruserID,
-                                                            UserPassword = cruserPassword,
-                                                            UserType = cruserType,
-                                                            UserStatus = cruserStatus,
+                                                            UserID = cruID,
+                                                            UserPassword = cruPassword,
+                                                            UserType = cruType,
+                                                            UserStatus = cruStatus,
                                                             LastSync = crlSync,
-                                                            LastUpdated = crlastUpdated,
-                                                            Deleted = crdltd
+                                                            Deleted = crdltd,
+                                                            LastUpdated = crlUpdated
                                                         };
 
-                                                        await conn.InsertOrReplaceAsync(cheuser);
+                                                        await conn.InsertOrReplaceAsync(cruser);
                                                     }
-
-                                                    var cruser = new UserTable
+                                                    catch (Exception ex)
                                                     {
-                                                        ContactID = crcontactID,
-                                                        UserID = cruID,
-                                                        UserPassword = cruPassword,
-                                                        UserType = cruType,
-                                                        UserStatus = cruStatus,
-                                                        LastSync = crlSync,
-                                                        Deleted = crdltd,
-                                                        LastUpdated = crlUpdated
-                                                    };
-
-                                                    await conn.InsertOrReplaceAsync(cruser);
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
+                                                        Crashes.TrackError(ex);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
                             }
                         }
@@ -414,7 +420,6 @@ namespace TBSMobile.Data
                                     var userresult = JsonConvert.DeserializeObject<List<UserData>>(content);
                                     for (int i = 0; i < userresult.Count; i++)
                                     {
-
                                         var item = userresult[i];
                                         var contactID = item.ContactID;
                                         var userID = item.UserID;
@@ -460,7 +465,7 @@ namespace TBSMobile.Data
         public static async void SyncRetailer(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -484,168 +489,217 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var crresult = getContactsChanges.Result[i];
-                                    var crcontactID = crresult.ContactID;
-                                    var crfileAs = crresult.FileAs;
-                                    var crfirstName = crresult.FirstName;
-                                    var crmiddleName = crresult.MiddleName;
-                                    var crlastName = crresult.LastName;
-                                    var crposition = crresult.Position;
-                                    var crcompany = crresult.Company;
-                                    var crcompanyID = crresult.CompanyID;
-                                    var crcontactType = crresult.ContactType;
-                                    var crretailerType = crresult.RetailerType;
-                                    var crpresStreet = crresult.PresStreet;
-                                    var crpresBarangay = crresult.PresBarangay;
-                                    var crpresDistrict = crresult.PresDistrict;
-                                    var crpresTown = crresult.PresTown;
-                                    var crpresProvince = crresult.PresProvince;
-                                    var crpresCountry = crresult.PresCountry;
-                                    var crlandmark = crresult.Landmark;
-                                    var crtelephone1 = crresult.Telephone1;
-                                    var crtelephone2 = crresult.Telephone2;
-                                    var crmobile = crresult.Mobile;
-                                    var cremail = crresult.Email;
-                                    var crphoto1 = crresult.Photo1;
-                                    var crphoto2 = crresult.Photo2;
-                                    var crphoto3 = crresult.Photo3;
-                                    var crvideo = crresult.Video;
-                                    var crmobilePhoto1 = crresult.MobilePhoto1;
-                                    var crmobilePhoto2 = crresult.MobilePhoto2;
-                                    var crmobilePhoto3 = crresult.MobilePhoto3;
-                                    var crmobileVideo = crresult.MobileVideo;
-                                    var cremployee = crresult.Employee;
-                                    var crcustomer = crresult.Customer;
-                                    var crcoordinator = crresult.Coordinator;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-                                    string crpht1 = Convert.ToBase64String(crPhoto1Data);
-
-                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-                                    string crpht2 = Convert.ToBase64String(crPhoto2Data);
-
-                                    byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-                                    string crpht3 = Convert.ToBase64String(crPhoto3Data);
-
-                                    string crvid;
-
-                                    if (!string.IsNullOrEmpty(crvideo))
+                                    try
                                     {
-                                        byte[] crVideoData = File.ReadAllBytes(crvideo);
-                                        crvid = Convert.ToBase64String(crVideoData);
-                                    }
-                                    else
-                                    {
-                                        crvid = "";
-                                    }
+                                        var crresult = getContactsChanges.Result[i];
+                                        var crcontactID = crresult.ContactID;
+                                        var crfileAs = crresult.FileAs;
+                                        var crfirstName = crresult.FirstName;
+                                        var crmiddleName = crresult.MiddleName;
+                                        var crlastName = crresult.LastName;
+                                        var crposition = crresult.Position;
+                                        var crcompany = crresult.Company;
+                                        var crcompanyID = crresult.CompanyID;
+                                        var crcontactType = crresult.ContactType;
+                                        var crretailerType = crresult.RetailerType;
+                                        var crpresStreet = crresult.PresStreet;
+                                        var crpresBarangay = crresult.PresBarangay;
+                                        var crpresDistrict = crresult.PresDistrict;
+                                        var crpresTown = crresult.PresTown;
+                                        var crpresProvince = crresult.PresProvince;
+                                        var crpresCountry = crresult.PresCountry;
+                                        var crlandmark = crresult.Landmark;
+                                        var crtelephone1 = crresult.Telephone1;
+                                        var crtelephone2 = crresult.Telephone2;
+                                        var crmobile = crresult.Mobile;
+                                        var cremail = crresult.Email;
+                                        var crphoto1 = crresult.Photo1;
+                                        var crphoto2 = crresult.Photo2;
+                                        var crphoto3 = crresult.Photo3;
+                                        var crvideo = crresult.Video;
+                                        var crmobilePhoto1 = crresult.MobilePhoto1;
+                                        var crmobilePhoto2 = crresult.MobilePhoto2;
+                                        var crmobilePhoto3 = crresult.MobilePhoto3;
+                                        var crmobileVideo = crresult.MobileVideo;
+                                        var cremployee = crresult.Employee;
+                                        var crcustomer = crresult.Customer;
+                                        var crcoordinator = crresult.Coordinator;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
 
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=nLm8YE";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
-                                    {
-                                        { "ContactID", crcontactID },
-                                        { "FileAs", crfileAs },
-                                        { "FirstName", crfirstName },
-                                        { "MiddleName", crmiddleName },
-                                        { "LastName", crlastName },
-                                        { "Position", crposition },
-                                        { "Company", crcompany },
-                                        { "CompanyID", crcompanyID },
-                                        { "ContactType", crcontactType },
-                                        { "RetailerType", crretailerType },
-                                        { "PresStreet", crpresStreet },
-                                        { "PresBarangay", crpresBarangay },
-                                        { "PresDistrict", crpresDistrict },
-                                        { "PresTown", crpresTown },
-                                        { "PresProvince", crpresProvince },
-                                        { "PresCountry", crpresCountry },
-                                        { "Landmark", crlandmark },
-                                        { "Telephone1", crtelephone1 },
-                                        { "Telephone2", crtelephone2 },
-                                        { "Mobile", crmobile },
-                                        { "Email", cremail },
-                                        { "Photo1", crpht1 },
-                                        { "Photo2", crpht2 },
-                                        { "Photo3", crpht3 },
-                                        { "Video", crvid },
-                                        { "MobilePhoto1", crmobilePhoto1 },
-                                        { "MobilePhoto2", crmobilePhoto2 },
-                                        { "MobilePhoto3", crmobilePhoto3 },
-                                        { "MobileVideo", crmobileVideo },
-                                        { "Employee", cremployee },
-                                        { "Customer", crcustomer },
-                                        { "Coordinator", crcoordinator },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
+                                        string crpht1 = Convert.ToBase64String(crPhoto1Data);
 
-                                    var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + crcoordinator + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
+                                        byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
+                                        string crpht2 = Convert.ToBase64String(crPhoto2Data);
 
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
+                                        string crpht3 = Convert.ToBase64String(crPhoto3Data);
 
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent))
+                                        string crvid;
+
+                                        if (!string.IsNullOrEmpty(crvideo))
                                         {
-                                            var crretailerresult = JsonConvert.DeserializeObject<List<ContactsData>>(crcontent);
+                                            byte[] crVideoData = File.ReadAllBytes(crvideo);
+                                            crvid = Convert.ToBase64String(crVideoData);
+                                        }
+                                        else
+                                        {
+                                            crvid = "";
+                                        }
 
-                                            for (i = 0; i < crretailerresult.Count; i++)
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=nLm8YE";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
+                                        {
+                                            { "ContactID", crcontactID },
+                                            { "FileAs", crfileAs },
+                                            { "FirstName", crfirstName },
+                                            { "MiddleName", crmiddleName },
+                                            { "LastName", crlastName },
+                                            { "Position", crposition },
+                                            { "Company", crcompany },
+                                            { "CompanyID", crcompanyID },
+                                            { "ContactType", crcontactType },
+                                            { "RetailerType", crretailerType },
+                                            { "PresStreet", crpresStreet },
+                                            { "PresBarangay", crpresBarangay },
+                                            { "PresDistrict", crpresDistrict },
+                                            { "PresTown", crpresTown },
+                                            { "PresProvince", crpresProvince },
+                                            { "PresCountry", crpresCountry },
+                                            { "Landmark", crlandmark },
+                                            { "Telephone1", crtelephone1 },
+                                            { "Telephone2", crtelephone2 },
+                                            { "Mobile", crmobile },
+                                            { "Email", cremail },
+                                            { "Photo1", crpht1 },
+                                            { "Photo2", crpht2 },
+                                            { "Photo3", crpht3 },
+                                            { "Video", crvid },
+                                            { "MobilePhoto1", crmobilePhoto1 },
+                                            { "MobilePhoto2", crmobilePhoto2 },
+                                            { "MobilePhoto3", crmobilePhoto3 },
+                                            { "MobileVideo", crmobileVideo },
+                                            { "Employee", cremployee },
+                                            { "Customer", crcustomer },
+                                            { "Coordinator", crcoordinator },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
+
+                                        var crupdate_sql = "UPDATE tblContacts SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE Coordinator='" + crcoordinator + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                        if (crresponse.IsSuccessStatusCode)
+                                        {
+                                            var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(crcontent))
                                             {
-                                                try
+                                                var crretailerresult = JsonConvert.DeserializeObject<List<ContactsData>>(crcontent);
+
+                                                for (i = 0; i < crretailerresult.Count; i++)
                                                 {
-                                                    var critem = crretailerresult[i];
-                                                    var crcID = critem.ContactID;
-                                                    var crfAs = critem.FileAs;
-                                                    var crfName = critem.FirstName;
-                                                    var crmName = critem.MiddleName;
-                                                    var crlName = critem.LastName;
-                                                    var crpos = critem.Position;
-                                                    var crcomp = critem.Company;
-                                                    var crcompID = critem.CompanyID;
-                                                    var crcType = critem.ContactType;
-                                                    var crrType = critem.RetailerType;
-                                                    var crpStreet = critem.PresStreet;
-                                                    var crpBarangay = critem.PresBarangay;
-                                                    var crpDistrict = critem.PresDistrict;
-                                                    var crpTown = critem.PresTown;
-                                                    var crpProvince = critem.PresProvince;
-                                                    var crpCountry = critem.PresCountry;
-                                                    var crlndmark = critem.Landmark;
-                                                    var crtel1 = critem.Telephone1;
-                                                    var crtel2 = critem.Telephone2;
-                                                    var crmob = critem.Mobile;
-                                                    var creml = critem.Email;
-                                                    var crpt1 = critem.Photo1;
-                                                    var crpt2 = critem.Photo2;
-                                                    var crpt3 = critem.Photo3;
-                                                    var crvd = critem.Video;
-                                                    var crmpt1 = critem.MobilePhoto1;
-                                                    var crmpt2 = critem.MobilePhoto2;
-                                                    var crmpt3 = critem.MobilePhoto3;
-                                                    var crmvd = critem.MobileVideo;
-                                                    var cremp = critem.Employee;
-                                                    var crcust = critem.Customer;
-                                                    var crcoord = critem.Coordinator;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblContacts WHERE ContactID = '" + crcID + "'";
-                                                    var crgetRetailer = conn.QueryAsync<ContactsTable>(crsql);
-                                                    var crresultCount = crgetRetailer.Result.Count;
-
-                                                    if (crresultCount > 0)
+                                                    try
                                                     {
-                                                        if (crlastUpdated > crgetRetailer.Result[0].LastUpdated)
+                                                        var critem = crretailerresult[i];
+                                                        var crcID = critem.ContactID;
+                                                        var crfAs = critem.FileAs;
+                                                        var crfName = critem.FirstName;
+                                                        var crmName = critem.MiddleName;
+                                                        var crlName = critem.LastName;
+                                                        var crpos = critem.Position;
+                                                        var crcomp = critem.Company;
+                                                        var crcompID = critem.CompanyID;
+                                                        var crcType = critem.ContactType;
+                                                        var crrType = critem.RetailerType;
+                                                        var crpStreet = critem.PresStreet;
+                                                        var crpBarangay = critem.PresBarangay;
+                                                        var crpDistrict = critem.PresDistrict;
+                                                        var crpTown = critem.PresTown;
+                                                        var crpProvince = critem.PresProvince;
+                                                        var crpCountry = critem.PresCountry;
+                                                        var crlndmark = critem.Landmark;
+                                                        var crtel1 = critem.Telephone1;
+                                                        var crtel2 = critem.Telephone2;
+                                                        var crmob = critem.Mobile;
+                                                        var creml = critem.Email;
+                                                        var crpt1 = critem.Photo1;
+                                                        var crpt2 = critem.Photo2;
+                                                        var crpt3 = critem.Photo3;
+                                                        var crvd = critem.Video;
+                                                        var crmpt1 = critem.MobilePhoto1;
+                                                        var crmpt2 = critem.MobilePhoto2;
+                                                        var crmpt3 = critem.MobilePhoto3;
+                                                        var crmvd = critem.MobileVideo;
+                                                        var cremp = critem.Employee;
+                                                        var crcust = critem.Customer;
+                                                        var crcoord = critem.Coordinator;
+                                                        var crlSync = DateTime.Parse(current_datetime);
+                                                        var crlUpdated = critem.LastUpdated;
+                                                        var crdltd = critem.Deleted;
+
+                                                        var crsql = "SELECT * FROM tblContacts WHERE ContactID = '" + crcID + "'";
+                                                        var crgetRetailer = conn.QueryAsync<ContactsTable>(crsql);
+                                                        var crresultCount = crgetRetailer.Result.Count;
+
+                                                        if (crresultCount > 0)
                                                         {
-                                                            var crretailer = new ContactsTable
+                                                            if (crlastUpdated > crgetRetailer.Result[0].LastUpdated)
+                                                            {
+                                                                var crretailer = new ContactsTable
+                                                                {
+                                                                    ContactID = crcID,
+                                                                    FileAs = crfAs,
+                                                                    FirstName = crfName,
+                                                                    MiddleName = crmName,
+                                                                    LastName = crlName,
+                                                                    Position = crpos,
+                                                                    Company = crcomp,
+                                                                    CompanyID = crcompID,
+                                                                    ContactType = crcType,
+                                                                    RetailerType = crrType,
+                                                                    PresStreet = crpStreet,
+                                                                    PresBarangay = crpBarangay,
+                                                                    PresDistrict = crpDistrict,
+                                                                    PresTown = crpTown,
+                                                                    PresProvince = crpProvince,
+                                                                    PresCountry = crpCountry,
+                                                                    Landmark = crlndmark,
+                                                                    Telephone1 = crtel1,
+                                                                    Telephone2 = crtel2,
+                                                                    Mobile = crmob,
+                                                                    Email = creml,
+                                                                    Photo1 = crpt1,
+                                                                    Photo2 = crpt2,
+                                                                    Photo3 = crpt3,
+                                                                    Video = crvd,
+                                                                    MobilePhoto1 = crmpt1,
+                                                                    MobilePhoto2 = crmpt2,
+                                                                    MobilePhoto3 = crmpt3,
+                                                                    MobileVideo = crmvd,
+                                                                    Employee = cremp,
+                                                                    Customer = crcust,
+                                                                    Coordinator = crcoord,
+                                                                    LastSync = crlSync,
+                                                                    Deleted = crdltd,
+                                                                    LastUpdated = crlUpdated
+                                                                };
+
+                                                                await conn.InsertOrReplaceAsync(crretailer);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var creretailer = new ContactsTable
                                                             {
                                                                 ContactID = crcID,
                                                                 FileAs = crfAs,
@@ -684,64 +738,21 @@ namespace TBSMobile.Data
                                                                 LastUpdated = crlUpdated
                                                             };
 
-                                                            await conn.InsertOrReplaceAsync(crretailer);
+                                                            await conn.InsertOrReplaceAsync(creretailer);
                                                         }
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        var creretailer = new ContactsTable
-                                                        {
-                                                            ContactID = crcID,
-                                                            FileAs = crfAs,
-                                                            FirstName = crfName,
-                                                            MiddleName = crmName,
-                                                            LastName = crlName,
-                                                            Position = crpos,
-                                                            Company = crcomp,
-                                                            CompanyID = crcompID,
-                                                            ContactType = crcType,
-                                                            RetailerType = crrType,
-                                                            PresStreet = crpStreet,
-                                                            PresBarangay = crpBarangay,
-                                                            PresDistrict = crpDistrict,
-                                                            PresTown = crpTown,
-                                                            PresProvince = crpProvince,
-                                                            PresCountry = crpCountry,
-                                                            Landmark = crlndmark,
-                                                            Telephone1 = crtel1,
-                                                            Telephone2 = crtel2,
-                                                            Mobile = crmob,
-                                                            Email = creml,
-                                                            Photo1 = crpt1,
-                                                            Photo2 = crpt2,
-                                                            Photo3 = crpt3,
-                                                            Video = crvd,
-                                                            MobilePhoto1 = crmpt1,
-                                                            MobilePhoto2 = crmpt2,
-                                                            MobilePhoto3 = crmpt3,
-                                                            MobileVideo = crmvd,
-                                                            Employee = cremp,
-                                                            Customer = crcust,
-                                                            Coordinator = crcoord,
-                                                            LastSync = crlSync,
-                                                            Deleted = crdltd,
-                                                            LastUpdated = crlUpdated
-                                                        };
-
-                                                        await conn.InsertOrReplaceAsync(creretailer);
+                                                        Crashes.TrackError(ex);
                                                     }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
                             }
                         }
@@ -1030,7 +1041,7 @@ namespace TBSMobile.Data
         public static async void SyncRetailerOutlet(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1046,7 +1057,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync  AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getOutletChanges = conn.QueryAsync<RetailerGroupTable>(changessql);
                         var changesresultCount = getOutletChanges.Result.Count;
 
@@ -1054,96 +1065,128 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var crresult = getOutletChanges.Result[i];
-                                    var crretailerCode = crresult.RetailerCode;
-                                    var crcontactID = crresult.ContactID;
-                                    var crpresStreet = crresult.PresStreet;
-                                    var crpresBarangay = crresult.PresBarangay;
-                                    var crpresDistrict = crresult.PresDistrict;
-                                    var crpresTown = crresult.PresTown;
-                                    var crpresProvince = crresult.PresProvince;
-                                    var crpresCountry = crresult.PresCountry;
-                                    var crtelephone1 = crresult.Telephone1;
-                                    var crtelephone2 = crresult.Telephone2;
-                                    var crmobile = crresult.Mobile;
-                                    var cremail = crresult.Email;
-                                    var crlandmark = crresult.Landmark;
-                                    var crgpsCoordinates = crresult.GPSCoordinates;
-                                    var crcoordinator = crresult.Coordinator;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Pb3c6A";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
+                                    try
                                     {
-                                        { "RetailerCode", crretailerCode },
-                                        { "ContactID", crcontactID },
-                                        { "PresStreet", crpresStreet },
-                                        { "PresBarangay", crpresBarangay },
-                                        { "PresDistrict", crpresDistrict },
-                                        { "PresTown", crpresTown },
-                                        { "PresProvince", crpresProvince },
-                                        { "PresCountry", crpresCountry },
-                                        { "Telephone1", crtelephone1 },
-                                        { "Telephone2", crtelephone2 },
-                                        { "Mobile", crmobile },
-                                        { "Email", cremail },
-                                        { "Landmark", crlandmark },
-                                        { "GPSCoordinates", crgpsCoordinates },
-                                        { "Coordinator", crcoordinator },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        var crresult = getOutletChanges.Result[i];
+                                        var crretailerCode = crresult.RetailerCode;
+                                        var crcontactID = crresult.ContactID;
+                                        var crpresStreet = crresult.PresStreet;
+                                        var crpresBarangay = crresult.PresBarangay;
+                                        var crpresDistrict = crresult.PresDistrict;
+                                        var crpresTown = crresult.PresTown;
+                                        var crpresProvince = crresult.PresProvince;
+                                        var crpresCountry = crresult.PresCountry;
+                                        var crtelephone1 = crresult.Telephone1;
+                                        var crtelephone2 = crresult.Telephone2;
+                                        var crmobile = crresult.Mobile;
+                                        var cremail = crresult.Email;
+                                        var crlandmark = crresult.Landmark;
+                                        var crgpsCoordinates = crresult.GPSCoordinates;
+                                        var crcoordinator = crresult.Coordinator;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
 
-                                    var crupdate_sql = "UPDATE tblRetailerGroup SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE RetailerCode='" + crretailerCode + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
-
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent))
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Pb3c6A";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
                                         {
-                                            var crretailerresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(crcontent);
+                                            { "RetailerCode", crretailerCode },
+                                            { "ContactID", crcontactID },
+                                            { "PresStreet", crpresStreet },
+                                            { "PresBarangay", crpresBarangay },
+                                            { "PresDistrict", crpresDistrict },
+                                            { "PresTown", crpresTown },
+                                            { "PresProvince", crpresProvince },
+                                            { "PresCountry", crpresCountry },
+                                            { "Telephone1", crtelephone1 },
+                                            { "Telephone2", crtelephone2 },
+                                            { "Mobile", crmobile },
+                                            { "Email", cremail },
+                                            { "Landmark", crlandmark },
+                                            { "GPSCoordinates", crgpsCoordinates },
+                                            { "Coordinator", crcoordinator },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
 
-                                            for (i = 0; i < crretailerresult.Count; i++)
+                                        var crupdate_sql = "UPDATE tblRetailerGroup SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE RetailerCode='" + crretailerCode + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                        if (crresponse.IsSuccessStatusCode)
+                                        {
+                                            var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(crcontent))
                                             {
-                                                try
+                                                var crretailerresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(crcontent);
+
+                                                for (i = 0; i < crretailerresult.Count; i++)
                                                 {
-                                                    var critem = crretailerresult[i];
-                                                    var crrCode = critem.RetailerCode;
-                                                    var crcID = critem.ContactID;
-                                                    var crpStreet = critem.PresStreet;
-                                                    var crpBarangay = critem.PresBarangay;
-                                                    var crpDistrict = critem.PresDistrict;
-                                                    var crpTown = critem.PresTown;
-                                                    var crpProvince = critem.PresProvince;
-                                                    var crpCountry = critem.PresCountry;
-                                                    var crtel1 = critem.Telephone1;
-                                                    var crtel2 = critem.Telephone2;
-                                                    var crmob = critem.Mobile;
-                                                    var creml = critem.Email;
-                                                    var crlmark = critem.Landmark;
-                                                    var crgps = critem.GPSCoordinates;
-                                                    var crcoord = critem.Coordinator;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblRetailerGroup WHERE RetailerCode = '" + crrCode + "'";
-                                                    var crgetRetailerOutlet = conn.QueryAsync<RetailerGroupTable>(crsql);
-                                                    var crresultCount = crgetRetailerOutlet.Result.Count;
-
-                                                    if (crresultCount > 0)
+                                                    try
                                                     {
-                                                        if (crlastUpdated > crgetRetailerOutlet.Result[0].LastUpdated)
+                                                        var critem = crretailerresult[i];
+                                                        var crrCode = critem.RetailerCode;
+                                                        var crcID = critem.ContactID;
+                                                        var crpStreet = critem.PresStreet;
+                                                        var crpBarangay = critem.PresBarangay;
+                                                        var crpDistrict = critem.PresDistrict;
+                                                        var crpTown = critem.PresTown;
+                                                        var crpProvince = critem.PresProvince;
+                                                        var crpCountry = critem.PresCountry;
+                                                        var crtel1 = critem.Telephone1;
+                                                        var crtel2 = critem.Telephone2;
+                                                        var crmob = critem.Mobile;
+                                                        var creml = critem.Email;
+                                                        var crlmark = critem.Landmark;
+                                                        var crgps = critem.GPSCoordinates;
+                                                        var crcoord = critem.Coordinator;
+                                                        var crlSync = DateTime.Parse(current_datetime);
+                                                        var crlUpdated = critem.LastUpdated;
+                                                        var crdltd = critem.Deleted;
+
+                                                        var crsql = "SELECT * FROM tblRetailerGroup WHERE RetailerCode = '" + crrCode + "'";
+                                                        var crgetRetailerOutlet = conn.QueryAsync<RetailerGroupTable>(crsql);
+                                                        var crresultCount = crgetRetailerOutlet.Result.Count;
+
+                                                        if (crresultCount > 0)
                                                         {
-                                                            var crretailer = new RetailerGroupTable
+                                                            if (crlastUpdated > crgetRetailerOutlet.Result[0].LastUpdated)
+                                                            {
+                                                                var crretailer = new RetailerGroupTable
+                                                                {
+                                                                    RetailerCode = crrCode,
+                                                                    ContactID = crcID,
+                                                                    PresStreet = crpStreet,
+                                                                    PresBarangay = crpBarangay,
+                                                                    PresDistrict = crpDistrict,
+                                                                    PresTown = crpTown,
+                                                                    PresProvince = crpProvince,
+                                                                    PresCountry = crpCountry,
+                                                                    Telephone1 = crtel1,
+                                                                    Telephone2 = crtel2,
+                                                                    Mobile = crmob,
+                                                                    Email = creml,
+                                                                    Landmark = crlmark,
+                                                                    GPSCoordinates = crgps,
+                                                                    Coordinator = crcoord,
+                                                                    LastSync = crlSync,
+                                                                    Deleted = crdltd,
+                                                                    LastUpdated = crlUpdated
+                                                                };
+
+                                                                await conn.InsertOrReplaceAsync(crretailer);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var creretailer = new RetailerGroupTable
                                                             {
                                                                 RetailerCode = crrCode,
                                                                 ContactID = crcID,
@@ -1165,47 +1208,21 @@ namespace TBSMobile.Data
                                                                 LastUpdated = crlUpdated
                                                             };
 
-                                                            await conn.InsertOrReplaceAsync(crretailer);
+                                                            await conn.InsertOrReplaceAsync(creretailer);
                                                         }
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        var creretailer = new RetailerGroupTable
-                                                        {
-                                                            RetailerCode = crrCode,
-                                                            ContactID = crcID,
-                                                            PresStreet = crpStreet,
-                                                            PresBarangay = crpBarangay,
-                                                            PresDistrict = crpDistrict,
-                                                            PresTown = crpTown,
-                                                            PresProvince = crpProvince,
-                                                            PresCountry = crpCountry,
-                                                            Telephone1 = crtel1,
-                                                            Telephone2 = crtel2,
-                                                            Mobile = crmob,
-                                                            Email = creml,
-                                                            Landmark = crlmark,
-                                                            GPSCoordinates = crgps,
-                                                            Coordinator = crcoord,
-                                                            LastSync = crlSync,
-                                                            Deleted = crdltd,
-                                                            LastUpdated = crlUpdated
-                                                        };
-
-                                                        await conn.InsertOrReplaceAsync(creretailer);
+                                                        Crashes.TrackError(ex);
                                                     }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
                             }
                         }
@@ -1409,7 +1426,7 @@ namespace TBSMobile.Data
         public static async void SyncCaf(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1425,7 +1442,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblCaf WHERE EmployeeID = '" + contact + "' AND LastUpdated > LastSync  AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblCaf WHERE EmployeeID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getCAFChanges = conn.QueryAsync<CAFTable>(changessql);
                         var changesresultCount = getCAFChanges.Result.Count;
 
@@ -1433,81 +1450,88 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var crresult = getCAFChanges.Result[i];
-                                    var crcafNo = crresult.CAFNo;
-                                    var cremployeeID = crresult.EmployeeID;
-                                    var crcafDate = crresult.CAFDate;
-                                    var crcustomerID = crresult.CustomerID;
-                                    var crstartTime = crresult.StartTime;
-                                    var crendTime = crresult.EndTime;
-                                    var crphoto1 = crresult.Photo1;
-                                    var crphoto2 = crresult.Photo2;
-                                    var crphoto3 = crresult.Photo3;
-                                    var crvideo = crresult.Video;
-                                    var crmobilePhoto1 = crresult.MobilePhoto1;
-                                    var crmobilePhoto2 = crresult.MobilePhoto2;
-                                    var crmobilePhoto3 = crresult.MobilePhoto3;
-                                    var crmobileVideo = crresult.MobileVideo;
-                                    var crremarks = crresult.Remarks;
-                                    var crotherConcern = crresult.OtherConcern;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-                                    string crpht1 = Convert.ToBase64String(crPhoto1Data);
-
-                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-                                    string crpht2 = Convert.ToBase64String(crPhoto2Data);
-
-                                    byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-                                    string crpht3 = Convert.ToBase64String(crPhoto3Data);
-
-                                    string crvid;
-
-                                    if (!string.IsNullOrEmpty(crvideo))
+                                    try
                                     {
-                                        byte[] crVideoData = File.ReadAllBytes(crvideo);
-                                        crvid = Convert.ToBase64String(crVideoData);
+                                        var crresult = getCAFChanges.Result[i];
+                                        var crcafNo = crresult.CAFNo;
+                                        var cremployeeID = crresult.EmployeeID;
+                                        var crcafDate = crresult.CAFDate;
+                                        var crcustomerID = crresult.CustomerID;
+                                        var crstartTime = crresult.StartTime;
+                                        var crendTime = crresult.EndTime;
+                                        var crphoto1 = crresult.Photo1;
+                                        var crphoto2 = crresult.Photo2;
+                                        var crphoto3 = crresult.Photo3;
+                                        var crvideo = crresult.Video;
+                                        var crmobilePhoto1 = crresult.MobilePhoto1;
+                                        var crmobilePhoto2 = crresult.MobilePhoto2;
+                                        var crmobilePhoto3 = crresult.MobilePhoto3;
+                                        var crmobileVideo = crresult.MobileVideo;
+                                        var crremarks = crresult.Remarks;
+                                        var crotherConcern = crresult.OtherConcern;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
+
+                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
+                                        string crpht1 = Convert.ToBase64String(crPhoto1Data);
+
+                                        byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
+                                        string crpht2 = Convert.ToBase64String(crPhoto2Data);
+
+                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
+                                        string crpht3 = Convert.ToBase64String(crPhoto3Data);
+
+                                        string crvid;
+
+                                        if (!string.IsNullOrEmpty(crvideo))
+                                        {
+                                            byte[] crVideoData = File.ReadAllBytes(crvideo);
+                                            crvid = Convert.ToBase64String(crVideoData);
+                                        }
+                                        else
+                                        {
+                                            crvid = "";
+                                        }
+
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=k5N7PE";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
+                                        {
+                                            { "CAFNo", crcafNo },
+                                            { "EmployeeID", cremployeeID },
+                                            { "CAFDate", crcafDate },
+                                            { "CustomerID", crcustomerID },
+                                            { "StartTime", crstartTime },
+                                            { "EndTime", crendTime },
+                                            { "Photo1", crpht1 },
+                                            { "Photo2", crpht2 },
+                                            { "Photo3", crpht3 },
+                                            { "Video", crvid },
+                                            { "MobilePhoto1", crmobilePhoto1 },
+                                            { "MobilePhoto2", crmobilePhoto2 },
+                                            { "MobilePhoto3", crmobilePhoto3 },
+                                            { "MobileVideo", crmobileVideo },
+                                            { "Remarks", crremarks },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
+
+                                        var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
                                     }
-                                    else
+                                    catch (Exception ex)
                                     {
-                                        crvid = "";
+                                        Crashes.TrackError(ex);
                                     }
 
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=k5N7PE";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
-                                    {
-                                        { "CAFNo", crcafNo },
-                                        { "EmployeeID", cremployeeID },
-                                        { "CAFDate", crcafDate },
-                                        { "CustomerID", crcustomerID },
-                                        { "StartTime", crstartTime },
-                                        { "EndTime", crendTime },
-                                        { "Photo1", crpht1 },
-                                        { "Photo2", crpht2 },
-                                        { "Photo3", crpht3 },
-                                        { "Video", crvid },
-                                        { "MobilePhoto1", crmobilePhoto1 },
-                                        { "MobilePhoto2", crmobilePhoto2 },
-                                        { "MobilePhoto3", crmobilePhoto3 },
-                                        { "MobileVideo", crmobileVideo },
-                                        { "Remarks", crremarks },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
-
-                                    var crupdate_sql = "UPDATE tblCaf SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
-
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
                                 }
                             }
                         }
@@ -1602,7 +1626,7 @@ namespace TBSMobile.Data
         public static async void SyncActivities(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1618,7 +1642,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync  AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getActivityChanges = conn.QueryAsync<ActivityTable>(changessql);
                         var changesresultCount = getActivityChanges.Result.Count;
 
@@ -1626,37 +1650,43 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
-                                {
-                                    var crresult = getActivityChanges.Result[i];
-                                    var crcafNo = crresult.CAFNo;
-                                    var crcontactId = crresult.ContactID;
-                                    var cractivity = crresult.Activity;
-                                    var cractivitySwitch = crresult.ActivitySwitch;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
 
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=b7Q9XU";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
+                                if (reply.Status == IPStatus.Success)
+                                {
+                                    try
                                     {
-                                        { "CAFNo", crcafNo },
-                                        { "ContactID", crcontactId },
-                                        { "Activity", cractivity },
-                                        { "ActivitySwitch", cractivitySwitch },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        var crresult = getActivityChanges.Result[i];
+                                        var crcafNo = crresult.CAFNo;
+                                        var crcontactId = crresult.ContactID;
+                                        var cractivity = crresult.Activity;
+                                        var cractivitySwitch = crresult.ActivitySwitch;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
 
-                                    var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=b7Q9XU";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
+                                        {
+                                            { "CAFNo", crcafNo },
+                                            { "ContactID", crcontactId },
+                                            { "Activity", cractivity },
+                                            { "ActivitySwitch", cractivitySwitch },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
 
-                                    HttpClient client = new HttpClient();
-                                    var response = await client.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
+                                        var crupdate_sql = "UPDATE tblActivity SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE CAFNo='" + crcafNo + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient client = new HttpClient();
+                                        var response = await client.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
                             }
                         }
@@ -1727,7 +1757,7 @@ namespace TBSMobile.Data
         public static async void SyncSubscription(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1743,7 +1773,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblSubscription WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync  AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblSubscription WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getSubscriptionChanges = conn.QueryAsync<SubscriptionTable>(changessql);
                         var changesresultCount = getSubscriptionChanges.Result.Count;
 
@@ -1751,69 +1781,92 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var crresult = getSubscriptionChanges.Result[i];
-                                    var crregistrationNumber = crresult.RegistrationNumber;
-                                    var crcontactID = crresult.ContactID;
-                                    var crnoOfDays = crresult.NoOfDays;
-                                    var crinputDate = crresult.InputDate;
-                                    var crexpirationDate = crresult.ExpirationDate;
-                                    var crproductKey = crresult.ProductKey;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=59EkmJ";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
+                                    try
                                     {
-                                        { "ContactID", crcontactID },
-                                        { "RegistrationNumber", crregistrationNumber },
-                                        { "NoOfDays", crnoOfDays },
-                                        { "InputDate", crinputDate },
-                                        { "ExpirationDate", crexpirationDate },
-                                        { "ProductKey", crproductKey },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        var crresult = getSubscriptionChanges.Result[i];
+                                        var crregistrationNumber = crresult.RegistrationNumber;
+                                        var crcontactID = crresult.ContactID;
+                                        var crnoOfDays = crresult.NoOfDays;
+                                        var crinputDate = crresult.InputDate;
+                                        var crexpirationDate = crresult.ExpirationDate;
+                                        var crproductKey = crresult.ProductKey;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
 
-                                    var crupdate_sql = "UPDATE  tblSubscription SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
-                                    await conn.ExecuteAsync(crupdate_sql);
-
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent))
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=59EkmJ";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
                                         {
-                                            var crsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(crcontent);
+                                            { "ContactID", crcontactID },
+                                            { "RegistrationNumber", crregistrationNumber },
+                                            { "NoOfDays", crnoOfDays },
+                                            { "InputDate", crinputDate },
+                                            { "ExpirationDate", crexpirationDate },
+                                            { "ProductKey", crproductKey },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
 
-                                            for (i = 0; i < crsubresult.Count; i++)
+                                        var crupdate_sql = "UPDATE tblSubscription SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                        await conn.ExecuteAsync(crupdate_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                        if (crresponse.IsSuccessStatusCode)
+                                        {
+                                            var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(crcontent))
                                             {
-                                                try
+                                                var crsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(crcontent);
+
+                                                for (i = 0; i < crsubresult.Count; i++)
                                                 {
-                                                    var critem = crsubresult[i];
-                                                    var crregNumber = critem.RegistrationNumber;
-                                                    var crcID = critem.ContactID;
-                                                    var crnoofDays = critem.NoOfDays;
-                                                    var criDate = critem.InputDate;
-                                                    var crexpDate = critem.ExpirationDate;
-                                                    var crpKey = critem.ProductKey;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblSubscription WHERE ContactID = '" + crcontactID + "' AND RegistrationNumber = '" + crregNumber + "'";
-                                                    var crgetSubscription = conn.QueryAsync<SubscriptionTable>(crsql);
-                                                    var crresultCount = crgetSubscription.Result.Count;
-
-                                                    if (crresultCount > 0)
+                                                    try
                                                     {
-                                                        if (crlastUpdated > crgetSubscription.Result[0].LastUpdated)
+                                                        var critem = crsubresult[i];
+                                                        var crregNumber = critem.RegistrationNumber;
+                                                        var crcID = critem.ContactID;
+                                                        var crnoofDays = critem.NoOfDays;
+                                                        var criDate = critem.InputDate;
+                                                        var crexpDate = critem.ExpirationDate;
+                                                        var crpKey = critem.ProductKey;
+                                                        var crlSync = DateTime.Parse(current_datetime);
+                                                        var crlUpdated = critem.LastUpdated;
+                                                        var crdltd = critem.Deleted;
+
+                                                        var crsql = "SELECT * FROM tblSubscription WHERE ContactID = '" + crcontactID + "' AND RegistrationNumber = '" + crregNumber + "'";
+                                                        var crgetSubscription = conn.QueryAsync<SubscriptionTable>(crsql);
+                                                        var crresultCount = crgetSubscription.Result.Count;
+
+                                                        if (crresultCount > 0)
                                                         {
-                                                            var crsub = new SubscriptionTable
+                                                            if (crlastUpdated > crgetSubscription.Result[0].LastUpdated)
+                                                            {
+                                                                var crsub = new SubscriptionTable
+                                                                {
+                                                                    ContactID = crcID,
+                                                                    RegistrationNumber = crregNumber,
+                                                                    NoOfDays = crnoofDays,
+                                                                    InputDate = criDate,
+                                                                    ExpirationDate = crexpDate,
+                                                                    ProductKey = crpKey,
+                                                                    LastSync = crlSync,
+                                                                    Deleted = crdltd,
+                                                                    LastUpdated = crlUpdated
+                                                                };
+
+                                                                await conn.InsertOrReplaceAsync(crsub);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var cresub = new SubscriptionTable
                                                             {
                                                                 ContactID = crcID,
                                                                 RegistrationNumber = crregNumber,
@@ -1826,38 +1879,21 @@ namespace TBSMobile.Data
                                                                 LastUpdated = crlUpdated
                                                             };
 
-                                                            await conn.InsertOrReplaceAsync(crsub);
+                                                            await conn.InsertOrReplaceAsync(cresub);
                                                         }
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        var cresub = new SubscriptionTable
-                                                        {
-                                                            ContactID = crcID,
-                                                            RegistrationNumber = crregNumber,
-                                                            NoOfDays = crnoofDays,
-                                                            InputDate = criDate,
-                                                            ExpirationDate = crexpDate,
-                                                            ProductKey = crpKey,
-                                                            LastSync = crlSync,
-                                                            Deleted = crdltd,
-                                                            LastUpdated = crlUpdated
-                                                        };
-
-                                                        await conn.InsertOrReplaceAsync(cresub);
+                                                        Crashes.TrackError(ex);
                                                     }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
                             }
                         }
@@ -2018,7 +2054,7 @@ namespace TBSMobile.Data
         public static async void SyncEmail(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -2034,7 +2070,7 @@ namespace TBSMobile.Data
 
                     if (resultCount > 0)
                     {
-                        var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync  AND Deleted != '1'";
+                        var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getEmailChanges = conn.QueryAsync<UserEmailTable>(changessql);
                         var changesresultCount = getEmailChanges.Result.Count;
 
@@ -2042,54 +2078,76 @@ namespace TBSMobile.Data
                         {
                             for (int i = 0; i < resultCount; i++)
                             {
-                                try
+                                var crping = new Ping();
+                                var crreply = ping.Send(new IPAddress(pingipaddress), 800);
+
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var crresult = getEmailChanges.Result[i];
-                                    var crcontactID = crresult.ContactID;
-                                    var cremail = crresult.Email;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=kcZw9g";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
+                                    try
                                     {
-                                        { "ContactID", crcontactID },
-                                        { "Email", cremail },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
+                                        var crresult = getEmailChanges.Result[i];
+                                        var crcontactID = crresult.ContactID;
+                                        var cremail = crresult.Email;
+                                        var crdeleted = crresult.Deleted;
+                                        var crlastUpdated = crresult.LastUpdated;
 
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent))
+                                        var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=kcZw9g";
+                                        string crcontentType = "application/json";
+                                        JObject crjson = new JObject
                                         {
-                                            var cremailresult = JsonConvert.DeserializeObject<List<EmailData>>(crcontent);
+                                            { "ContactID", crcontactID },
+                                            { "Email", cremail },
+                                            { "Deleted", crdeleted },
+                                            { "LastUpdated", crlastUpdated }
+                                        };
 
-                                            for (i = 0; i < cremailresult.Count; i++)
+                                        var update_sql = "UPDATE  tblUserEmail SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
+                                        await conn.ExecuteAsync(update_sql);
+
+                                        HttpClient crclient = new HttpClient();
+                                        var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                        if (crresponse.IsSuccessStatusCode)
+                                        {
+                                            var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(crcontent))
                                             {
-                                                try
+                                                var cremailresult = JsonConvert.DeserializeObject<List<EmailData>>(crcontent);
+
+                                                for (i = 0; i < cremailresult.Count; i++)
                                                 {
-                                                    var critem = cremailresult[i];
-                                                    var crcID = critem.ContactID;
-                                                    var creml = critem.Email;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "'";
-                                                    var crgetEmail = conn.QueryAsync<UserEmailTable>(crsql);
-                                                    var crresultCount = crgetEmail.Result.Count;
-
-                                                    if (crresultCount > 0)
+                                                    try
                                                     {
-                                                        if (crlUpdated > crgetEmail.Result[0].LastUpdated)
+                                                        var critem = cremailresult[i];
+                                                        var crcID = critem.ContactID;
+                                                        var creml = critem.Email;
+                                                        var crlSync = DateTime.Parse(current_datetime);
+                                                        var crlUpdated = critem.LastUpdated;
+                                                        var crdltd = critem.Deleted;
+
+                                                        var crsql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "'";
+                                                        var crgetEmail = conn.QueryAsync<UserEmailTable>(crsql);
+                                                        var crresultCount = crgetEmail.Result.Count;
+
+                                                        if (crresultCount > 0)
                                                         {
-                                                            var crel = new UserEmailTable
+                                                            if (crlUpdated > crgetEmail.Result[0].LastUpdated)
+                                                            {
+                                                                var crel = new UserEmailTable
+                                                                {
+                                                                    ContactID = crcID,
+                                                                    Email = creml,
+                                                                    LastSync = crlSync,
+                                                                    Deleted = crdltd,
+                                                                    LastUpdated = crlUpdated
+                                                                };
+
+                                                                await conn.InsertOrReplaceAsync(crel);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var creel = new UserEmailTable
                                                             {
                                                                 ContactID = crcID,
                                                                 Email = creml,
@@ -2098,38 +2156,22 @@ namespace TBSMobile.Data
                                                                 LastUpdated = crlUpdated
                                                             };
 
-                                                            await conn.InsertOrReplaceAsync(crel);
+                                                            await conn.InsertOrReplaceAsync(creel);
                                                         }
                                                     }
-                                                    else
+                                                    catch (Exception ex)
                                                     {
-                                                        var creel = new UserEmailTable
-                                                        {
-                                                            ContactID = crcID,
-                                                            Email = creml,
-                                                            LastSync = crlSync,
-                                                            Deleted = crdltd,
-                                                            LastUpdated = crlUpdated
-                                                        };
-
-                                                        await conn.InsertOrReplaceAsync(creel);
+                                                        Crashes.TrackError(ex);
                                                     }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
                                                 }
                                             }
                                         }
                                     }
+                                    catch (Exception ex)
+                                    {
+                                        Crashes.TrackError(ex);
+                                    }
                                 }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
-                                }
-
-                                var update_sql = "UPDATE  tblUserEmail SET LastSync='" + DateTime.Parse(current_datetime) + "' WHERE ContactID='" + contact + "'";
-                                await conn.ExecuteAsync(update_sql);
                             }
                         }
                         else
@@ -2267,7 +2309,7 @@ namespace TBSMobile.Data
         public static async void SyncProvince(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -2392,7 +2434,7 @@ namespace TBSMobile.Data
         public static async void SyncTown(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 800);
 
             if (reply.Status == IPStatus.Success)
             {

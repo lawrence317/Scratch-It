@@ -249,7 +249,7 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 1500);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 800);
                                     if (reply.Status == IPStatus.Success)
                                     {
                                         try
