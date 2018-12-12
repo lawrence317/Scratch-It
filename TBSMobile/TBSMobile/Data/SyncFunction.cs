@@ -164,8 +164,6 @@ namespace TBSMobile.Data
 
     public class SyncFunction
     {
-        public string status;
-
         public static async void SyncUser(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
