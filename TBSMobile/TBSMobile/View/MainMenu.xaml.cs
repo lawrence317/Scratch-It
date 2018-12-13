@@ -5,6 +5,7 @@ using Plugin.Geolocator;
 using System;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -53,13 +54,14 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 800);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
                             if (reply.Status == IPStatus.Success)
                             {
-                                SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
                                 lblStatus.Text = "Online - Connected to server";
                                 lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
+                                //CheckConnectionContinuously();
+                                SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
                             }
                             else
                             {
@@ -69,7 +71,7 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            lblStatus.Text = "Offline";
+                            lblStatus.Text = "Offline - Connect to internet";
                             lblStatus.BackgroundColor = Color.FromHex("#e74c3c");
                         }
                     }
@@ -247,44 +249,39 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    try
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
-                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        if (CrossConnectivity.Current.IsConnected)
                         {
-                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                            var ping = new Ping();
+                            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
-                            if (CrossConnectivity.Current.IsConnected)
+                            if (reply.Status == IPStatus.Success)
                             {
-                                var ping = new Ping();
-                                var reply = ping.Send(new IPAddress(pingipaddress), 800);
-
-                                if (reply.Status == IPStatus.Success)
-                                {
-                                    SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
-                                    lblStatus.Text = "Online - Connected to server";
-                                    lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Online - Server unreachable. Connect to VPN";
-                                    lblStatus.BackgroundColor = Color.FromHex("#e67e22");
-                                }
+                                lblStatus.Text = "Syncing data to server";
+                                lblStatus.BackgroundColor = Color.FromHex("#2bcbba");
+                                SyncFunction.SyncUser(host, database, contact, ipaddress, pingipaddress);
+                                lblStatus.Text = "Online - Connected to server";
+                                lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
                             }
                             else
                             {
-                                lblStatus.Text = "Offline";
-                                lblStatus.BackgroundColor = Color.FromHex("#e74c3c");
+                                lblStatus.Text = "Online - Server unreachable. Connect to VPN";
+                                lblStatus.BackgroundColor = Color.FromHex("#e67e22");
                             }
                         }
                         else
                         {
-                            DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                            Navigation.PopToRootAsync();
+                            lblStatus.Text = "Offline - Connect to internet";
+                            lblStatus.BackgroundColor = Color.FromHex("#e74c3c");
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        DisplayAlert("Error", ex.Message, "Ok");
+                        DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        Navigation.PopToRootAsync();
                     }
                 }
                 

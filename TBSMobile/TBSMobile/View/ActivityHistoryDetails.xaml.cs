@@ -77,8 +77,8 @@ namespace TBSMobile.View
                     lblEndTime.Text = contactResult.EndTime.ToString("hh:mm:ss");
                     lblOtherConcern.Text = contactResult.OtherConcern;
                     lblRemarks.Text = contactResult.Remarks;
-                    lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy hh:mm:ss");
-                    lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy hh:mm:ss");
+                    lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy HH:mm:ss");
+                    lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy HH:mm:ss");
                 }
             }
             catch (Exception ex)

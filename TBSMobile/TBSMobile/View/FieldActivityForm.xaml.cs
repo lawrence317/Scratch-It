@@ -44,7 +44,7 @@ namespace TBSMobile.View
 
         void Init()
         {
-            tpTime.Text = DateTime.Now.ToString("hh:mm:ss");
+            tpTime.Text = DateTime.Now.ToString("HH:mm:ss");
             SetCAFNo();
             getRecipients();
             GetGPS();
@@ -941,7 +941,7 @@ namespace TBSMobile.View
                                 var location = entLocation.Text;
                                 var date = dpDate.Text;
                                 var startTime = tpTime.Text;
-                                var endTime = DateTime.Now.ToString("hh:mm:ss");
+                                var endTime = DateTime.Now.ToString("HH:mm:ss");
                                 var photo1url = entPhoto1Url.Text;
                                 var photo2url = entPhoto2Url.Text;
                                 var photo3url = entPhoto3Url.Text;
@@ -952,7 +952,7 @@ namespace TBSMobile.View
                                 int merchandizing;
                                 int tradecheck;
                                 int others;
-                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                                 if (swRekorida.IsToggled == true)
                                 {
@@ -1014,7 +1014,7 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 800);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 50000);
                                     if (reply.Status == IPStatus.Success)
                                     {
                                         try
@@ -1064,9 +1064,8 @@ namespace TBSMobile.View
 
                                             var db = DependencyService.Get<ISQLiteDB>();
                                             var conn = db.GetConnection();
-
-                                            string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastSync = '" + DateTime.Parse(current_datetime) + "', LastUpdated = '" + DateTime.Parse(current_datetime) + "' WHERE RetailerCode = '" + retailerCode + "'";
-                                            await conn.ExecuteAsync(retailer_group_sql);
+                                            
+                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
                                             var caf_insert = new CAFTable
                                             {
@@ -1151,11 +1150,8 @@ namespace TBSMobile.View
                                     {
                                         var db = DependencyService.Get<ISQLiteDB>();
                                         var conn = db.GetConnection();
-
-                                        var current = DateTime.Parse(current_datetime);
-
-                                        string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "',  LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
-                                        await conn.ExecuteAsync(retailer_group_sql);
+                                        
+                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
                                         var caf_insert = new CAFTable
                                         {
@@ -1232,10 +1228,7 @@ namespace TBSMobile.View
                                     var db = DependencyService.Get<ISQLiteDB>();
                                     var conn = db.GetConnection();
 
-                                    var current = DateTime.Parse(current_datetime);
-
-                                    string retailer_group_sql = "UPDATE tblRetailerGroup SET PresStreet = '" + street + "', PresBarangay = '" + barangay + "', PresTown = '" + town + "', PresProvince = '" + province + "', PresCountry = '" + country + "', PresDistrict= '" + district + "', Landmark = '" + landmark + "', Telephone1 = '" + telephone1 + "', Telephone2 = '" + telephone2 + "', Mobile = '" + mobile + "', Email = '" + email + "', GPSCoordinates = '" + location + "', LastUpdated = '" + current + "' WHERE RetailerCode = '" + retailerCode + "'";
-                                    await conn.ExecuteAsync(retailer_group_sql);
+                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
                                     var caf_insert = new CAFTable
                                     {

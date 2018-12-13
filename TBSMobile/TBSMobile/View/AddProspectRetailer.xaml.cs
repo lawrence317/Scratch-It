@@ -333,7 +333,7 @@ namespace TBSMobile.View
                                 var videourl = entVideoUrl.Text;
                                 int employee = 0;
                                 int customer = 1;
-                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                                 byte[] Photo1Data = File.ReadAllBytes(photo1url);
                                 string photo1 = Convert.ToBase64String(Photo1Data);
@@ -359,7 +359,7 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 800);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 50000);
                                     if (reply.Status == IPStatus.Success)
                                     {
                                         try
@@ -396,8 +396,8 @@ namespace TBSMobile.View
                                                 { "Employee", employee },
                                                 { "Customer", customer },
                                                 { "Coordinator", contact },
-                                                { "LastSync", DateTime.Parse(current_datetime) },
-                                                { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                { "LastSync", current_datetime },
+                                                { "LastUpdated", current_datetime }
                                             };
 
                                             HttpClient client = new HttpClient();

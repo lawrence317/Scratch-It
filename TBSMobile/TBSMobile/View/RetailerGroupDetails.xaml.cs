@@ -97,8 +97,8 @@ namespace TBSMobile.View
                     lblMobile.Text = contactResult.Mobile;
                     lblEmail.Text = contactResult.Email;
                     lblLocation.Text = contactResult.GPSCoordinates;
-                    lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy hh:mm:ss");
-                    lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy hh:mm:ss");
+                    lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy HH:mm:ss");
+                    lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy HH:mm:ss");
                 }
             }
             catch (Exception ex)

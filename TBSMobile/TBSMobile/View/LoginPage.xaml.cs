@@ -180,7 +180,7 @@ namespace TBSMobile.View
                             request.Method = "GET";
 
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 800);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 50000);
 
                             if (reply.Status == IPStatus.Success)
                             {
@@ -277,8 +277,8 @@ namespace TBSMobile.View
                                     var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UserPassword = ? AND UserStatus='Active'", userName, password);
                                     var result = getUser.Result.Count;
                                     var logType = "Login";
-                                    var logDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                                    var logDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                                     if (result < 1)
                                     {
@@ -418,8 +418,8 @@ namespace TBSMobile.View
                         var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UserPassword = ? AND UserStatus='Active'", userName, password);
                         var result = getUser.Result.Count;
                         var logType = "Login";
-                        var logDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                        var logDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                         if (result < 1)
                         {
