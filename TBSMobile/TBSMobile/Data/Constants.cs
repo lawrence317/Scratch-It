@@ -14,6 +14,7 @@ namespace TBSMobile.Data
         //public static string server_ip = "192.168.120.10";
         //public static string server_ip = "192.168.1.17";
         public static string server_ip = "192.168.0.8";
+        //public static string server_ip = "192.168.1.187";
 
         public static string deviceID = CrossDeviceInfo.Current.Id;
         public static string appversion = "Version: " + VersionTracking.CurrentVersion;

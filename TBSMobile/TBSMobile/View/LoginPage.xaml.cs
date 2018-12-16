@@ -65,7 +65,23 @@ namespace TBSMobile.View
         {
             entHost.Text = Constants.hostname;
             entDatabase.Text = Constants.database;
-            entIPAddress.Text = Constants.server_ip;
+            
+            var ipaddress = Preferences.Get("ipaddress", String.Empty, "private_prefs");
+            if (string.IsNullOrEmpty(ipaddress))
+            {
+                entIPAddress.Text = Constants.server_ip;
+            }
+            else
+            {
+                entIPAddress.Text = ipaddress;
+            }
+
+            var username = Preferences.Get("username", String.Empty, "private_prefs");
+            var password = Preferences.Get("password", String.Empty, "private_prefs");
+
+            entUser.Text = username;
+            entPassword.Text = password;
+
             entUser.Completed += (s, e) => entPassword.Focus();
             entPassword.Completed += (s, e) => Login();
             lblVersion.Text = Constants.appversion;
@@ -115,8 +131,6 @@ namespace TBSMobile.View
 
                 if (!string.IsNullOrEmpty(username) || !string.IsNullOrEmpty(password))
                 {
-                    entUser.Text = username;
-                    entPassword.Text = password;
                     Login();
                 }
             }
@@ -180,7 +194,7 @@ namespace TBSMobile.View
                             request.Method = "GET";
 
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 50000);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 500);
 
                             if (reply.Status == IPStatus.Success)
                             {
@@ -257,6 +271,7 @@ namespace TBSMobile.View
 
                                                         Preferences.Set("username", userName, "private_prefs");
                                                         Preferences.Set("password", password, "private_prefs");
+                                                        Preferences.Set("ipaddress", ipaddress, "private_prefs");
 
                                                         await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
                                                     }
@@ -347,6 +362,7 @@ namespace TBSMobile.View
 
                                                     Preferences.Set("username", userName, "private_prefs");
                                                     Preferences.Set("password", password, "private_prefs");
+                                                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
 
                                                     await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
                                                 }
@@ -392,6 +408,7 @@ namespace TBSMobile.View
 
                                                 Preferences.Set("username", userName, "private_prefs");
                                                 Preferences.Set("password", password, "private_prefs");
+                                                Preferences.Set("ipaddress", ipaddress, "private_prefs");
 
                                                 await conn.InsertAsync(logs_insert);
                                                 await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
@@ -488,6 +505,7 @@ namespace TBSMobile.View
 
                                         Preferences.Set("username", userName, "private_prefs");
                                         Preferences.Set("password", password, "private_prefs");
+                                        Preferences.Set("ipaddress", ipaddress, "private_prefs");
 
                                         await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
                                     }
@@ -533,6 +551,7 @@ namespace TBSMobile.View
 
                                     Preferences.Set("username", userName, "private_prefs");
                                     Preferences.Set("password", password, "private_prefs");
+                                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
 
                                     await conn.InsertAsync(logs_insert);
                                     await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
