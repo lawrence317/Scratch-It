@@ -7,6 +7,7 @@ using Plugin.Media.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -359,95 +360,245 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 50000);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        try
+                                        var optimalSpeed = 500000;
+                                        var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
+
+                                        if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
                                         {
-                                            string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=9Fcq8C";
-                                            string contentType = "application/json";
-                                            JObject json = new JObject
+                                            var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
+                                            if (sendconfirm == true)
                                             {
-                                                { "ContactID", id },
-                                                { "FirstName", firstName },
-                                                { "MiddleName", middleName },
-                                                { "LastName", lastName },
-                                                { "FileAs", fileas },
-                                                { "ContactType", contactType },
-                                                { "Street", street },
-                                                { "Barangay", barangay },
-                                                { "Town", town },
-                                                { "Province", province },
-                                                { "District", district },
-                                                { "Country", country },
-                                                { "Landmark", landmark },
-                                                { "Telephone1", telephone1 },
-                                                { "Telephone2", telephone2 },
-                                                { "Mobile", mobile },
-                                                { "Email", email },
-                                                { "Photo1", photo1 },
-                                                { "Photo2", photo2 },
-                                                { "Photo3", photo3 },
-                                                { "Video", video },
-                                                { "MobilePhoto1", photo1url },
-                                                { "MobilePhoto2", photo2url },
-                                                { "MobilePhoto3", photo3url },
-                                                { "MobileVideo", videourl },
-                                                { "Employee", employee },
-                                                { "Customer", customer },
-                                                { "Coordinator", contact },
-                                                { "LastSync", current_datetime },
-                                                { "LastUpdated", current_datetime }
-                                            };
+                                                try
+                                                {
+                                                    string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=9Fcq8C";
+                                                    string contentType = "application/json";
+                                                    JObject json = new JObject
+                                                    {
+                                                        { "ContactID", id },
+                                                        { "FirstName", firstName },
+                                                        { "MiddleName", middleName },
+                                                        { "LastName", lastName },
+                                                        { "FileAs", fileas },
+                                                        { "ContactType", contactType },
+                                                        { "Street", street },
+                                                        { "Barangay", barangay },
+                                                        { "Town", town },
+                                                        { "Province", province },
+                                                        { "District", district },
+                                                        { "Country", country },
+                                                        { "Landmark", landmark },
+                                                        { "Telephone1", telephone1 },
+                                                        { "Telephone2", telephone2 },
+                                                        { "Mobile", mobile },
+                                                        { "Email", email },
+                                                        { "Photo1", photo1 },
+                                                        { "Photo2", photo2 },
+                                                        { "Photo3", photo3 },
+                                                        { "Video", video },
+                                                        { "MobilePhoto1", photo1url },
+                                                        { "MobilePhoto2", photo2url },
+                                                        { "MobilePhoto3", photo3url },
+                                                        { "MobileVideo", videourl },
+                                                        { "Employee", employee },
+                                                        { "Customer", customer },
+                                                        { "Coordinator", contact },
+                                                        { "LastSync", current_datetime },
+                                                        { "LastUpdated", current_datetime }
+                                                    };
 
-                                            HttpClient client = new HttpClient();
-                                            var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                                    HttpClient client = new HttpClient();
+                                                    var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                                            var db = DependencyService.Get<ISQLiteDB>();
-                                            var conn = db.GetConnection();
+                                                    var db = DependencyService.Get<ISQLiteDB>();
+                                                    var conn = db.GetConnection();
 
-                                            var retailer = new ContactsTable
+                                                    var retailer = new ContactsTable
+                                                    {
+                                                        ContactID = id,
+                                                        FileAs = firstName + " " + lastName + " " + middleName,
+                                                        FirstName = firstName,
+                                                        MiddleName = middleName,
+                                                        LastName = lastName,
+                                                        ContactType = contactType,
+                                                        PresStreet = street,
+                                                        PresBarangay = barangay,
+                                                        PresDistrict = district,
+                                                        PresTown = town,
+                                                        PresProvince = province,
+                                                        PresCountry = country,
+                                                        Landmark = landmark,
+                                                        Telephone1 = telephone1,
+                                                        Telephone2 = telephone2,
+                                                        Mobile = mobile,
+                                                        Email = email,
+                                                        Photo1 = photo1url,
+                                                        Photo2 = photo2url,
+                                                        Photo3 = photo3url,
+                                                        Video = videourl,
+                                                        MobilePhoto1 = photo1url,
+                                                        MobilePhoto2 = photo2url,
+                                                        MobilePhoto3 = photo3url,
+                                                        MobileVideo = videourl,
+                                                        Employee = employee,
+                                                        Customer = customer,
+                                                        Coordinator = contact,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertOrReplaceAsync(retailer);
+
+                                                    await DisplayAlert("Prospect retailer was sent!", "Prospect retailer has been sent to the server", "Got it");
+                                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Crashes.TrackError(ex);
+                                                }
+                                            }
+                                            else
                                             {
-                                                ContactID = id,
-                                                FileAs = firstName + " " + lastName + " " + middleName,
-                                                FirstName = firstName,
-                                                MiddleName = middleName,
-                                                LastName = lastName,
-                                                ContactType = contactType,
-                                                PresStreet = street,
-                                                PresBarangay = barangay,
-                                                PresDistrict = district,
-                                                PresTown = town,
-                                                PresProvince = province,
-                                                PresCountry = country,
-                                                Landmark = landmark,
-                                                Telephone1 = telephone1,
-                                                Telephone2 = telephone2,
-                                                Mobile = mobile,
-                                                Email = email,
-                                                Photo1 = photo1url,
-                                                Photo2 = photo2url,
-                                                Photo3 = photo3url,
-                                                Video = videourl,
-                                                MobilePhoto1 = photo1url,
-                                                MobilePhoto2 = photo2url,
-                                                MobilePhoto3 = photo3url,
-                                                MobileVideo = videourl,
-                                                Employee = employee,
-                                                Customer = customer,
-                                                Coordinator = contact,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                try
+                                                {
+                                                    var db = DependencyService.Get<ISQLiteDB>();
+                                                    var conn = db.GetConnection();
 
-                                            await conn.InsertOrReplaceAsync(retailer);
+                                                    var prospect_insert = new ContactsTable
+                                                    {
+                                                        ContactID = id,
+                                                        FileAs = fileas,
+                                                        FirstName = firstName,
+                                                        MiddleName = middleName,
+                                                        LastName = lastName,
+                                                        ContactType = contactType,
+                                                        PresStreet = street,
+                                                        PresBarangay = barangay,
+                                                        PresDistrict = district,
+                                                        PresTown = town,
+                                                        PresProvince = province,
+                                                        PresCountry = country,
+                                                        Landmark = landmark,
+                                                        Telephone1 = telephone1,
+                                                        Telephone2 = telephone2,
+                                                        Mobile = mobile,
+                                                        Email = email,
+                                                        Photo1 = photo1url,
+                                                        Photo2 = photo2url,
+                                                        Photo3 = photo3url,
+                                                        Video = videourl,
+                                                        MobilePhoto1 = photo1url,
+                                                        MobilePhoto2 = photo2url,
+                                                        MobilePhoto3 = photo3url,
+                                                        MobileVideo = videourl,
+                                                        Employee = employee,
+                                                        Customer = customer,
+                                                        Coordinator = contact,
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
 
-                                            await DisplayAlert("Prospect retailer was sent!", "Prospect retailer has been sent to the server", "Got it");
-                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                    await conn.InsertAsync(prospect_insert);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Crashes.TrackError(ex);
+                                                }
+
+                                                await DisplayAlert("Prospect retailer was saved offline", "Prospect retailer has been saved offline connect to the server to send your activity", "Got it");
+                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                            }
                                         }
-                                        catch (Exception ex)
+                                        else
                                         {
-                                            Crashes.TrackError(ex);
+                                            try
+                                            {
+                                                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=9Fcq8C";
+                                                string contentType = "application/json";
+                                                JObject json = new JObject
+                                                {
+                                                    { "ContactID", id },
+                                                    { "FirstName", firstName },
+                                                    { "MiddleName", middleName },
+                                                    { "LastName", lastName },
+                                                    { "FileAs", fileas },
+                                                    { "ContactType", contactType },
+                                                    { "Street", street },
+                                                    { "Barangay", barangay },
+                                                    { "Town", town },
+                                                    { "Province", province },
+                                                    { "District", district },
+                                                    { "Country", country },
+                                                    { "Landmark", landmark },
+                                                    { "Telephone1", telephone1 },
+                                                    { "Telephone2", telephone2 },
+                                                    { "Mobile", mobile },
+                                                    { "Email", email },
+                                                    { "Photo1", photo1 },
+                                                    { "Photo2", photo2 },
+                                                    { "Photo3", photo3 },
+                                                    { "Video", video },
+                                                    { "MobilePhoto1", photo1url },
+                                                    { "MobilePhoto2", photo2url },
+                                                    { "MobilePhoto3", photo3url },
+                                                    { "MobileVideo", videourl },
+                                                    { "Employee", employee },
+                                                    { "Customer", customer },
+                                                    { "Coordinator", contact },
+                                                    { "LastSync", current_datetime },
+                                                    { "LastUpdated", current_datetime }
+                                                };
+
+                                                HttpClient client = new HttpClient();
+                                                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                var conn = db.GetConnection();
+
+                                                var retailer = new ContactsTable
+                                                {
+                                                    ContactID = id,
+                                                    FileAs = firstName + " " + lastName + " " + middleName,
+                                                    FirstName = firstName,
+                                                    MiddleName = middleName,
+                                                    LastName = lastName,
+                                                    ContactType = contactType,
+                                                    PresStreet = street,
+                                                    PresBarangay = barangay,
+                                                    PresDistrict = district,
+                                                    PresTown = town,
+                                                    PresProvince = province,
+                                                    PresCountry = country,
+                                                    Landmark = landmark,
+                                                    Telephone1 = telephone1,
+                                                    Telephone2 = telephone2,
+                                                    Mobile = mobile,
+                                                    Email = email,
+                                                    Photo1 = photo1url,
+                                                    Photo2 = photo2url,
+                                                    Photo3 = photo3url,
+                                                    Video = videourl,
+                                                    MobilePhoto1 = photo1url,
+                                                    MobilePhoto2 = photo2url,
+                                                    MobilePhoto3 = photo3url,
+                                                    MobileVideo = videourl,
+                                                    Employee = employee,
+                                                    Customer = customer,
+                                                    Coordinator = contact,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertOrReplaceAsync(retailer);
+
+                                                await DisplayAlert("Prospect retailer was sent!", "Prospect retailer has been sent to the server", "Got it");
+                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Crashes.TrackError(ex);
+                                            }
                                         }
                                     }
                                     else
@@ -811,7 +962,7 @@ namespace TBSMobile.View
         private async void btnCamera4_Clicked(object sender, EventArgs e)
         {
             var prospectID = entTempID.Text;
-            TimeSpan time = new TimeSpan(0, 0, 0, 30, 0);
+            TimeSpan time = new TimeSpan(0, 0, 0, 20, 0);
 
             await CrossMedia.Current.Initialize();
 

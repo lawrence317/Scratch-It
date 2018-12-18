@@ -583,7 +583,7 @@ namespace TBSMobile.View
         private async void btnCamera4_Clicked(object sender, EventArgs e)
         {
             var cafNo = entCafNo.Text;
-            TimeSpan time = new TimeSpan(0, 0, 0, 30, 0);
+            TimeSpan time = new TimeSpan(0, 0, 0, 20, 0);
 
             await CrossMedia.Current.Initialize();
 
@@ -1014,136 +1014,353 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 50000);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        try
+                                        var optimalSpeed = 500000;
+                                        var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
+
+                                        if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
                                         {
-                                            string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
-                                            string contentType = "application/json";
-                                            JObject json = new JObject
+                                            var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
+                                            if (sendconfirm == true)
                                             {
-                                                { "CAF", caf },
-                                                { "CustomerID", retailerCode },
-                                                { "EmployeeNumber", employeeNumber },
-                                                { "Street", street },
-                                                { "Barangay", barangay },
-                                                { "Town", town },
-                                                { "District", district },
-                                                { "Province", province },
-                                                { "Country", country },
-                                                { "Landmark", landmark },
-                                                { "Telephone1", telephone1 },
-                                                { "Telephone2", telephone2 },
-                                                { "Mobile", mobile },
-                                                { "Email", email },
-                                                { "Location", location },
-                                                { "Date", DateTime.Parse(date) },
-                                                { "StartTime", DateTime.Parse(startTime) },
-                                                { "EndTime", DateTime.Parse(endTime) },
-                                                { "Photo1", photo1 },
-                                                { "Photo2", photo2 },
-                                                { "Photo3", photo3 },
-                                                { "Video", video },
-                                                { "MobilePhoto1", photo1url },
-                                                { "MobilePhoto2", photo2url },
-                                                { "MobilePhoto3", photo3url },
-                                                { "MobileVideo", videourl },
-                                                { "Rekorida", rekorida },
-                                                { "Merchandizing", merchandizing },
-                                                { "TradeCheck", tradecheck },
-                                                { "Others", others },
-                                                { "OtherConcern", otherconcern },
-                                                { "Remarks", remarks },
-                                                { "LastUpdated", DateTime.Parse(current_datetime) }
-                                            };
+                                                try
+                                                {
+                                                    string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
+                                                    string contentType = "application/json";
+                                                    JObject json = new JObject
+                                                    {
+                                                        { "CAF", caf },
+                                                        { "CustomerID", retailerCode },
+                                                        { "EmployeeNumber", employeeNumber },
+                                                        { "Street", street },
+                                                        { "Barangay", barangay },
+                                                        { "Town", town },
+                                                        { "District", district },
+                                                        { "Province", province },
+                                                        { "Country", country },
+                                                        { "Landmark", landmark },
+                                                        { "Telephone1", telephone1 },
+                                                        { "Telephone2", telephone2 },
+                                                        { "Mobile", mobile },
+                                                        { "Email", email },
+                                                        { "Location", location },
+                                                        { "Date", DateTime.Parse(date) },
+                                                        { "StartTime", DateTime.Parse(startTime) },
+                                                        { "EndTime", DateTime.Parse(endTime) },
+                                                        { "Photo1", photo1 },
+                                                        { "Photo2", photo2 },
+                                                        { "Photo3", photo3 },
+                                                        { "Video", video },
+                                                        { "MobilePhoto1", photo1url },
+                                                        { "MobilePhoto2", photo2url },
+                                                        { "MobilePhoto3", photo3url },
+                                                        { "MobileVideo", videourl },
+                                                        { "Rekorida", rekorida },
+                                                        { "Merchandizing", merchandizing },
+                                                        { "TradeCheck", tradecheck },
+                                                        { "Others", others },
+                                                        { "OtherConcern", otherconcern },
+                                                        { "Remarks", remarks },
+                                                        { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                    };
 
-                                            HttpClient client = new HttpClient();
-                                            client.Timeout = TimeSpan.FromMinutes(20);
-                                            var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                                    HttpClient client = new HttpClient();
+                                                    client.Timeout = TimeSpan.FromMinutes(20);
+                                                    var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                                            var db = DependencyService.Get<ISQLiteDB>();
-                                            var conn = db.GetConnection();
-                                            
-                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+                                                    var db = DependencyService.Get<ISQLiteDB>();
+                                                    var conn = db.GetConnection();
 
-                                            var caf_insert = new CAFTable
+                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+
+                                                    var caf_insert = new CAFTable
+                                                    {
+                                                        CAFNo = caf,
+                                                        EmployeeID = employeeNumber,
+                                                        CAFDate = DateTime.Parse(date),
+                                                        CustomerID = retailerCode,
+                                                        StartTime = DateTime.Parse(startTime),
+                                                        EndTime = DateTime.Parse(endTime),
+                                                        Photo1 = photo1url,
+                                                        Photo2 = photo2url,
+                                                        Photo3 = photo3url,
+                                                        Video = videourl,
+                                                        MobilePhoto1 = photo1url,
+                                                        MobilePhoto2 = photo2url,
+                                                        MobilePhoto3 = photo3url,
+                                                        MobileVideo = videourl,
+                                                        Remarks = remarks,
+                                                        OtherConcern = otherconcern,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertAsync(caf_insert);
+
+                                                    var rekorida_insert = new ActivityTable
+                                                    {
+                                                        CAFNo = caf,
+                                                        ContactID = employeeNumber,
+                                                        Activity = "Rekorida",
+                                                        ActivitySwitch = rekorida,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertAsync(rekorida_insert);
+
+                                                    var merchandizing_insert = new ActivityTable
+                                                    {
+                                                        CAFNo = caf,
+                                                        ContactID = employeeNumber,
+                                                        Activity = "Merchandizing",
+                                                        ActivitySwitch = merchandizing,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertAsync(merchandizing_insert);
+
+                                                    var trade_check_insert = new ActivityTable
+                                                    {
+                                                        CAFNo = caf,
+                                                        ContactID = employeeNumber,
+                                                        Activity = "Trade Check",
+                                                        ActivitySwitch = tradecheck,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertAsync(trade_check_insert);
+
+                                                    var others_insert = new ActivityTable
+                                                    {
+                                                        CAFNo = caf,
+                                                        ContactID = employeeNumber,
+                                                        Activity = "Others",
+                                                        ActivitySwitch = others,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertAsync(others_insert);
+
+                                                    await DisplayAlert("Your activity was sent!", "Your activity has been sent to the server", "Got it");
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Crashes.TrackError(ex);
+                                                }
+                                            }
+                                            else
                                             {
-                                                CAFNo = caf,
-                                                EmployeeID = employeeNumber,
-                                                CAFDate = DateTime.Parse(date),
-                                                CustomerID = retailerCode,
-                                                StartTime = DateTime.Parse(startTime),
-                                                EndTime = DateTime.Parse(endTime),
-                                                Photo1 = photo1url,
-                                                Photo2 = photo2url,
-                                                Photo3 = photo3url,
-                                                Video = videourl,
-                                                MobilePhoto1 = photo1url,
-                                                MobilePhoto2 = photo2url,
-                                                MobilePhoto3 = photo3url,
-                                                MobileVideo = videourl,
-                                                Remarks = remarks,
-                                                OtherConcern = otherconcern,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                var conn = db.GetConnection();
 
-                                            await conn.InsertAsync(caf_insert);
+                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
-                                            var rekorida_insert = new ActivityTable
-                                            {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Rekorida",
-                                                ActivitySwitch = rekorida,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var caf_insert = new CAFTable
+                                                {
+                                                    CAFNo = caf,
+                                                    EmployeeID = employeeNumber,
+                                                    CAFDate = DateTime.Parse(date),
+                                                    CustomerID = retailerCode,
+                                                    StartTime = DateTime.Parse(startTime),
+                                                    EndTime = DateTime.Parse(endTime),
+                                                    Photo1 = photo1url,
+                                                    Photo2 = photo2url,
+                                                    Photo3 = photo3url,
+                                                    Video = videourl,
+                                                    MobilePhoto1 = photo1url,
+                                                    MobilePhoto2 = photo2url,
+                                                    MobilePhoto3 = photo3url,
+                                                    MobileVideo = videourl,
+                                                    Remarks = remarks,
+                                                    OtherConcern = otherconcern,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(rekorida_insert);
+                                                await conn.InsertAsync(caf_insert);
 
-                                            var merchandizing_insert = new ActivityTable
-                                            {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Merchandizing",
-                                                ActivitySwitch = merchandizing,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var rekorida_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Rekorida",
+                                                    ActivitySwitch = rekorida,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(merchandizing_insert);
+                                                await conn.InsertAsync(rekorida_insert);
 
-                                            var trade_check_insert = new ActivityTable
-                                            {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Trade Check",
-                                                ActivitySwitch = tradecheck,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var merchandizing_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Merchandizing",
+                                                    ActivitySwitch = merchandizing,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(trade_check_insert);
+                                                await conn.InsertAsync(merchandizing_insert);
 
-                                            var others_insert = new ActivityTable
-                                            {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Others",
-                                                ActivitySwitch = others,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var trade_check_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Trade Check",
+                                                    ActivitySwitch = tradecheck,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(others_insert);
+                                                await conn.InsertAsync(trade_check_insert);
 
-                                            await DisplayAlert("Your activity was sent!", "Your activity has been sent to the server", "Got it");
+                                                var others_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Others",
+                                                    ActivitySwitch = others,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(others_insert);
+
+                                                await DisplayAlert("Your activity was saved offline", "Your activity has been saved offline connect to the server to send your activity", "Got it");
+                                            }
                                         }
-                                        catch (Exception ex)
+                                        else
                                         {
-                                            Crashes.TrackError(ex);
+                                            try
+                                            {
+                                                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
+                                                string contentType = "application/json";
+                                                JObject json = new JObject
+                                                {
+                                                    { "CAF", caf },
+                                                    { "CustomerID", retailerCode },
+                                                    { "EmployeeNumber", employeeNumber },
+                                                    { "Street", street },
+                                                    { "Barangay", barangay },
+                                                    { "Town", town },
+                                                    { "District", district },
+                                                    { "Province", province },
+                                                    { "Country", country },
+                                                    { "Landmark", landmark },
+                                                    { "Telephone1", telephone1 },
+                                                    { "Telephone2", telephone2 },
+                                                    { "Mobile", mobile },
+                                                    { "Email", email },
+                                                    { "Location", location },
+                                                    { "Date", DateTime.Parse(date) },
+                                                    { "StartTime", DateTime.Parse(startTime) },
+                                                    { "EndTime", DateTime.Parse(endTime) },
+                                                    { "Photo1", photo1 },
+                                                    { "Photo2", photo2 },
+                                                    { "Photo3", photo3 },
+                                                    { "Video", video },
+                                                    { "MobilePhoto1", photo1url },
+                                                    { "MobilePhoto2", photo2url },
+                                                    { "MobilePhoto3", photo3url },
+                                                    { "MobileVideo", videourl },
+                                                    { "Rekorida", rekorida },
+                                                    { "Merchandizing", merchandizing },
+                                                    { "TradeCheck", tradecheck },
+                                                    { "Others", others },
+                                                    { "OtherConcern", otherconcern },
+                                                    { "Remarks", remarks },
+                                                    { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                };
+
+                                                HttpClient client = new HttpClient();
+                                                client.Timeout = TimeSpan.FromMinutes(20);
+                                                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                var conn = db.GetConnection();
+
+                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+
+                                                var caf_insert = new CAFTable
+                                                {
+                                                    CAFNo = caf,
+                                                    EmployeeID = employeeNumber,
+                                                    CAFDate = DateTime.Parse(date),
+                                                    CustomerID = retailerCode,
+                                                    StartTime = DateTime.Parse(startTime),
+                                                    EndTime = DateTime.Parse(endTime),
+                                                    Photo1 = photo1url,
+                                                    Photo2 = photo2url,
+                                                    Photo3 = photo3url,
+                                                    Video = videourl,
+                                                    MobilePhoto1 = photo1url,
+                                                    MobilePhoto2 = photo2url,
+                                                    MobilePhoto3 = photo3url,
+                                                    MobileVideo = videourl,
+                                                    Remarks = remarks,
+                                                    OtherConcern = otherconcern,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(caf_insert);
+
+                                                var rekorida_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Rekorida",
+                                                    ActivitySwitch = rekorida,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(rekorida_insert);
+
+                                                var merchandizing_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Merchandizing",
+                                                    ActivitySwitch = merchandizing,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(merchandizing_insert);
+
+                                                var trade_check_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Trade Check",
+                                                    ActivitySwitch = tradecheck,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(trade_check_insert);
+
+                                                var others_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    Activity = "Others",
+                                                    ActivitySwitch = others,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
+
+                                                await conn.InsertAsync(others_insert);
+
+                                                await DisplayAlert("Your activity was sent!", "Your activity has been sent to the server", "Got it");
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Crashes.TrackError(ex);
+                                            }
                                         }
                                     }
                                     else

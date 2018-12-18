@@ -249,70 +249,175 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 50000);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        try
+                                        var optimalSpeed = 500000;
+                                        var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
+
+                                        if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
                                         {
-                                            string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
-                                            string contentType = "application/json";
-                                            JObject json = new JObject
+                                            var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
+                                            if (sendconfirm == true)
                                             {
-                                                { "ContactID", id },
-                                                { "RetailerCode", retailerCode },
-                                                { "PresStreet", street },
-                                                { "PresBarangay", barangay },
-                                                { "PresDistrict", district },
-                                                { "PresTown", town },
-                                                { "PresProvince", province },
-                                                { "PresCountry", country },
-                                                { "Landmark", landmark },
-                                                { "Telephone1", telephone1 },
-                                                { "Telephone2", telephone2 },
-                                                { "Mobile", mobile },
-                                                { "Email", email },
-                                                { "GPSCoordinates", location },
-                                                { "Coordinator", contact },
-                                                { "LastSync", current_datetime },
-                                                { "LastUpdated", current_datetime }
-                                            };
+                                                try
+                                                {
+                                                    string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
+                                                    string contentType = "application/json";
+                                                    JObject json = new JObject
+                                                    {
+                                                        { "ContactID", id },
+                                                        { "RetailerCode", retailerCode },
+                                                        { "PresStreet", street },
+                                                        { "PresBarangay", barangay },
+                                                        { "PresDistrict", district },
+                                                        { "PresTown", town },
+                                                        { "PresProvince", province },
+                                                        { "PresCountry", country },
+                                                        { "Landmark", landmark },
+                                                        { "Telephone1", telephone1 },
+                                                        { "Telephone2", telephone2 },
+                                                        { "Mobile", mobile },
+                                                        { "Email", email },
+                                                        { "GPSCoordinates", location },
+                                                        { "Coordinator", contact },
+                                                        { "LastSync", current_datetime },
+                                                        { "LastUpdated", current_datetime }
+                                                    };
 
-                                            await DisplayAlert("Your retailer outlet was sent!", "Retailer outlet has been sent to the server", "Got it");
-                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                    await DisplayAlert("Your retailer outlet was sent!", "Retailer outlet has been sent to the server", "Got it");
+                                                    await Application.Current.MainPage.Navigation.PopModalAsync();
 
-                                            var db = DependencyService.Get<ISQLiteDB>();
-                                            var conn = db.GetConnection();
+                                                    var db = DependencyService.Get<ISQLiteDB>();
+                                                    var conn = db.GetConnection();
 
-                                            var retailer_group_insert = new RetailerGroupTable
+                                                    var retailer_group_insert = new RetailerGroupTable
+                                                    {
+                                                        ContactID = id,
+                                                        RetailerCode = retailerCode,
+                                                        PresStreet = street,
+                                                        PresBarangay = barangay,
+                                                        PresDistrict = district,
+                                                        PresTown = town,
+                                                        PresProvince = province,
+                                                        PresCountry = country,
+                                                        Landmark = landmark,
+                                                        Telephone1 = telephone1,
+                                                        Telephone2 = telephone2,
+                                                        Mobile = mobile,
+                                                        Email = email,
+                                                        GPSCoordinates = location,
+                                                        Coordinator = contact,
+                                                        LastSync = DateTime.Parse(current_datetime),
+                                                        LastUpdated = DateTime.Parse(current_datetime),
+                                                    };
+
+                                                    await conn.InsertAsync(retailer_group_insert);
+
+                                                    HttpClient client = new HttpClient();
+                                                    var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Crashes.TrackError(ex);
+                                                }
+                                            }
+                                            else
                                             {
-                                                ContactID = id,
-                                                RetailerCode = retailerCode,
-                                                PresStreet = street,
-                                                PresBarangay = barangay,
-                                                PresDistrict = district,
-                                                PresTown = town,
-                                                PresProvince = province,
-                                                PresCountry = country,
-                                                Landmark = landmark,
-                                                Telephone1 = telephone1,
-                                                Telephone2 = telephone2,
-                                                Mobile = mobile,
-                                                Email = email,
-                                                GPSCoordinates = location,
-                                                Coordinator = contact,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime),
-                                            };
+                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                var conn = db.GetConnection();
 
-                                            await conn.InsertAsync(retailer_group_insert);
+                                                var retailer_group_insert = new RetailerGroupTable
+                                                {
+                                                    ContactID = id,
+                                                    RetailerCode = retailerCode,
+                                                    PresStreet = street,
+                                                    PresBarangay = barangay,
+                                                    PresDistrict = district,
+                                                    PresTown = town,
+                                                    PresProvince = province,
+                                                    PresCountry = country,
+                                                    Landmark = landmark,
+                                                    Telephone1 = telephone1,
+                                                    Telephone2 = telephone2,
+                                                    Mobile = mobile,
+                                                    Email = email,
+                                                    GPSCoordinates = location,
+                                                    Coordinator = contact,
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            HttpClient client = new HttpClient();
-                                            var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                                await conn.InsertOrReplaceAsync(retailer_group_insert);
 
+                                                await DisplayAlert("Retailer outlet was saved offline", "Retailer outlet has been saved offline connect to the server to send your activity", "Got it");
+                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                            }
                                         }
-                                        catch (Exception ex)
+                                        else
                                         {
-                                            Crashes.TrackError(ex);
+                                            try
+                                            {
+                                                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
+                                                string contentType = "application/json";
+                                                JObject json = new JObject
+                                                {
+                                                    { "ContactID", id },
+                                                    { "RetailerCode", retailerCode },
+                                                    { "PresStreet", street },
+                                                    { "PresBarangay", barangay },
+                                                    { "PresDistrict", district },
+                                                    { "PresTown", town },
+                                                    { "PresProvince", province },
+                                                    { "PresCountry", country },
+                                                    { "Landmark", landmark },
+                                                    { "Telephone1", telephone1 },
+                                                    { "Telephone2", telephone2 },
+                                                    { "Mobile", mobile },
+                                                    { "Email", email },
+                                                    { "GPSCoordinates", location },
+                                                    { "Coordinator", contact },
+                                                    { "LastSync", current_datetime },
+                                                    { "LastUpdated", current_datetime }
+                                                };
+
+                                                await DisplayAlert("Your retailer outlet was sent!", "Retailer outlet has been sent to the server", "Got it");
+                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+
+                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                var conn = db.GetConnection();
+
+                                                var retailer_group_insert = new RetailerGroupTable
+                                                {
+                                                    ContactID = id,
+                                                    RetailerCode = retailerCode,
+                                                    PresStreet = street,
+                                                    PresBarangay = barangay,
+                                                    PresDistrict = district,
+                                                    PresTown = town,
+                                                    PresProvince = province,
+                                                    PresCountry = country,
+                                                    Landmark = landmark,
+                                                    Telephone1 = telephone1,
+                                                    Telephone2 = telephone2,
+                                                    Mobile = mobile,
+                                                    Email = email,
+                                                    GPSCoordinates = location,
+                                                    Coordinator = contact,
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime),
+                                                };
+
+                                                await conn.InsertAsync(retailer_group_insert);
+
+                                                HttpClient client = new HttpClient();
+                                                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Crashes.TrackError(ex);
+                                            }
                                         }
                                     }
                                     else
