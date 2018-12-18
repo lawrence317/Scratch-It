@@ -345,16 +345,15 @@ namespace TBSMobile.View
                                 byte[] Photo3Data = File.ReadAllBytes(photo3url);
                                 string photo3 = Convert.ToBase64String(Photo3Data);
 
-                                string video;
+                                byte[] VideoData;
 
                                 if (!string.IsNullOrEmpty(videourl))
                                 {
-                                    byte[] VideoData = File.ReadAllBytes(videourl);
-                                    video = Convert.ToBase64String(VideoData);
+                                    VideoData = File.ReadAllBytes(videourl);
                                 }
                                 else
                                 {
-                                    video = "";
+                                    VideoData = null;
                                 }
 
                                 if (CrossConnectivity.Current.IsConnected)
@@ -363,7 +362,7 @@ namespace TBSMobile.View
                                     var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        var optimalSpeed = 500000;
+                                        var optimalSpeed = 200000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -397,7 +396,7 @@ namespace TBSMobile.View
                                                         { "Photo1", photo1 },
                                                         { "Photo2", photo2 },
                                                         { "Photo3", photo3 },
-                                                        { "Video", video },
+                                                        { "Video", VideoData },
                                                         { "MobilePhoto1", photo1url },
                                                         { "MobilePhoto2", photo2url },
                                                         { "MobilePhoto3", photo3url },
@@ -538,7 +537,7 @@ namespace TBSMobile.View
                                                     { "Photo1", photo1 },
                                                     { "Photo2", photo2 },
                                                     { "Photo3", photo3 },
-                                                    { "Video", video },
+                                                    { "Video", VideoData },
                                                     { "MobilePhoto1", photo1url },
                                                     { "MobilePhoto2", photo2url },
                                                     { "MobilePhoto3", photo3url },
@@ -861,7 +860,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = prospectID + "_IMG_01.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );
@@ -900,7 +899,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = prospectID + "_IMG_02.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );
@@ -939,7 +938,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = prospectID + "_IMG_03.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );

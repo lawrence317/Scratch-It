@@ -89,7 +89,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 500000;
+                                    var optimalSpeed = 200000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
                                     var speeds = CrossConnectivity.Current.Bandwidths;
 
@@ -378,7 +378,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 500000;
+                                    var optimalSpeed = 200000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                     if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -704,16 +704,15 @@ namespace TBSMobile.View
                             byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
                             string crpht3 = Convert.ToBase64String(crPhoto3Data);
 
-                            string crvid;
+                            byte[] crVideoData;
 
                             if (!string.IsNullOrEmpty(crvideo))
                             {
-                                byte[] crVideoData = File.ReadAllBytes(crvideo);
-                                crvid = Convert.ToBase64String(crVideoData);
+                                crVideoData = File.ReadAllBytes(crvideo);
                             }
                             else
                             {
-                                crvid = "";
+                                crVideoData = null;
                             }
 
                             var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=nLm8YE";
@@ -744,7 +743,7 @@ namespace TBSMobile.View
                                 { "Photo1", crpht1 },
                                 { "Photo2", crpht2 },
                                 { "Photo3", crpht3 },
-                                { "Video", crvid },
+                                { "Video", crVideoData },
                                 { "MobilePhoto1", crmobilePhoto1 },
                                 { "MobilePhoto2", crmobilePhoto2 },
                                 { "MobilePhoto3", crmobilePhoto3 },
@@ -932,16 +931,15 @@ namespace TBSMobile.View
                             byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
                             string crpht3 = Convert.ToBase64String(crPhoto3Data);
 
-                            string crvid;
+                            byte[] crVideoData;
 
                             if (!string.IsNullOrEmpty(crvideo))
                             {
-                                byte[] crVideoData = File.ReadAllBytes(crvideo);
-                                crvid = Convert.ToBase64String(crVideoData);
+                                crVideoData = File.ReadAllBytes(crvideo);
                             }
                             else
                             {
-                                crvid = "";
+                                crVideoData = null;
                             }
 
                             var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=k5N7PE";
@@ -957,7 +955,7 @@ namespace TBSMobile.View
                                 { "Photo1", crpht1 },
                                 { "Photo2", crpht2 },
                                 { "Photo3", crpht3 },
-                                { "Video", crvid },
+                                { "Video", crVideoData },
                                 { "MobilePhoto1", crmobilePhoto1 },
                                 { "MobilePhoto2", crmobilePhoto2 },
                                 { "MobilePhoto3", crmobilePhoto3 },

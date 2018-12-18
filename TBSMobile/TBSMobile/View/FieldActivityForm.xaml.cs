@@ -482,7 +482,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = cafNo + "_IMG_01.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );
@@ -521,7 +521,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = cafNo + "_IMG_02.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );
@@ -560,7 +560,7 @@ namespace TBSMobile.View
                     {
                         SaveToAlbum = false,
                         Name = cafNo + "_IMG_03.png",
-                        CompressionQuality = 80,
+                        CompressionQuality = 60,
                         PhotoSize = PhotoSize.Medium
                     }
                 );
@@ -599,8 +599,8 @@ namespace TBSMobile.View
                     new Plugin.Media.Abstractions.StoreVideoOptions
                     {
                         Name = cafNo + "_VID.mp4",
-                        CompressionQuality = 0,
-                        Quality = VideoQuality.Low,
+                        CompressionQuality = 100,
+                        Quality = VideoQuality.High,
                         DesiredLength = time
                     }
                 );
@@ -998,17 +998,16 @@ namespace TBSMobile.View
 
                                 byte[] Photo3Data = File.ReadAllBytes(photo3url);
                                 string photo3 = Convert.ToBase64String(Photo3Data);
-
-                                string video;
+                                
+                                byte[] VideoData;
 
                                 if (!string.IsNullOrEmpty(videourl))
                                 {
-                                    byte[] VideoData = File.ReadAllBytes(videourl);
-                                    video = Convert.ToBase64String(VideoData);
+                                    VideoData = File.ReadAllBytes(videourl);
                                 }
                                 else
                                 {
-                                    video = "";
+                                    VideoData = null;
                                 }
 
                                 if (CrossConnectivity.Current.IsConnected)
@@ -1017,7 +1016,7 @@ namespace TBSMobile.View
                                     var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        var optimalSpeed = 500000;
+                                        var optimalSpeed = 200000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -1052,7 +1051,7 @@ namespace TBSMobile.View
                                                         { "Photo1", photo1 },
                                                         { "Photo2", photo2 },
                                                         { "Photo3", photo3 },
-                                                        { "Video", video },
+                                                        { "Video", VideoData },
                                                         { "MobilePhoto1", photo1url },
                                                         { "MobilePhoto2", photo2url },
                                                         { "MobilePhoto3", photo3url },
@@ -1073,7 +1072,7 @@ namespace TBSMobile.View
                                                     var db = DependencyService.Get<ISQLiteDB>();
                                                     var conn = db.GetConnection();
 
-                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                     var caf_insert = new CAFTable
                                                     {
@@ -1159,7 +1158,7 @@ namespace TBSMobile.View
                                                 var db = DependencyService.Get<ISQLiteDB>();
                                                 var conn = db.GetConnection();
 
-                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                 var caf_insert = new CAFTable
                                                 {
@@ -1260,7 +1259,7 @@ namespace TBSMobile.View
                                                     { "Photo1", photo1 },
                                                     { "Photo2", photo2 },
                                                     { "Photo3", photo3 },
-                                                    { "Video", video },
+                                                    { "Video", VideoData },
                                                     { "MobilePhoto1", photo1url },
                                                     { "MobilePhoto2", photo2url },
                                                     { "MobilePhoto3", photo3url },
@@ -1275,13 +1274,12 @@ namespace TBSMobile.View
                                                 };
 
                                                 HttpClient client = new HttpClient();
-                                                client.Timeout = TimeSpan.FromMinutes(20);
                                                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                                 var db = DependencyService.Get<ISQLiteDB>();
                                                 var conn = db.GetConnection();
 
-                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                 var caf_insert = new CAFTable
                                                 {

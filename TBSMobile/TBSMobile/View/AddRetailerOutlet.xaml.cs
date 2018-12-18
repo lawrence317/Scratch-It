@@ -252,7 +252,7 @@ namespace TBSMobile.View
                                     var reply = ping.Send(new IPAddress(pingipaddress), 500);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        var optimalSpeed = 500000;
+                                        var optimalSpeed = 200000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
