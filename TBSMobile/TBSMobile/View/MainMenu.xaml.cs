@@ -760,7 +760,70 @@ namespace TBSMobile.View
 
                             if (crresponse.IsSuccessStatusCode)
                             {
-                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
+                                string ph1contentType = "application/json";
+                                JObject ph1json = new JObject
+                                    {
+                                        { "ContactID", crcontactID },
+                                        { "Photo1", crpht1 }
+                                    };
+
+                                HttpClient ph1client = new HttpClient();
+                                var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
+
+                                if (ph1response.IsSuccessStatusCode)
+                                {
+                                    var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
+                                    string ph2contentType = "application/json";
+                                    JObject ph2json = new JObject
+                                        {
+                                            { "ContactID", crcontactID },
+                                            { "Photo2", crpht2 }
+                                        };
+
+                                    HttpClient ph2client = new HttpClient();
+                                    var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+
+                                    if (ph2response.IsSuccessStatusCode)
+                                    {
+                                        var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
+                                        string ph3contentType = "application/json";
+                                        JObject ph3json = new JObject
+                                            {
+                                                { "ContactID", crcontactID },
+                                                { "Photo3", crpht3 }
+                                            };
+
+                                        HttpClient ph3client = new HttpClient();
+                                        var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
+
+                                        if (ph3response.IsSuccessStatusCode)
+                                        {
+                                            if (!string.IsNullOrEmpty(crvideo))
+                                            {
+                                                var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
+                                                string vidcontentType = "application/json";
+                                                JObject vidjson = new JObject
+                                                    {
+                                                        { "ContactID", crcontactID },
+                                                        { "Video", crVideoData }
+                                                    };
+
+                                                HttpClient vidclient = new HttpClient();
+                                                var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                if (vidresponse.IsSuccessStatusCode)
+                                                {
+                                                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -952,10 +1015,6 @@ namespace TBSMobile.View
                                 { "CustomerID", crcustomerID },
                                 { "StartTime", crstartTime },
                                 { "EndTime", crendTime },
-                                { "Photo1", crpht1 },
-                                { "Photo2", crpht2 },
-                                { "Photo3", crpht3 },
-                                { "Video", crVideoData },
                                 { "MobilePhoto1", crmobilePhoto1 },
                                 { "MobilePhoto2", crmobilePhoto2 },
                                 { "MobilePhoto3", crmobilePhoto3 },
@@ -970,7 +1029,81 @@ namespace TBSMobile.View
 
                             if (crresponse.IsSuccessStatusCode)
                             {
-                                await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
+                                string ph1contentType = "application/json";
+                                JObject ph1json = new JObject
+                                {
+                                    { "CAFNo", crcafNo },
+                                    { "CAFDate", crcafDate },
+                                    { "Photo1", crpht1 }
+                                };
+
+                                HttpClient ph1client = new HttpClient();
+                                var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
+
+                                if (ph1response.IsSuccessStatusCode)
+                                {
+                                    var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
+                                    string ph2contentType = "application/json";
+                                    JObject ph2json = new JObject
+                                    {
+                                        { "CAFNo", crcafNo },
+                                        { "CAFDate", crcafDate },
+                                        { "Photo2", crpht2 }
+                                    };
+
+                                    HttpClient ph2client = new HttpClient();
+                                    var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+
+                                    if (ph2response.IsSuccessStatusCode)
+                                    {
+                                        var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
+                                        string ph3contentType = "application/json";
+                                        JObject ph3json = new JObject
+                                        {
+                                            { "CAFNo", crcafNo },
+                                            { "CAFDate", crcafDate },
+                                            { "Photo3", crpht3 }
+                                        };
+
+                                        HttpClient ph3client = new HttpClient();
+                                        var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
+
+                                        if (ph3response.IsSuccessStatusCode)
+                                        {
+                                            try
+                                            {
+                                                if (!string.IsNullOrEmpty(crvideo))
+                                                {
+                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
+                                                    string vidcontentType = "application/json";
+                                                    JObject vidjson = new JObject
+                                                    {
+                                                        { "CAFNo", crcafNo },
+                                                        { "CAFDate", crcafDate },
+                                                        { "Video", crVideoData }
+                                                    };
+
+                                                    HttpClient vidclient = new HttpClient();
+                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                    if (vidresponse.IsSuccessStatusCode)
+                                                    {
+                                                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                }
+                                            }
+                                            catch(Exception ex)
+                                            {
+                                                Crashes.TrackError(ex);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

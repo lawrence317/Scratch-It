@@ -1030,7 +1030,7 @@ namespace TBSMobile.View
                                                     string contentType = "application/json";
                                                     JObject json = new JObject
                                                     {
-                                                        { "CAF", caf },
+                                                        { "CAFNo", caf },
                                                         { "CustomerID", retailerCode },
                                                         { "EmployeeNumber", employeeNumber },
                                                         { "Street", street },
@@ -1048,10 +1048,6 @@ namespace TBSMobile.View
                                                         { "Date", DateTime.Parse(date) },
                                                         { "StartTime", DateTime.Parse(startTime) },
                                                         { "EndTime", DateTime.Parse(endTime) },
-                                                        { "Photo1", photo1 },
-                                                        { "Photo2", photo2 },
-                                                        { "Photo3", photo3 },
-                                                        { "Video", VideoData },
                                                         { "MobilePhoto1", photo1url },
                                                         { "MobilePhoto2", photo2url },
                                                         { "MobilePhoto3", photo3url },
@@ -1066,8 +1062,77 @@ namespace TBSMobile.View
                                                     };
 
                                                     HttpClient client = new HttpClient();
-                                                    client.Timeout = TimeSpan.FromMinutes(20);
                                                     var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                                    if (response.IsSuccessStatusCode)
+                                                    {
+                                                        var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
+                                                        string ph1contentType = "application/json";
+                                                        JObject ph1json = new JObject
+                                                        {
+                                                            { "CAFNo", caf },
+                                                            { "CAFDate", DateTime.Parse(date) },
+                                                            { "Photo1", photo1 }
+                                                        };
+
+                                                        HttpClient ph1client = new HttpClient();
+                                                        var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
+
+                                                        if (ph1response.IsSuccessStatusCode)
+                                                        {
+                                                            var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
+                                                            string ph2contentType = "application/json";
+                                                            JObject ph2json = new JObject
+                                                            {
+                                                                { "CAFNo", caf },
+                                                                { "CAFDate", DateTime.Parse(date) },
+                                                                { "Photo2", photo2 }
+                                                            };
+
+                                                            HttpClient ph2client = new HttpClient();
+                                                            var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+
+                                                            if (ph2response.IsSuccessStatusCode)
+                                                            {
+                                                                var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
+                                                                string ph3contentType = "application/json";
+                                                                JObject ph3json = new JObject
+                                                                {
+                                                                    { "CAFNo", caf },
+                                                                    { "CAFDate", DateTime.Parse(date) },
+                                                                    { "Photo3", photo3 }
+                                                                };
+
+                                                                HttpClient ph3client = new HttpClient();
+                                                                var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
+
+                                                                if (ph3response.IsSuccessStatusCode)
+                                                                {
+                                                                    if (!string.IsNullOrEmpty(videourl))
+                                                                    {
+                                                                        try
+                                                                        {
+                                                                            var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
+                                                                            string vidcontentType = "application/json";
+                                                                            JObject vidjson = new JObject
+                                                                            {
+                                                                                { "CAFNo", caf },
+                                                                                { "CAFDate", DateTime.Parse(date) },
+                                                                                { "Video", VideoData }
+                                                                            };
+
+                                                                            HttpClient vidclient = new HttpClient();
+                                                                            var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+                                                                        }
+                                                                        catch (Exception ex)
+                                                                        {
+                                                                            Crashes.TrackError(ex);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
 
                                                     var db = DependencyService.Get<ISQLiteDB>();
                                                     var conn = db.GetConnection();
@@ -1158,7 +1223,7 @@ namespace TBSMobile.View
                                                 var db = DependencyService.Get<ISQLiteDB>();
                                                 var conn = db.GetConnection();
 
-                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
+                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
                                                 var caf_insert = new CAFTable
                                                 {
@@ -1238,7 +1303,7 @@ namespace TBSMobile.View
                                                 string contentType = "application/json";
                                                 JObject json = new JObject
                                                 {
-                                                    { "CAF", caf },
+                                                    { "CAFNo", caf },
                                                     { "CustomerID", retailerCode },
                                                     { "EmployeeNumber", employeeNumber },
                                                     { "Street", street },
@@ -1256,10 +1321,6 @@ namespace TBSMobile.View
                                                     { "Date", DateTime.Parse(date) },
                                                     { "StartTime", DateTime.Parse(startTime) },
                                                     { "EndTime", DateTime.Parse(endTime) },
-                                                    { "Photo1", photo1 },
-                                                    { "Photo2", photo2 },
-                                                    { "Photo3", photo3 },
-                                                    { "Video", VideoData },
                                                     { "MobilePhoto1", photo1url },
                                                     { "MobilePhoto2", photo2url },
                                                     { "MobilePhoto3", photo3url },
@@ -1275,6 +1336,69 @@ namespace TBSMobile.View
 
                                                 HttpClient client = new HttpClient();
                                                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                                                if (response.IsSuccessStatusCode)
+                                                {
+                                                    var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
+                                                    string ph1contentType = "application/json";
+                                                    JObject ph1json = new JObject
+                                                    {
+                                                        { "CAFNo", caf },
+                                                        { "CAFDate", DateTime.Parse(date) },
+                                                        { "Photo1", photo1 }
+                                                    };
+
+                                                    HttpClient ph1client = new HttpClient();
+                                                    var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
+
+                                                    if (ph1response.IsSuccessStatusCode)
+                                                    {
+                                                        var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
+                                                        string ph2contentType = "application/json";
+                                                        JObject ph2json = new JObject
+                                                        {
+                                                            { "CAFNo", caf },
+                                                            { "CAFDate", DateTime.Parse(date) },
+                                                            { "Photo2", photo2 }
+                                                        };
+
+                                                        HttpClient ph2client = new HttpClient();
+                                                        var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+
+                                                        if (ph2response.IsSuccessStatusCode)
+                                                        {
+                                                            var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
+                                                            string ph3contentType = "application/json";
+                                                            JObject ph3json = new JObject
+                                                            {
+                                                                { "CAFNo", caf },
+                                                                { "CAFDate", DateTime.Parse(date) },
+                                                                { "Photo3", photo3 }
+                                                            };
+
+                                                            HttpClient ph3client = new HttpClient();
+                                                            var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
+
+                                                            if (ph3response.IsSuccessStatusCode)
+                                                            {
+                                                                if (!string.IsNullOrEmpty(videourl))
+                                                                {
+                                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
+                                                                    string vidcontentType = "application/json";
+                                                                    JObject vidjson = new JObject
+                                                                    {
+                                                                        { "CAFNo", caf },
+                                                                        { "CAFDate", DateTime.Parse(date) },
+                                                                        { "Video", VideoData }
+                                                                    };
+
+                                                                    HttpClient vidclient = new HttpClient();
+                                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
 
                                                 var db = DependencyService.Get<ISQLiteDB>();
                                                 var conn = db.GetConnection();

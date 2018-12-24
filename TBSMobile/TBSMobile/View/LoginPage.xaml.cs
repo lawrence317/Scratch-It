@@ -194,7 +194,7 @@ namespace TBSMobile.View
                             request.Method = "GET";
 
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 1000);
 
                             if (reply.Status == IPStatus.Success)
                             {
@@ -422,9 +422,9 @@ namespace TBSMobile.View
                                 }
                             }
                         }
-                        catch
+                        catch (Exception ex)
                         {
-                            await DisplayAlert("Login Error", "Server is unreachable, please check your connection", "Ok");
+                            Crashes.TrackError(ex);
                         }
                     }
                 }
