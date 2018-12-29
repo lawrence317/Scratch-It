@@ -599,8 +599,8 @@ namespace TBSMobile.View
                     new Plugin.Media.Abstractions.StoreVideoOptions
                     {
                         Name = cafNo + "_VID.mp4",
-                        CompressionQuality = 100,
-                        Quality = VideoQuality.High,
+                        CompressionQuality = 5,
+                        Quality = VideoQuality.Low,
                         DesiredLength = time
                     }
                 );

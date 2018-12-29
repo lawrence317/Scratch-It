@@ -985,26 +985,6 @@ namespace TBSMobile.View
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
-                            byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-                            string crpht1 = Convert.ToBase64String(crPhoto1Data);
-
-                            byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-                            string crpht2 = Convert.ToBase64String(crPhoto2Data);
-
-                            byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-                            string crpht3 = Convert.ToBase64String(crPhoto3Data);
-
-                            byte[] crVideoData;
-
-                            if (!string.IsNullOrEmpty(crvideo))
-                            {
-                                crVideoData = File.ReadAllBytes(crvideo);
-                            }
-                            else
-                            {
-                                crVideoData = null;
-                            }
-
                             var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=k5N7PE";
                             string crcontentType = "application/json";
                             JObject crjson = new JObject
@@ -1029,6 +1009,9 @@ namespace TBSMobile.View
 
                             if (crresponse.IsSuccessStatusCode)
                             {
+                                byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
+                                string crpht1 = Convert.ToBase64String(crPhoto1Data);
+
                                 var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                                 string ph1contentType = "application/json";
                                 JObject ph1json = new JObject
@@ -1043,6 +1026,9 @@ namespace TBSMobile.View
 
                                 if (ph1response.IsSuccessStatusCode)
                                 {
+                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
+                                    string crpht2 = Convert.ToBase64String(crPhoto2Data);
+
                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                     string ph2contentType = "application/json";
                                     JObject ph2json = new JObject
@@ -1057,6 +1043,9 @@ namespace TBSMobile.View
 
                                     if (ph2response.IsSuccessStatusCode)
                                     {
+                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
+                                        string crpht3 = Convert.ToBase64String(crPhoto3Data);
+
                                         var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
                                         string ph3contentType = "application/json";
                                         JObject ph3json = new JObject
@@ -1073,23 +1062,41 @@ namespace TBSMobile.View
                                         {
                                             try
                                             {
+                                                byte[] crVideoData;
+
                                                 if (!string.IsNullOrEmpty(crvideo))
                                                 {
-                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
-                                                    string vidcontentType = "application/json";
-                                                    JObject vidjson = new JObject
-                                                    {
-                                                        { "CAFNo", crcafNo },
-                                                        { "CAFDate", crcafDate },
-                                                        { "Video", crVideoData }
-                                                    };
+                                                    crVideoData = File.ReadAllBytes(crvideo);
+                                                }
+                                                else
+                                                {
+                                                    crVideoData = null;
+                                                }
 
-                                                    HttpClient vidclient = new HttpClient();
-                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
-
-                                                    if (vidresponse.IsSuccessStatusCode)
+                                                if (!string.IsNullOrEmpty(crvideo))
+                                                {
+                                                    try
                                                     {
-                                                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                        var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
+                                                        string vidcontentType = "application/json";
+                                                        JObject vidjson = new JObject
+                                                        {
+                                                            { "CAFNo", crcafNo },
+                                                            { "CAFDate", crcafDate },
+                                                            { "Video", crVideoData }
+                                                        };
+
+                                                        HttpClient vidclient = new HttpClient();
+                                                        var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                        if (vidresponse.IsSuccessStatusCode)
+                                                        {
+                                                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                        }
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        Crashes.TrackError(ex);
                                                     }
                                                 }
                                                 else

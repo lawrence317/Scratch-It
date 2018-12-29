@@ -1091,7 +1091,7 @@ namespace TBSMobile.View
                     new Plugin.Media.Abstractions.StoreVideoOptions
                     {
                         Name = prospectID + "_VID.mp4",
-                        CompressionQuality = 0,
+                        CompressionQuality = 5,
                         Quality = VideoQuality.Low,
                         DesiredLength = time
                     }
