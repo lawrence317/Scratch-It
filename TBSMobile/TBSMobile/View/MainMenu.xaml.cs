@@ -60,7 +60,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
                             if (reply.Status == IPStatus.Success)
                             {
@@ -89,7 +89,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 200000;
+                                    var optimalSpeed = 300000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
                                     var speeds = CrossConnectivity.Current.Bandwidths;
 
@@ -349,7 +349,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             var ping = new Ping();
-                            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+                            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
                             if (reply.Status == IPStatus.Success)
                             {
@@ -378,7 +378,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 200000;
+                                    var optimalSpeed = 300000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                     if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -386,7 +386,7 @@ namespace TBSMobile.View
                                         lblStatus.Text = "Initializing data sync";
                                         lblStatus.BackgroundColor = Color.FromHex("#27ae60");
 
-                                        var confirm = await DisplayAlert("Auto-sync Connection Warning", "Slow connection detected. Do you want to sync the data?", "Yes", "No");
+                                        var confirm = await DisplayAlert("Auto-sync Connection Speed Warning", "Slow connection detected. Do you want to sync the data?", "Yes", "No");
                                         if (confirm == true)
                                         {
                                             SyncRetailer(host, database, contact, ipaddress, pingipaddress);
@@ -638,7 +638,7 @@ namespace TBSMobile.View
         public async void SyncRetailer(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -695,26 +695,6 @@ namespace TBSMobile.View
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
-                            byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-                            string crpht1 = Convert.ToBase64String(crPhoto1Data);
-
-                            byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-                            string crpht2 = Convert.ToBase64String(crPhoto2Data);
-
-                            byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-                            string crpht3 = Convert.ToBase64String(crPhoto3Data);
-
-                            byte[] crVideoData;
-
-                            if (!string.IsNullOrEmpty(crvideo))
-                            {
-                                crVideoData = File.ReadAllBytes(crvideo);
-                            }
-                            else
-                            {
-                                crVideoData = null;
-                            }
-
                             var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=nLm8YE";
                             string crcontentType = "application/json";
                             JObject crjson = new JObject
@@ -740,10 +720,6 @@ namespace TBSMobile.View
                                 { "Telephone2", crtelephone2 },
                                 { "Mobile", crmobile },
                                 { "Email", cremail },
-                                { "Photo1", crpht1 },
-                                { "Photo2", crpht2 },
-                                { "Photo3", crpht3 },
-                                { "Video", crVideoData },
                                 { "MobilePhoto1", crmobilePhoto1 },
                                 { "MobilePhoto2", crmobilePhoto2 },
                                 { "MobilePhoto3", crmobilePhoto3 },
@@ -760,25 +736,29 @@ namespace TBSMobile.View
 
                             if (crresponse.IsSuccessStatusCode)
                             {
+                                byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
+
                                 var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
                                 string ph1contentType = "application/json";
                                 JObject ph1json = new JObject
-                                    {
-                                        { "ContactID", crcontactID },
-                                        { "Photo1", crpht1 }
-                                    };
+                                {
+                                    { "ContactID", crcontactID },
+                                    { "Photo1", crPhoto1Data }
+                                };
 
                                 HttpClient ph1client = new HttpClient();
                                 var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
 
                                 if (ph1response.IsSuccessStatusCode)
                                 {
+                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
+
                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
                                     string ph2contentType = "application/json";
                                     JObject ph2json = new JObject
                                         {
                                             { "ContactID", crcontactID },
-                                            { "Photo2", crpht2 }
+                                            { "Photo2", crPhoto2Data }
                                         };
 
                                     HttpClient ph2client = new HttpClient();
@@ -786,12 +766,14 @@ namespace TBSMobile.View
 
                                     if (ph2response.IsSuccessStatusCode)
                                     {
+                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
+
                                         var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
                                         string ph3contentType = "application/json";
                                         JObject ph3json = new JObject
                                             {
                                                 { "ContactID", crcontactID },
-                                                { "Photo3", crpht3 }
+                                                { "Photo3", crPhoto3Data }
                                             };
 
                                         HttpClient ph3client = new HttpClient();
@@ -799,27 +781,45 @@ namespace TBSMobile.View
 
                                         if (ph3response.IsSuccessStatusCode)
                                         {
-                                            if (!string.IsNullOrEmpty(crvideo))
+                                            try
                                             {
-                                                var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
-                                                string vidcontentType = "application/json";
-                                                JObject vidjson = new JObject
+                                                if (!string.IsNullOrEmpty(crvideo))
+                                                {
+                                                    byte[] crVideoData;
+
+                                                    if (!string.IsNullOrEmpty(crvideo))
                                                     {
-                                                        { "ContactID", crcontactID },
-                                                        { "Video", crVideoData }
+                                                        crVideoData = File.ReadAllBytes(crvideo);
+                                                    }
+                                                    else
+                                                    {
+                                                        crVideoData = null;
+                                                    }
+
+                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
+                                                    string vidcontentType = "application/json";
+                                                    JObject vidjson = new JObject
+                                                    {
+                                                       { "ContactID", crcontactID },
+                                                       { "Video", crVideoData }
                                                     };
 
-                                                HttpClient vidclient = new HttpClient();
-                                                var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+                                                    HttpClient vidclient = new HttpClient();
+                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
 
-                                                if (vidresponse.IsSuccessStatusCode)
+                                                    if (vidresponse.IsSuccessStatusCode)
+                                                    {
+                                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                    }
+                                                }
+                                                else
                                                 {
                                                     await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
                                                 }
                                             }
-                                            else
+                                            catch (Exception ex)
                                             {
-                                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                Crashes.TrackError(ex);
                                             }
                                         }
                                     }
@@ -850,7 +850,7 @@ namespace TBSMobile.View
         public async void SyncRetailerOutlet(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -945,7 +945,7 @@ namespace TBSMobile.View
         public async void SyncCaf(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1010,7 +1010,6 @@ namespace TBSMobile.View
                             if (crresponse.IsSuccessStatusCode)
                             {
                                 byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-                                string crpht1 = Convert.ToBase64String(crPhoto1Data);
 
                                 var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                                 string ph1contentType = "application/json";
@@ -1018,7 +1017,7 @@ namespace TBSMobile.View
                                 {
                                     { "CAFNo", crcafNo },
                                     { "CAFDate", crcafDate },
-                                    { "Photo1", crpht1 }
+                                    { "Photo1", crPhoto1Data }
                                 };
 
                                 HttpClient ph1client = new HttpClient();
@@ -1027,7 +1026,6 @@ namespace TBSMobile.View
                                 if (ph1response.IsSuccessStatusCode)
                                 {
                                     byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-                                    string crpht2 = Convert.ToBase64String(crPhoto2Data);
 
                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                     string ph2contentType = "application/json";
@@ -1035,7 +1033,7 @@ namespace TBSMobile.View
                                     {
                                         { "CAFNo", crcafNo },
                                         { "CAFDate", crcafDate },
-                                        { "Photo2", crpht2 }
+                                        { "Photo2", crPhoto2Data }
                                     };
 
                                     HttpClient ph2client = new HttpClient();
@@ -1044,7 +1042,6 @@ namespace TBSMobile.View
                                     if (ph2response.IsSuccessStatusCode)
                                     {
                                         byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-                                        string crpht3 = Convert.ToBase64String(crPhoto3Data);
 
                                         var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
                                         string ph3contentType = "application/json";
@@ -1052,7 +1049,7 @@ namespace TBSMobile.View
                                         {
                                             { "CAFNo", crcafNo },
                                             { "CAFDate", crcafDate },
-                                            { "Photo3", crpht3 }
+                                            { "Photo3", crPhoto3Data }
                                         };
 
                                         HttpClient ph3client = new HttpClient();
@@ -1137,7 +1134,7 @@ namespace TBSMobile.View
         public async void SyncActivities(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1209,7 +1206,7 @@ namespace TBSMobile.View
         public async void SyncEmail(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             var ping = new Ping();
-            var reply = ping.Send(new IPAddress(pingipaddress), 500);
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -1276,8 +1273,28 @@ namespace TBSMobile.View
 
         public void OnSyncComplete()
         {
-            lblStatus.Text = "Online - Connected to server";
-            lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
+            var ping = new Ping();
+            var reply = ping.Send(new IPAddress(pingipaddress), 5000);
+
+            if (CrossConnectivity.Current.IsConnected)
+            {
+                if (reply.Status == IPStatus.Success)
+                {
+                    lblStatus.Text = "Online - Connected to server";
+                    lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
+                }
+                else
+                {
+                    lblStatus.Text = "Online - Server unreachable. Connect to VPN";
+                    lblStatus.BackgroundColor = Color.FromHex("#e67e22");
+                }
+            }
+            else
+            {
+                lblStatus.Text = "Offline - Connect to internet";
+                lblStatus.BackgroundColor = Color.FromHex("#e74c3c");
+            }
+
             btnFAF.IsEnabled = true;
             btnAH.IsEnabled = true;
             btnLogout.IsEnabled = true;

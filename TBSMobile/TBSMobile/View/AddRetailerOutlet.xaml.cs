@@ -230,29 +230,14 @@ namespace TBSMobile.View
                                 countryvalidator.IsVisible = false;
 
                                 btnAdd.IsEnabled = false;
-                                var id = entContact.Text;
-                                var retailerCode = entRetailerCode.Text;
-                                var street = entStreet.Text;
-                                var barangay = entBarangay.Text;
-                                var town = entTownCode.Text;
-                                var province = entProvinceCode.Text;
-                                var district = entDistrict.Text;
-                                var country = entCountry.Text;
-                                var landmark = entLandmark.Text;
-                                var mobile = entMobile.Text;
-                                var telephone1 = entTelephone1.Text;
-                                var telephone2 = entTelephone2.Text;
-                                var email = entEmail.Text;
-                                var location = entLocation.Text;
-                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 500);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 5000);
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        var optimalSpeed = 200000;
+                                        var optimalSpeed = 300000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -260,226 +245,26 @@ namespace TBSMobile.View
                                             var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
                                             if (sendconfirm == true)
                                             {
-                                                try
-                                                {
-                                                    string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
-                                                    string contentType = "application/json";
-                                                    JObject json = new JObject
-                                                    {
-                                                        { "ContactID", id },
-                                                        { "RetailerCode", retailerCode },
-                                                        { "PresStreet", street },
-                                                        { "PresBarangay", barangay },
-                                                        { "PresDistrict", district },
-                                                        { "PresTown", town },
-                                                        { "PresProvince", province },
-                                                        { "PresCountry", country },
-                                                        { "Landmark", landmark },
-                                                        { "Telephone1", telephone1 },
-                                                        { "Telephone2", telephone2 },
-                                                        { "Mobile", mobile },
-                                                        { "Email", email },
-                                                        { "GPSCoordinates", location },
-                                                        { "Coordinator", contact },
-                                                        { "LastSync", current_datetime },
-                                                        { "LastUpdated", current_datetime }
-                                                    };
-
-                                                    await DisplayAlert("Your retailer outlet was sent!", "Retailer outlet has been sent to the server", "Got it");
-                                                    await Application.Current.MainPage.Navigation.PopModalAsync();
-
-                                                    var db = DependencyService.Get<ISQLiteDB>();
-                                                    var conn = db.GetConnection();
-
-                                                    var retailer_group_insert = new RetailerGroupTable
-                                                    {
-                                                        ContactID = id,
-                                                        RetailerCode = retailerCode,
-                                                        PresStreet = street,
-                                                        PresBarangay = barangay,
-                                                        PresDistrict = district,
-                                                        PresTown = town,
-                                                        PresProvince = province,
-                                                        PresCountry = country,
-                                                        Landmark = landmark,
-                                                        Telephone1 = telephone1,
-                                                        Telephone2 = telephone2,
-                                                        Mobile = mobile,
-                                                        Email = email,
-                                                        GPSCoordinates = location,
-                                                        Coordinator = contact,
-                                                        LastSync = DateTime.Parse(current_datetime),
-                                                        LastUpdated = DateTime.Parse(current_datetime),
-                                                    };
-
-                                                    await conn.InsertAsync(retailer_group_insert);
-
-                                                    HttpClient client = new HttpClient();
-                                                    var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
-                                                }
+                                                Send_online();
                                             }
                                             else
                                             {
-                                                var db = DependencyService.Get<ISQLiteDB>();
-                                                var conn = db.GetConnection();
-
-                                                var retailer_group_insert = new RetailerGroupTable
-                                                {
-                                                    ContactID = id,
-                                                    RetailerCode = retailerCode,
-                                                    PresStreet = street,
-                                                    PresBarangay = barangay,
-                                                    PresDistrict = district,
-                                                    PresTown = town,
-                                                    PresProvince = province,
-                                                    PresCountry = country,
-                                                    Landmark = landmark,
-                                                    Telephone1 = telephone1,
-                                                    Telephone2 = telephone2,
-                                                    Mobile = mobile,
-                                                    Email = email,
-                                                    GPSCoordinates = location,
-                                                    Coordinator = contact,
-                                                    LastUpdated = DateTime.Parse(current_datetime)
-                                                };
-
-                                                await conn.InsertOrReplaceAsync(retailer_group_insert);
-
-                                                await DisplayAlert("Retailer outlet was saved offline", "Retailer outlet has been saved offline connect to the server to send your activity", "Got it");
-                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                Send_offline();
                                             }
                                         }
                                         else
                                         {
-                                            try
-                                            {
-                                                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
-                                                string contentType = "application/json";
-                                                JObject json = new JObject
-                                                {
-                                                    { "ContactID", id },
-                                                    { "RetailerCode", retailerCode },
-                                                    { "PresStreet", street },
-                                                    { "PresBarangay", barangay },
-                                                    { "PresDistrict", district },
-                                                    { "PresTown", town },
-                                                    { "PresProvince", province },
-                                                    { "PresCountry", country },
-                                                    { "Landmark", landmark },
-                                                    { "Telephone1", telephone1 },
-                                                    { "Telephone2", telephone2 },
-                                                    { "Mobile", mobile },
-                                                    { "Email", email },
-                                                    { "GPSCoordinates", location },
-                                                    { "Coordinator", contact },
-                                                    { "LastSync", current_datetime },
-                                                    { "LastUpdated", current_datetime }
-                                                };
-
-                                                await DisplayAlert("Your retailer outlet was sent!", "Retailer outlet has been sent to the server", "Got it");
-                                                await Application.Current.MainPage.Navigation.PopModalAsync();
-
-                                                var db = DependencyService.Get<ISQLiteDB>();
-                                                var conn = db.GetConnection();
-
-                                                var retailer_group_insert = new RetailerGroupTable
-                                                {
-                                                    ContactID = id,
-                                                    RetailerCode = retailerCode,
-                                                    PresStreet = street,
-                                                    PresBarangay = barangay,
-                                                    PresDistrict = district,
-                                                    PresTown = town,
-                                                    PresProvince = province,
-                                                    PresCountry = country,
-                                                    Landmark = landmark,
-                                                    Telephone1 = telephone1,
-                                                    Telephone2 = telephone2,
-                                                    Mobile = mobile,
-                                                    Email = email,
-                                                    GPSCoordinates = location,
-                                                    Coordinator = contact,
-                                                    LastSync = DateTime.Parse(current_datetime),
-                                                    LastUpdated = DateTime.Parse(current_datetime),
-                                                };
-
-                                                await conn.InsertAsync(retailer_group_insert);
-
-                                                HttpClient client = new HttpClient();
-                                                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Crashes.TrackError(ex);
-                                            }
+                                            Send_online();
                                         }
                                     }
                                     else
                                     {
-                                        var db = DependencyService.Get<ISQLiteDB>();
-                                        var conn = db.GetConnection();
-
-                                        var retailer_group_insert = new RetailerGroupTable
-                                        {
-                                            ContactID = id,
-                                            RetailerCode = retailerCode,
-                                            PresStreet = street,
-                                            PresBarangay = barangay,
-                                            PresDistrict = district,
-                                            PresTown = town,
-                                            PresProvince = province,
-                                            PresCountry = country,
-                                            Landmark = landmark,
-                                            Telephone1 = telephone1,
-                                            Telephone2 = telephone2,
-                                            Mobile = mobile,
-                                            Email = email,
-                                            GPSCoordinates = location,
-                                            Coordinator = contact,
-                                            LastUpdated = DateTime.Parse(current_datetime)
-                                        };
-
-                                        await conn.InsertOrReplaceAsync(retailer_group_insert);
-
-                                        await DisplayAlert("Retailer outlet was saved offline", "Retailer outlet has been saved offline connect to the server to send your activity", "Got it");
-                                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                                        Send_offline();
                                     }
                                 }
                                 else
                                 {
-                                    var db = DependencyService.Get<ISQLiteDB>();
-                                    var conn = db.GetConnection();
-
-                                    var retailer_group_insert = new RetailerGroupTable
-                                    {
-                                        ContactID = id,
-                                        RetailerCode = retailerCode,
-                                        PresStreet = street,
-                                        PresBarangay = barangay,
-                                        PresDistrict = district,
-                                        PresTown = town,
-                                        PresProvince = province,
-                                        PresCountry = country,
-                                        Landmark = landmark,
-                                        Telephone1 = telephone1,
-                                        Telephone2 = telephone2,
-                                        Mobile = mobile,
-                                        Email = email,
-                                        GPSCoordinates = location,
-                                        Coordinator = contact,
-                                        LastUpdated = DateTime.Parse(current_datetime)
-                                    };
-
-                                    await conn.InsertOrReplaceAsync(retailer_group_insert);
-
-                                    await DisplayAlert("Retailer outlet was saved offline", "Retailer outlet has been saved offline connect to the server to send your activity", "Got it");
-                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    Send_offline();
                                 }
                             }
                         }
@@ -809,6 +594,144 @@ namespace TBSMobile.View
                     townPicker.SelectedIndex = -1;
                     entTownCode.Text = null;
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void Send_online()
+        {
+            var id = entContact.Text;
+            var retailerCode = entRetailerCode.Text;
+            var street = entStreet.Text;
+            var barangay = entBarangay.Text;
+            var town = entTownCode.Text;
+            var province = entProvinceCode.Text;
+            var district = entDistrict.Text;
+            var country = entCountry.Text;
+            var landmark = entLandmark.Text;
+            var mobile = entMobile.Text;
+            var telephone1 = entTelephone1.Text;
+            var telephone2 = entTelephone2.Text;
+            var email = entEmail.Text;
+            var location = entLocation.Text;
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            try
+            {
+                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
+                string contentType = "application/json";
+                JObject json = new JObject
+                {
+                    { "ContactID", id },
+                    { "RetailerCode", retailerCode },
+                    { "PresStreet", street },
+                    { "PresBarangay", barangay },
+                    { "PresDistrict", district },
+                    { "PresTown", town },
+                    { "PresProvince", province },
+                    { "PresCountry", country },
+                    { "Landmark", landmark },
+                    { "Telephone1", telephone1 },
+                    { "Telephone2", telephone2 },
+                    { "Mobile", mobile },
+                    { "Email", email },
+                    { "GPSCoordinates", location },
+                    { "Coordinator", contact },
+                    { "LastUpdated", DateTime.Parse(current_datetime) }
+                };
+
+                HttpClient client = new HttpClient();
+                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var retailer_group_insert = new RetailerGroupTable
+                    {
+                        ContactID = id,
+                        RetailerCode = retailerCode,
+                        PresStreet = street,
+                        PresBarangay = barangay,
+                        PresDistrict = district,
+                        PresTown = town,
+                        PresProvince = province,
+                        PresCountry = country,
+                        Landmark = landmark,
+                        Telephone1 = telephone1,
+                        Telephone2 = telephone2,
+                        Mobile = mobile,
+                        Email = email,
+                        GPSCoordinates = location,
+                        Coordinator = contact,
+                        LastSync = DateTime.Parse(current_datetime),
+                        LastUpdated = DateTime.Parse(current_datetime)
+                    };
+
+                    await conn.InsertAsync(retailer_group_insert);
+
+                    await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
+                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                Send_offline();
+            }
+        }
+
+        public async void Send_offline()
+        {
+            try
+            {
+                var id = entContact.Text;
+                var retailerCode = entRetailerCode.Text;
+                var street = entStreet.Text;
+                var barangay = entBarangay.Text;
+                var town = entTownCode.Text;
+                var province = entProvinceCode.Text;
+                var district = entDistrict.Text;
+                var country = entCountry.Text;
+                var landmark = entLandmark.Text;
+                var mobile = entMobile.Text;
+                var telephone1 = entTelephone1.Text;
+                var telephone2 = entTelephone2.Text;
+                var email = entEmail.Text;
+                var location = entLocation.Text;
+                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var retailer_group_insert = new RetailerGroupTable
+                {
+                    ContactID = id,
+                    RetailerCode = retailerCode,
+                    PresStreet = street,
+                    PresBarangay = barangay,
+                    PresDistrict = district,
+                    PresTown = town,
+                    PresProvince = province,
+                    PresCountry = country,
+                    Landmark = landmark,
+                    Telephone1 = telephone1,
+                    Telephone2 = telephone2,
+                    Mobile = mobile,
+                    Email = email,
+                    GPSCoordinates = location,
+                    Coordinator = contact,
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
+
+                await conn.InsertOrReplaceAsync(retailer_group_insert);
+
+                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to send your activity", "Got it");
+                await Application.Current.MainPage.Navigation.PopModalAsync();
             }
             catch (Exception ex)
             {
