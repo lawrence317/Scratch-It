@@ -783,43 +783,62 @@ namespace TBSMobile.View
                                         {
                                             try
                                             {
-                                                if (!string.IsNullOrEmpty(crvideo))
+                                                try
                                                 {
-                                                    byte[] crVideoData;
-
                                                     if (!string.IsNullOrEmpty(crvideo))
                                                     {
-                                                        crVideoData = File.ReadAllBytes(crvideo);
+                                                        byte[] crVideoData;
+
+                                                        if (!string.IsNullOrEmpty(crvideo))
+                                                        {
+                                                            crVideoData = File.ReadAllBytes(crvideo);
+                                                        }
+                                                        else
+                                                        {
+                                                            crVideoData = null;
+                                                        }
+
+                                                        var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
+                                                        string vidcontentType = "application/json";
+                                                        JObject vidjson = new JObject
+                                                        {
+                                                           { "ContactID", crcontactID },
+                                                           { "Video", crVideoData }
+                                                        };
+
+                                                        HttpClient vidclient = new HttpClient();
+                                                        var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                        if (vidresponse.IsSuccessStatusCode)
+                                                        {
+                                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                        }
                                                     }
                                                     else
-                                                    {
-                                                        crVideoData = null;
-                                                    }
-
-                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
-                                                    string vidcontentType = "application/json";
-                                                    JObject vidjson = new JObject
-                                                    {
-                                                       { "ContactID", crcontactID },
-                                                       { "Video", crVideoData }
-                                                    };
-
-                                                    HttpClient vidclient = new HttpClient();
-                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
-
-                                                    if (vidresponse.IsSuccessStatusCode)
                                                     {
                                                         await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
                                                     }
                                                 }
-                                                else
+                                                catch (Exception ex)
                                                 {
-                                                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                    Crashes.TrackError(ex);
+
+                                                    var seedata = await DisplayAlert("Sync Error", "Video send failed, unstable connection to server", "See unsynced data", "Cancel");
+                                                    if (seedata == true)
+                                                    {
+                                                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                                                    }
                                                 }
                                             }
                                             catch (Exception ex)
                                             {
                                                 Crashes.TrackError(ex);
+                                                
+                                                var seedata = await DisplayAlert("Sync Error", "Retailer send failed, unstable connection to server", "See unsynced data", "Cancel");
+                                                if (seedata == true)
+                                                {
+                                                    await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                                                }
                                             }
                                         }
                                     }
@@ -833,6 +852,11 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
+                    var seedata = await DisplayAlert("Sync Error", "Retailer send failed, unstable connection to server", "See unsynced data", "Cancel");
+                    if (seedata == true)
+                    {
+                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                    }
                 }
             }
             else
@@ -928,6 +952,11 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
+                    var seedata = await DisplayAlert("Sync Error", "Retailer outlet send failed, unstable connection to server", "See unsynced data", "Cancel");
+                    if (seedata == true)
+                    {
+                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                    }
                 }
             }
             else
@@ -1094,6 +1123,12 @@ namespace TBSMobile.View
                                                     catch (Exception ex)
                                                     {
                                                         Crashes.TrackError(ex);
+
+                                                        var seedata = await DisplayAlert("Sync Error", "Video send failed, unstable connection to server", "See unsynced data", "Cancel");
+                                                        if (seedata == true)
+                                                        {
+                                                            await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                                                        }
                                                     }
                                                 }
                                                 else
@@ -1104,6 +1139,12 @@ namespace TBSMobile.View
                                             catch(Exception ex)
                                             {
                                                 Crashes.TrackError(ex);
+
+                                                var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
+                                                if (seedata == true)
+                                                {
+                                                    await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                                                }
                                             }
                                         }
                                     }
@@ -1117,6 +1158,12 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
+
+                    var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
+                    if (seedata == true)
+                    {
+                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                    }
                 }
             }
             else
@@ -1189,6 +1236,12 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
+
+                    var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
+                    if (seedata == true)
+                    {
+                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                    }
                 }
             }
             else
@@ -1257,6 +1310,12 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
+
+                    var seedata = await DisplayAlert("Sync Error", "Email queue send failed, unstable connection to server", "See unsynced data", "Cancel");
+                    if (seedata == true)
+                    {
+                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress, pingipaddress));
+                    }
                 }
             }
             else
@@ -1280,6 +1339,7 @@ namespace TBSMobile.View
             {
                 if (reply.Status == IPStatus.Success)
                 {
+                    DisplayAlert("Sync Completed", "Sync successfully", "Got it");
                     lblStatus.Text = "Online - Connected to server";
                     lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
                 }
