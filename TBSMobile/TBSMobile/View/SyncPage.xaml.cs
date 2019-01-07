@@ -375,8 +375,8 @@ namespace TBSMobile.View
                                     { "ContactID", contact }
                                 };
 
-                                HttpClient client = new HttpClient();
-                                var chresponse = await client.PostAsync(chlink, new StringContent(json.ToString(), Encoding.UTF8, chcontentType));
+                                HttpClient chclient = new HttpClient();
+                                var chresponse = await chclient.PostAsync(chlink, new StringContent(json.ToString(), Encoding.UTF8, chcontentType));
 
                                 if (chresponse.IsSuccessStatusCode)
                                 {
@@ -1748,7 +1748,7 @@ namespace TBSMobile.View
 
                         if(changesresultCount > 0)
                         {
-                            for (int i = 0; i < resultCount; i++)
+                            for (int i = 0; i < changesresultCount; i++)
                             {
                                 try
                                 {
