@@ -929,7 +929,7 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 5000);
+                                    var reply = ping.Send(new IPAddress(pingipaddress), 2000);
 
                                     if (reply.Status == IPStatus.Success)
                                     {
