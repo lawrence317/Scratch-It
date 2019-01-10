@@ -547,13 +547,13 @@ namespace TBSMobile.View
 
                         if(changesresultCount > 0)
                         {
-                            for (int i = 0; i < resultCount; i++)
+                            foreach (var crresult in getContactsChanges.Result)
                             {
                                 try
                                 {
+                                    int i = 0;
                                     syncStatus.Text = "Sending retailer outlet changes to server " + (i + 1) + " out of " + changesresultCount;
-
-                                    var crresult = getContactsChanges.Result[i];
+                                    
                                     var crcontactID = crresult.ContactID;
                                     var crfileAs = crresult.FileAs;
                                     var crfirstName = crresult.FirstName;
@@ -857,6 +857,8 @@ namespace TBSMobile.View
                                                                                 }
                                                                             }
                                                                         }
+
+                                                                        i++;
                                                                     }
                                                                 }
                                                                 catch (Exception ex)
@@ -1016,6 +1018,8 @@ namespace TBSMobile.View
                                                                         }
                                                                     }
                                                                 }
+
+                                                                i++;
                                                             }
                                                         }
                                                         catch (Exception ex)
@@ -1353,13 +1357,12 @@ namespace TBSMobile.View
 
                         if (changesresultCount > 0)
                         {
-                            for (int i = 0; i < resultCount; i++)
+                            foreach (var crresult in getOutletChanges.Result)
                             {
                                 try
                                 {
                                     syncStatus.Text = "Getting retailer outlet data from local database";
-
-                                    var crresult = getOutletChanges.Result[i];
+                                    
                                     var crretailerCode = crresult.RetailerCode;
                                     var crcontactID = crresult.ContactID;
                                     var crpresStreet = crresult.PresStreet;
@@ -1413,7 +1416,7 @@ namespace TBSMobile.View
                                         {
                                             var crretailerresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(crcontent);
 
-                                            for (i = 0; i < crretailerresult.Count; i++)
+                                            for (int i = 0; i < crretailerresult.Count; i++)
                                             {
                                                 try
                                                 {
@@ -1748,13 +1751,13 @@ namespace TBSMobile.View
 
                         if(changesresultCount > 0)
                         {
-                            for (int i = 0; i < changesresultCount; i++)
+                            foreach (var crresult in getCAFChanges.Result)
                             {
                                 try
                                 {
+                                    int i = 0;
                                     syncStatus.Text = "Sending coordinator activity changes to server " + (i + 1) + " out of " + changesresultCount;
-
-                                    var crresult = getCAFChanges.Result[i];
+                                    
                                     var crcafNo = crresult.CAFNo;
                                     var cremployeeID = crresult.EmployeeID;
                                     var crcafDate = crresult.CAFDate;
@@ -1877,6 +1880,7 @@ namespace TBSMobile.View
                                                             if (vidresponse.IsSuccessStatusCode)
                                                             {
                                                                 await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                                i++;
                                                             }
                                                         }
                                                         catch (Exception ex)
@@ -1887,6 +1891,7 @@ namespace TBSMobile.View
                                                     else
                                                     {
                                                         await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
+                                                        i++;
                                                     }
                                                 }
                                             }
@@ -2021,13 +2026,12 @@ namespace TBSMobile.View
 
                         if (changesresultCount > 0)
                         {
-                            for (int i = 0; i < resultCount; i++)
+                            foreach (var crresult in getActivityChanges.Result)
                             {
                                 try
                                 {
                                     syncStatus.Text = "Getting activity data from local database";
-
-                                    var crresult = getActivityChanges.Result[i];
+                                    
                                     var crcafNo = crresult.CAFNo;
                                     var crcontactId = crresult.ContactID;
                                     var cractivity = crresult.Activity;
@@ -2475,13 +2479,12 @@ namespace TBSMobile.View
 
                         if (changesresultCount > 0)
                         {
-                            for (int i = 0; i < resultCount; i++)
+                            foreach (var crresult in getEmailChanges.Result)
                             {
                                 try
                                 {
                                     syncStatus.Text = "Getting user email data from local database";
-
-                                    var crresult = getEmailChanges.Result[i];
+                                    
                                     var crcontactID = crresult.ContactID;
                                     var cremail = crresult.Email;
                                     var crdeleted = crresult.Deleted;
@@ -2509,7 +2512,7 @@ namespace TBSMobile.View
                                         {
                                             var cremailresult = JsonConvert.DeserializeObject<List<EmailData>>(crcontent);
 
-                                            for (i = 0; i < cremailresult.Count; i++)
+                                            for (int i = 0; i < cremailresult.Count; i++)
                                             {
                                                 try
                                                 {

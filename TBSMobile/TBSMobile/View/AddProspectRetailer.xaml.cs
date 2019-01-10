@@ -1,4 +1,5 @@
-﻿using Microsoft.AppCenter.Crashes;
+﻿using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
@@ -919,7 +920,7 @@ namespace TBSMobile.View
                                             };
 
                                             await conn.InsertAsync(retailer);
-
+                                            Analytics.TrackEvent("Sent Prospect Retailer");
                                             await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
                                             await Application.Current.MainPage.Navigation.PopModalAsync();
                                         }
@@ -1013,6 +1014,7 @@ namespace TBSMobile.View
                 Crashes.TrackError(ex);
             }
 
+            Analytics.TrackEvent("Sent Prospect Retailer");
             await DisplayAlert("Offline Save", "Prospect retailer has been saved offline. Connect to the server to send your activity", "Got it");
             await Application.Current.MainPage.Navigation.PopModalAsync();
         }

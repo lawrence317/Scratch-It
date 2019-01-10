@@ -1541,6 +1541,7 @@ namespace TBSMobile.View
 
                                             await conn.InsertAsync(others_insert);
 
+                                            Analytics.TrackEvent("Sent Field Activity Form");
                                             await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
                                             await Application.Current.MainPage.Navigation.PopAsync();
                                         }
@@ -1706,7 +1707,8 @@ namespace TBSMobile.View
             await conn.InsertAsync(others_insert);
 
             await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
-
+            
+            Analytics.TrackEvent("Sent Field Activity Form");
             await DisplayAlert("Offline Save", "Your activity has been saved offline. Connect to the server to send your activity", "Got it");
             await Application.Current.MainPage.Navigation.PopAsync();
         }
