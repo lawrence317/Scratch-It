@@ -1,4 +1,5 @@
 ﻿using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Analytics;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using System;
