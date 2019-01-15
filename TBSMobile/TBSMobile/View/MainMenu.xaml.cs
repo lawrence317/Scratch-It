@@ -655,11 +655,13 @@ namespace TBSMobile.View
 
                     if (changesresultCount > 0)
                     {
-                        foreach (var crresult in getContactsChanges.Result)
+                        int count = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            int i = 0;
-                            lblStatus.Text = "Sending retailer changes to server " + (i + 1) + " out of " + changesresultCount;
-                            
+                            lblStatus.Text = "Sending retailer changes to server " + count + " out of " + changesresultCount;
+
+                            var crresult = getContactsChanges.Result[i];
                             var crcontactID = crresult.ContactID;
                             var crfileAs = crresult.FileAs;
                             var crfirstName = crresult.FirstName;
@@ -812,11 +814,13 @@ namespace TBSMobile.View
                                                         if (vidresponse.IsSuccessStatusCode)
                                                         {
                                                             await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                            count++;
                                                         }
                                                     }
                                                     else
                                                     {
                                                         await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
+                                                        count++;
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -891,11 +895,13 @@ namespace TBSMobile.View
 
                     if (changesresultCount > 0)
                     {
-                        foreach (var crresult in getOutletChanges.Result)
+                        int count = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            int i = 0;
-                            lblStatus.Text = "Sending retailer outlet changes to server " + (i + 1) + " out of " + changesresultCount;
-                            
+                            lblStatus.Text = "Sending retailer outlet changes to server " + count + " out of " + changesresultCount;
+
+                            var crresult = getOutletChanges.Result[i];
                             var crretailerCode = crresult.RetailerCode;
                             var crcontactID = crresult.ContactID;
                             var crpresStreet = crresult.PresStreet;
@@ -943,6 +949,7 @@ namespace TBSMobile.View
                             if (crresponse.IsSuccessStatusCode)
                             {
                                 await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), crretailerCode);
+                                count++;
                             }
                         }
                     }
@@ -990,11 +997,14 @@ namespace TBSMobile.View
 
                     if (changesresultCount > 0)
                     {
-                        foreach (var crresult in getCAFChanges.Result)
+                        int count = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            int i = 0;
-                            lblStatus.Text = "Sending coordinator activity changes to server " + (i + 1) + " out of " + changesresultCount;
                             
+                            lblStatus.Text = "Sending coordinator activity changes to server " + count + " out of " + changesresultCount;
+
+                            var crresult = getCAFChanges.Result[i];
                             var crcafNo = crresult.CAFNo;
                             var cremployeeID = crresult.EmployeeID;
                             var crcafDate = crresult.CAFDate;
@@ -1119,7 +1129,7 @@ namespace TBSMobile.View
                                                         if (vidresponse.IsSuccessStatusCode)
                                                         {
                                                             await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                                            i++;
+                                                            count++;
                                                         }
                                                     }
                                                     catch (Exception ex)
@@ -1136,7 +1146,7 @@ namespace TBSMobile.View
                                                 else
                                                 {
                                                     await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                                    i++;
+                                                    count++;
                                                 }
                                             }
                                             catch(Exception ex)
@@ -1200,11 +1210,13 @@ namespace TBSMobile.View
 
                     if (changesresultCount > 0)
                     {
-                        foreach (var crresult in getActivityChanges.Result)
+                        int count = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            int i = 0;
-                            lblStatus.Text = "Sending activity changes to server " + (i + 1) + " out of " + changesresultCount;
-;
+                            lblStatus.Text = "Sending activity changes to server " + count + " out of " + changesresultCount;
+
+                            var crresult = getActivityChanges.Result[i];
                             var crcafNo = crresult.CAFNo;
                             var crcontactId = crresult.ContactID;
                             var cractivity = crresult.Activity;
@@ -1230,7 +1242,7 @@ namespace TBSMobile.View
                             if (crresponse.IsSuccessStatusCode)
                             {
                                 await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                i++;
+                                count++;
                             }
                         }
                     }
@@ -1279,11 +1291,13 @@ namespace TBSMobile.View
 
                     if (changesresultCount > 0)
                     {
-                        foreach (var crresult in getEmailChanges.Result)
+                        int count = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            int i = 0;
-                            lblStatus.Text = "Sending email changes to server " + (i + 1) + " out of " + changesresultCount;
-                            
+                            lblStatus.Text = "Sending email changes to server " + count + " out of " + changesresultCount;
+
+                            var crresult = getEmailChanges.Result[i];
                             var crcontactID = crresult.ContactID;
                             var cremail = crresult.Email;
                             var crdeleted = crresult.Deleted;
@@ -1305,7 +1319,7 @@ namespace TBSMobile.View
                             if (crresponse.IsSuccessStatusCode)
                             {
                                 await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
-                                i++;
+                                count++;
                             }
                         }
                     }

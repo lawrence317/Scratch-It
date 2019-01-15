@@ -129,7 +129,7 @@ namespace TBSMobile.View
                 var username = Preferences.Get("username", String.Empty, "private_prefs");
                 var password = Preferences.Get("password", String.Empty, "private_prefs");
 
-                if (!string.IsNullOrEmpty(username) || !string.IsNullOrEmpty(password))
+                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
                 {
                     Login();
                 }
@@ -589,6 +589,134 @@ namespace TBSMobile.View
             else
             {
                 passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
+            }
+        }
+
+        private void BtnConnect_Clicked(object sender, EventArgs e)
+        {
+            Connect();
+        }
+
+        private void BtnChange_Clicked(object sender, EventArgs e)
+        {
+            connectstack.IsVisible = true;
+            loginstack.IsVisible = false;
+        }
+
+        public async void Connect()
+        {
+            var hostName = entHost.Text;
+            var database = entDatabase.Text;
+            var ipaddress = entIPAddress.Text;
+
+            string[] pingip = ipaddress.Split(new char[] { '.' });
+            byte[] pingipaddress = new byte[] { byte.Parse(pingip[0]), byte.Parse(pingip[1]), byte.Parse(pingip[2]), byte.Parse(pingip[3]) };
+
+            if (String.IsNullOrEmpty(hostName) || String.IsNullOrEmpty(database) || String.IsNullOrEmpty(ipaddress))
+            {
+                if (string.IsNullOrEmpty(entHost.Text))
+                {
+                    hostFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    hostFrame.BorderColor = Color.FromHex("#f2f2f5");
+                }
+
+                if (string.IsNullOrEmpty(entDatabase.Text))
+                {
+                    databaseFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    databaseFrame.BorderColor = Color.FromHex("#f2f2f5");
+                }
+
+                if (string.IsNullOrEmpty(entIPAddress.Text))
+                {
+                    ipaddressFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    ipaddressFrame.BorderColor = Color.FromHex("#f2f2f5");
+                }
+
+                await DisplayAlert("Login Error", "Please fill-up the form", "Got it");
+            }
+            else
+            {
+                //Check if there is an internet connection
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    try
+                    {
+                        var ping = new Ping();
+                        var reply = ping.Send(new IPAddress(pingipaddress), 5000);
+                        if (reply.Status == IPStatus.Success)
+                        {
+                            var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + hostName + "&Database=" + database + "&Request=M8g5E6";
+                            var request = HttpWebRequest.Create(string.Format(@link));
+
+                            request.ContentType = "application/json";
+                            request.Method = "GET";
+
+                            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                            {
+                                if (response.StatusCode != HttpStatusCode.OK)
+                                {
+                                    await DisplayAlert("Login Error", "Error fetching data. Server returned status code: {0} " + response.StatusCode, "Ok");
+                                }
+                                else
+                                {
+                                    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                                    {
+                                        var content = reader.ReadToEnd();
+
+                                        if (!content.Equals("[]") || !string.IsNullOrWhiteSpace(content) || !string.IsNullOrEmpty(content))
+                                        {
+                                            try
+                                            {
+                                                if (content.Equals("[{\"Message\":\"Connected\"}]"))
+                                                {
+                                                    connectstack.IsVisible = false;
+                                                    loginstack.IsVisible = true;
+
+                                                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                                                    Preferences.Set("host", hostName, "private_prefs");
+                                                    Preferences.Set("database", database, "private_prefs");
+                                                }
+                                                else if (content.Equals("[{\"Message\":\"Not Connected\"}]"))
+                                                {
+                                                    await DisplayAlert("Connection Error", "Cannot connect to server", "Got it");
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Crashes.TrackError(ex);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Connection Error", "Server unreachable. Switching to offline mode", "Got it");
+                            connectstack.IsVisible = false;
+                            loginstack.IsVisible = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Connection Error", "Server unreachable. Switching to offline mode", "Got it");
+                    connectstack.IsVisible = false;
+                    loginstack.IsVisible = true;
+                }
             }
         }
     }
