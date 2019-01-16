@@ -30,7 +30,7 @@
                 <StackLayout VerticalOptions="CenterAndExpand">
                     <Frame StyleClass="loginframe" CornerRadius="5" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
-                            <StackLayout x:Name="connectstack">
+                            <StackLayout x:Name="connectstack" IsVisible="False">
                                 <Label Text="Server IP Address" StyleClass="lbl-login">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -94,7 +94,7 @@
                                 </Button>
                             </StackLayout>
 
-                            <StackLayout x:Name="loginstack" IsVisible="False">
+                            <StackLayout x:Name="loginstack">
                                 <Label Text="Username" StyleClass="lbl-login">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
