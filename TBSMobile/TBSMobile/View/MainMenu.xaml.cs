@@ -649,14 +649,14 @@ namespace TBSMobile.View
                     
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+                    int count = 1;
+
                     var changessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                     var getContactsChanges = conn.QueryAsync<ContactsTable>(changessql);
                     var changesresultCount = getContactsChanges.Result.Count;
 
                     if (changesresultCount > 0)
                     {
-                        int count = 1;
-
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             lblStatus.Text = "Sending retailer changes to server " + count + " out of " + changesresultCount;
@@ -889,14 +889,14 @@ namespace TBSMobile.View
 
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+                    int count = 1;
+
                     var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                     var getOutletChanges = conn.QueryAsync<RetailerGroupTable>(changessql);
                     var changesresultCount = getOutletChanges.Result.Count;
 
                     if (changesresultCount > 0)
                     {
-                        int count = 1;
-
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             lblStatus.Text = "Sending retailer outlet changes to server " + count + " out of " + changesresultCount;
@@ -991,14 +991,14 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+                    int count = 1;
+
                     var changessql = "SELECT * FROM tblCaf WHERE EmployeeID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                     var getCAFChanges = conn.QueryAsync<CAFTable>(changessql);
                     var changesresultCount = getCAFChanges.Result.Count;
 
                     if (changesresultCount > 0)
                     {
-                        int count = 1;
-
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             
@@ -1204,14 +1204,14 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+                    int count = 1;
+
                     var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                     var getActivityChanges = conn.QueryAsync<ActivityTable>(changessql);
                     var changesresultCount = getActivityChanges.Result.Count;
 
                     if (changesresultCount > 0)
                     {
-                        int count = 1;
-
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             lblStatus.Text = "Sending activity changes to server " + count + " out of " + changesresultCount;
@@ -1285,14 +1285,14 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+                    int count = 1;
+
                     var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                     var getEmailChanges = conn.QueryAsync<UserEmailTable>(changessql);
                     var changesresultCount = getEmailChanges.Result.Count;
 
                     if (changesresultCount > 0)
                     {
-                        int count = 1;
-
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             lblStatus.Text = "Sending email changes to server " + count + " out of " + changesresultCount;

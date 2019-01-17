@@ -521,7 +521,7 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                            await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to get your new subscription key", "Send Email");
 
                                             var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
                                             var body = "Good Day!<br/><br/> " +
@@ -540,6 +540,8 @@ namespace TBSMobile.View
 
                                                 emailMessenger.SendEmail(emailsend);
                                             }
+
+                                            await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE RegistrationNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                         }
                                     }
                                     else

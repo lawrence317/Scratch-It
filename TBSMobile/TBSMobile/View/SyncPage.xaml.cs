@@ -541,14 +541,14 @@ namespace TBSMobile.View
 
                     if(resultCount > 0)
                     {
+                        int count = 1;
+
                         var changessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getContactsChanges = conn.QueryAsync<ContactsTable>(changessql);
                         var changesresultCount = getContactsChanges.Result.Count;
 
                         if(changesresultCount > 0)
                         {
-                            int count = 1;
-
                             for (int i = 0; i < changesresultCount; i++)
                             {
                                 try
@@ -1354,14 +1354,14 @@ namespace TBSMobile.View
 
                     if(resultCount > 0)
                     {
+                        int count = 1;
+
                         var changessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getOutletChanges = conn.QueryAsync<RetailerGroupTable>(changessql);
                         var changesresultCount = getOutletChanges.Result.Count;
 
                         if (changesresultCount > 0)
                         {
-                            int count = 1;
-
                             for (int i = 0; i < changesresultCount; i++)
                             {
                                 try
@@ -2029,19 +2029,19 @@ namespace TBSMobile.View
                     
                     if (resultCount > 0)
                     {
+                        int count = 1;
+
                         var changessql = "SELECT * FROM tblActivity WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getActivityChanges = conn.QueryAsync<ActivityTable>(changessql);
                         var changesresultCount = getActivityChanges.Result.Count;
 
                         if (changesresultCount > 0)
                         {
-                            int count = 1;
-
                             for (int i = 0; i < changesresultCount; i++)
                             {
                                 try
                                 {
-                                    syncStatus.Text = "Sending coordinator activity changes to server " + (count + 1) + " out of " + changesresultCount;
+                                    syncStatus.Text = "Sending coordinator activity changes to server " + count + " out of " + changesresultCount;
 
                                     var crresult = getActivityChanges.Result[i];
                                     var crcafNo = crresult.CAFNo;
@@ -2486,14 +2486,14 @@ namespace TBSMobile.View
                     
                     if (resultCount > 0)
                     {
+                        int count = 1;
+
                         var changessql = "SELECT * FROM tblUserEmail WHERE ContactID = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                         var getEmailChanges = conn.QueryAsync<UserEmailTable>(changessql);
                         var changesresultCount = getEmailChanges.Result.Count;
 
                         if (changesresultCount > 0)
                         {
-                            int count = 1;
-
                             for (int i = 0; i < changesresultCount; i++)
                             {
                                 try
