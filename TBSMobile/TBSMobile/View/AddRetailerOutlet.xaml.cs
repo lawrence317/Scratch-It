@@ -647,7 +647,7 @@ namespace TBSMobile.View
                 HttpClient client = new HttpClient();
                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                if (response.IsSuccessStatusCode)
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();

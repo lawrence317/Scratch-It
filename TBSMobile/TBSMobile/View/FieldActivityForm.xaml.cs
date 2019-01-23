@@ -1385,7 +1385,7 @@ namespace TBSMobile.View
                 HttpClient client = new HttpClient();
                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                if (response.IsSuccessStatusCode)
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     byte[] Photo1Data = File.ReadAllBytes(photo1url);
 
@@ -1401,7 +1401,7 @@ namespace TBSMobile.View
                     HttpClient ph1client = new HttpClient();
                     var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
 
-                    if (ph1response.IsSuccessStatusCode)
+                    if (ph1response.StatusCode == HttpStatusCode.OK)
                     {
                         byte[] Photo2Data = File.ReadAllBytes(photo2url);
 
@@ -1417,7 +1417,7 @@ namespace TBSMobile.View
                         HttpClient ph2client = new HttpClient();
                         var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
 
-                        if (ph2response.IsSuccessStatusCode)
+                        if (ph2response.StatusCode == HttpStatusCode.OK)
                         {
                             byte[] Photo3Data = File.ReadAllBytes(photo3url);
 
@@ -1433,7 +1433,7 @@ namespace TBSMobile.View
                             HttpClient ph3client = new HttpClient();
                             var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
 
-                            if (ph3response.IsSuccessStatusCode)
+                            if (ph3response.StatusCode == HttpStatusCode.OK)
                             {
                                 if (!string.IsNullOrEmpty(videourl))
                                 {
@@ -1462,7 +1462,7 @@ namespace TBSMobile.View
                                         HttpClient vidclient = new HttpClient();
                                         var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
 
-                                        if (vidresponse.IsSuccessStatusCode)
+                                        if (vidresponse.StatusCode == HttpStatusCode.OK)
                                         {
                                             var db = DependencyService.Get<ISQLiteDB>();
                                             var conn = db.GetConnection();
