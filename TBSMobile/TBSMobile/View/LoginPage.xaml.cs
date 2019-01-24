@@ -357,7 +357,8 @@ namespace TBSMobile.View
                                                     JObject trialjson = new JObject
                                                     {
                                                         { "Serial", Constants.deviceID },
-                                                        { "Date",  DateTime.Parse(current_date)}
+                                                        { "Date",  DateTime.Parse(current_date)},
+                                                        { "ContactID",  userName}
                                                     };
 
                                                     HttpClient trialclient = new HttpClient();
@@ -427,7 +428,7 @@ namespace TBSMobile.View
                                     var item = getUser.Result[0];
                                     var contactID = item.ContactID;
 
-                                    var sbgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                    var sbgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                     var sbsubresult = sbgetSubscription.Result.Count;
 
                                     //Check if the device is registered
@@ -485,7 +486,7 @@ namespace TBSMobile.View
                                                     emailMessenger.SendEmail(emailsend);
                                                 }
 
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                             }
                                             else
                                             {
@@ -519,7 +520,7 @@ namespace TBSMobile.View
                                                     emailMessenger.SendEmail(emailsend);
                                                 }
 
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                             }
                                             else
                                             {
@@ -553,7 +554,7 @@ namespace TBSMobile.View
                                                     emailMessenger.SendEmail(emailsend);
                                                 }
 
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                             }
                                             else
                                             {
@@ -601,7 +602,7 @@ namespace TBSMobile.View
                             var item = getUser.Result[0];
                             var contactID = item.ContactID;
 
-                            var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                            var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                             var subresult = getSubscription.Result.Count;
 
                             //Check if the device is registered
@@ -659,7 +660,7 @@ namespace TBSMobile.View
                                             emailMessenger.SendEmail(emailsend);
                                         }
 
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                     }
                                     else
                                     {
@@ -693,7 +694,7 @@ namespace TBSMobile.View
                                             emailMessenger.SendEmail(emailsend);
                                         }
 
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                     }
                                     else
                                     {
@@ -727,7 +728,7 @@ namespace TBSMobile.View
                                             emailMessenger.SendEmail(emailsend);
                                         }
 
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                                     }
                                     else
                                     {

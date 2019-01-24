@@ -2175,6 +2175,7 @@ namespace TBSMobile.View
 
                                         var subitem = subsubresult[i];
                                         var subSerialNumber = subitem.SerialNumber;
+                                        var subContactID = subitem.ContactID;
                                         var subnoOfDays = subitem.NoOfDays;
                                         var subdateStart = subitem.DateStart;
                                         var subtrials = subitem.Trials;
@@ -2186,6 +2187,7 @@ namespace TBSMobile.View
                                         var subsub = new SubscriptionTable
                                         {
                                             SerialNumber = subSerialNumber,
+                                            ContactID = subContactID,
                                             NoOfDays = subnoOfDays,
                                             DateStart = subdateStart,
                                             Trials = subtrials,
