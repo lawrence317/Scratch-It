@@ -12,9 +12,7 @@ namespace TBSMobile.Data
         public string CAFNo { get; set; }
         public string ContactID { get; set; }
         [MaxLength(100)]
-        public string Activity { get; set; }
-        [MaxLength(2)]
-        public int ActivitySwitch { get; set; }
+        public string ActivityID { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
         public int Deleted { get; set; }

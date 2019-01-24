@@ -37,7 +37,7 @@ namespace TBSMobile.Data
         [MaxLength(200)]
         public string GPSCoordinates { get; set; }
         [MaxLength(50)]
-        public string Coordinator { get; set; }
+        public string Supervisor { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
         public int Deleted { get; set; }

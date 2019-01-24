@@ -72,7 +72,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
                 var resultCount = getRetailer.Result.Count;
 
                 if (resultCount > 0)
@@ -134,7 +134,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)
@@ -295,7 +295,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactType = 'Prospect Retailer' AND Coordinator=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)
@@ -376,7 +376,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
                 var resultCount = getRetailer.Result.Count;
 
                 if (resultCount > 0)

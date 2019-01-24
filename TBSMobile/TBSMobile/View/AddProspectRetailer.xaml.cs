@@ -752,7 +752,7 @@ namespace TBSMobile.View
                 var middleName = entMiddleName.Text;
                 var lastName = entLastName.Text;
                 var fileas = firstName + " " + middleName + " " + lastName;
-                var contactType = "Prospect Retailer";
+                var retailerType = "RT00004";
                 var street = entStreet.Text;
                 var barangay = entBarangay.Text;
                 var town = entTownCode.Text;
@@ -781,7 +781,7 @@ namespace TBSMobile.View
                     { "MiddleName", middleName },
                     { "LastName", lastName },
                     { "FileAs", fileas },
-                    { "ContactType", contactType },
+                    { "RetailerType", retailerType },
                     { "Street", street },
                     { "Barangay", barangay },
                     { "Town", town },
@@ -799,7 +799,7 @@ namespace TBSMobile.View
                     { "MobileVideo", videourl },
                     { "Employee", employee },
                     { "Customer", customer },
-                    { "Coordinator", contact },
+                    { "Supervisor", contact },
                     { "LastSync", current_datetime },
                     { "LastUpdated", current_datetime }
                 };
@@ -892,7 +892,7 @@ namespace TBSMobile.View
                                                 FirstName = firstName,
                                                 MiddleName = middleName,
                                                 LastName = lastName,
-                                                ContactType = contactType,
+                                                RetailerType = retailerType,
                                                 PresStreet = street,
                                                 PresBarangay = barangay,
                                                 PresDistrict = district,
@@ -914,7 +914,7 @@ namespace TBSMobile.View
                                                 MobileVideo = videourl,
                                                 Employee = employee,
                                                 Customer = customer,
-                                                Coordinator = contact,
+                                                Supervisor = contact,
                                                 LastSync = DateTime.Parse(current_datetime),
                                                 LastUpdated = DateTime.Parse(current_datetime)
                                             };
@@ -951,7 +951,7 @@ namespace TBSMobile.View
                 var middleName = entMiddleName.Text;
                 var lastName = entLastName.Text;
                 var fileas = firstName + " " + middleName + " " + lastName;
-                var contactType = "Prospect Retailer";
+                var retailerType = "RT00004";
                 var street = entStreet.Text;
                 var barangay = entBarangay.Text;
                 var town = entTownCode.Text;
@@ -981,7 +981,7 @@ namespace TBSMobile.View
                     FirstName = firstName,
                     MiddleName = middleName,
                     LastName = lastName,
-                    ContactType = contactType,
+                    RetailerType = retailerType,
                     PresStreet = street,
                     PresBarangay = barangay,
                     PresDistrict = district,
@@ -1003,7 +1003,7 @@ namespace TBSMobile.View
                     MobileVideo = videourl,
                     Employee = employee,
                     Customer = customer,
-                    Coordinator = contact,
+                    Supervisor = contact,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 

@@ -66,8 +66,8 @@ namespace TBSMobile.View
         {
             public string ContactID { get; set; }
             public string UserID { get; set; }
-            public string UserPassword { get; set; }
-            public string UserType { get; set; }
+            public string UsrPassword { get; set; }
+            public string UserTypeID { get; set; }
             public string UserStatus { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
@@ -84,7 +84,6 @@ namespace TBSMobile.View
             public string Position { get; set; }
             public string Company { get; set; }
             public string CompanyID { get; set; }
-            public string ContactType { get; set; }
             public string RetailerType { get; set; }
             public string PresStreet { get; set; }
             public string PresBarangay { get; set; }
@@ -107,7 +106,7 @@ namespace TBSMobile.View
             public string MobileVideo { get; set; }
             public int Employee { get; set; }
             public int Customer { get; set; }
-            public string Coordinator { get; set; }
+            public string Supervisor { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -131,7 +130,7 @@ namespace TBSMobile.View
             public string Email { get; set; }
             public string Landmark { get; set; }
             public string GPSCoordinates { get; set; }
-            public string Coordinator { get; set; }
+            public string Supervisor { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -164,8 +163,7 @@ namespace TBSMobile.View
         {
             public string CAFNo { get; set; }
             public string ContactID { get; set; }
-            public string Activity { get; set; }
-            public int ActivitySwitch { get; set; }
+            public string ActivityID { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -173,15 +171,15 @@ namespace TBSMobile.View
 
         public class SubscriptionData
         {
-            public string RegistrationNumber { get; set; }
+            public string SerialNumber { get; set; }
             public string ContactID { get; set; }
+            public DateTime DateStart { get; set; }
             public string NoOfDays { get; set; }
-            public string InputDate { get; set; }
-            public string ExpirationDate { get; set; }
-            public string ProductKey { get; set; }
+            public string Trials { get; set; }
+            public string InputSerialNumber { get; set; }
             public DateTime LastSync { get; set; }
-            public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
+            public int Deleted { get; set; }
         }
 
         public class EmailData
@@ -245,9 +243,9 @@ namespace TBSMobile.View
 
                                     var result = getUserChanges.Result[i];
                                     var cruserID = result.UserID;
-                                    var cruserPassword = result.UserPassword;
+                                    var cruserPassword = result.UsrPassword;
                                     var cruserStatus = result.UserStatus;
-                                    var cruserType = result.UserType;
+                                    var cruserType = result.UserTypeID;
                                     var crdeleted = result.Deleted;
                                     var crlastUpdated = result.LastUpdated;
 
@@ -257,9 +255,9 @@ namespace TBSMobile.View
                                     {
                                         { "ContactID", contact },
                                         { "UserID", cruserID },
-                                        { "UserPassword", cruserPassword },
+                                        { "UsrPassword", cruserPassword },
                                         { "UserStatus", cruserStatus },
-                                        { "UserType", cruserType },
+                                        { "UserTypeID", cruserType },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -283,8 +281,8 @@ namespace TBSMobile.View
                                                     var critem = cruserresult[i];
                                                     var crcontactID = critem.ContactID;
                                                     var cruID = critem.UserID;
-                                                    var cruPassword = critem.UserPassword;
-                                                    var cruType = critem.UserType;
+                                                    var cruPassword = critem.UsrPassword;
+                                                    var cruType = critem.UserTypeID;
                                                     var cruStatus = critem.UserStatus;
                                                     var crlSync = DateTime.Parse(current_datetime);
                                                     var crlUpdated = critem.LastUpdated;
@@ -301,8 +299,8 @@ namespace TBSMobile.View
                                                             {
                                                                 ContactID = crcontactID,
                                                                 UserID = cruserID,
-                                                                UserPassword = cruserPassword,
-                                                                UserType = cruserType,
+                                                                UsrPassword = cruserPassword,
+                                                                UserTypeID = cruserType,
                                                                 UserStatus = cruserStatus,
                                                                 LastSync = crlSync,
                                                                 LastUpdated = crlastUpdated,
@@ -319,8 +317,8 @@ namespace TBSMobile.View
                                                         {
                                                             ContactID = crcontactID,
                                                             UserID = cruserID,
-                                                            UserPassword = cruserPassword,
-                                                            UserType = cruserType,
+                                                            UsrPassword = cruserPassword,
+                                                            UserTypeID = cruserType,
                                                             UserStatus = cruserStatus,
                                                             LastSync = crlSync,
                                                             LastUpdated = crlastUpdated,
@@ -335,8 +333,8 @@ namespace TBSMobile.View
                                                     {
                                                         ContactID = crcontactID,
                                                         UserID = cruID,
-                                                        UserPassword = cruPassword,
-                                                        UserType = cruType,
+                                                        UsrPassword = cruPassword,
+                                                        UserTypeID = cruType,
                                                         UserStatus = cruStatus,
                                                         LastSync = crlSync,
                                                         Deleted = crdltd,
@@ -387,8 +385,8 @@ namespace TBSMobile.View
                                             var item = chuserresult[i];
                                             var chcontactID = item.ContactID;
                                             var chuserID = item.UserID;
-                                            var chuserPassword = item.UserPassword;
-                                            var chuserType = item.UserType;
+                                            var chuserPassword = item.UsrPassword;
+                                            var chuserType = item.UserTypeID;
                                             var chuserStatus = item.UserStatus;
                                             var chlastSync = DateTime.Parse(current_datetime);
                                             var chlastUpdated = item.LastUpdated;
@@ -406,8 +404,8 @@ namespace TBSMobile.View
                                                     {
                                                         ContactID = chcontactID,
                                                         UserID = chuserID,
-                                                        UserPassword = chuserPassword,
-                                                        UserType = chuserType,
+                                                        UsrPassword = chuserPassword,
+                                                        UserTypeID = chuserType,
                                                         UserStatus = chuserStatus,
                                                         LastSync = chlastSync,
                                                         LastUpdated = chlastUpdated,
@@ -424,8 +422,8 @@ namespace TBSMobile.View
                                                 {
                                                     ContactID = chcontactID,
                                                     UserID = chuserID,
-                                                    UserPassword = chuserPassword,
-                                                    UserType = chuserType,
+                                                    UsrPassword = chuserPassword,
+                                                    UserTypeID = chuserType,
                                                     UserStatus = chuserStatus,
                                                     LastSync = chlastSync,
                                                     LastUpdated = chlastUpdated,
@@ -476,8 +474,8 @@ namespace TBSMobile.View
                                         var item = userresult[i];
                                         var contactID = item.ContactID;
                                         var userID = item.UserID;
-                                        var userPassword = item.UserPassword;
-                                        var userType = item.UserType;
+                                        var userPassword = item.UsrPassword;
+                                        var userType = item.UserTypeID;
                                         var userStatus = item.UserStatus;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
@@ -487,8 +485,8 @@ namespace TBSMobile.View
                                         {
                                             ContactID = contactID,
                                             UserID = userID,
-                                            UserPassword = userPassword,
-                                            UserType = userType,
+                                            UsrPassword = userPassword,
+                                            UserTypeID = userType,
                                             UserStatus = userStatus,
                                             LastSync = lastSync,
                                             Deleted = deleted,
@@ -534,7 +532,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Coordinator = ? AND Deleted != '1'", contact);
+                    var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND Deleted != '1'", contact);
                     var resultCount = getContacts.Result.Count;
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -542,7 +540,7 @@ namespace TBSMobile.View
                     {
                         int count = 1;
                         
-                        var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Coordinator = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                         var changesresultCount = getContactsChanges.Result.Count;
 
                         if(changesresultCount > 0)
@@ -563,7 +561,6 @@ namespace TBSMobile.View
                                     var crposition = crresult.Position;
                                     var crcompany = crresult.Company;
                                     var crcompanyID = crresult.CompanyID;
-                                    var crcontactType = crresult.ContactType;
                                     var crretailerType = crresult.RetailerType;
                                     var crpresStreet = crresult.PresStreet;
                                     var crpresBarangay = crresult.PresBarangay;
@@ -586,7 +583,7 @@ namespace TBSMobile.View
                                     var crmobileVideo = crresult.MobileVideo;
                                     var cremployee = crresult.Employee;
                                     var crcustomer = crresult.Customer;
-                                    var crcoordinator = crresult.Coordinator;
+                                    var crsupervisor = crresult.Supervisor;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -602,7 +599,6 @@ namespace TBSMobile.View
                                         { "Position", crposition },
                                         { "Company", crcompany },
                                         { "CompanyID", crcompanyID },
-                                        { "ContactType", crcontactType },
                                         { "RetailerType", crretailerType },
                                         { "PresStreet", crpresStreet },
                                         { "PresBarangay", crpresBarangay },
@@ -621,7 +617,7 @@ namespace TBSMobile.View
                                         { "MobileVideo", crmobileVideo },
                                         { "Employee", cremployee },
                                         { "Customer", crcustomer },
-                                        { "Coordinator", crcoordinator },
+                                        { "Supervisor", crsupervisor },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -758,7 +754,6 @@ namespace TBSMobile.View
                                                     var crpos = critem.Position;
                                                     var crcomp = critem.Company;
                                                     var crcompID = critem.CompanyID;
-                                                    var crcType = critem.ContactType;
                                                     var crrType = critem.RetailerType;
                                                     var crpStreet = critem.PresStreet;
                                                     var crpBarangay = critem.PresBarangay;
@@ -781,7 +776,7 @@ namespace TBSMobile.View
                                                     var crmvd = critem.MobileVideo;
                                                     var cremp = critem.Employee;
                                                     var crcust = critem.Customer;
-                                                    var crcoord = critem.Coordinator;
+                                                    var crcoord = critem.Supervisor;
                                                     var crlSync = DateTime.Parse(current_datetime);
                                                     var crlUpdated = critem.LastUpdated;
                                                     var crdltd = critem.Deleted;
@@ -804,7 +799,6 @@ namespace TBSMobile.View
                                                                 Position = crpos,
                                                                 Company = crcomp,
                                                                 CompanyID = crcompID,
-                                                                ContactType = crcType,
                                                                 RetailerType = crrType,
                                                                 PresStreet = crpStreet,
                                                                 PresBarangay = crpBarangay,
@@ -827,7 +821,7 @@ namespace TBSMobile.View
                                                                 MobileVideo = crmvd,
                                                                 Employee = cremp,
                                                                 Customer = crcust,
-                                                                Coordinator = crcoord,
+                                                                Supervisor = crcoord,
                                                                 LastSync = crlSync,
                                                                 Deleted = crdltd,
                                                                 LastUpdated = crlUpdated
@@ -849,7 +843,6 @@ namespace TBSMobile.View
                                                             Position = crpos,
                                                             Company = crcomp,
                                                             CompanyID = crcompID,
-                                                            ContactType = crcType,
                                                             RetailerType = crrType,
                                                             PresStreet = crpStreet,
                                                             PresBarangay = crpBarangay,
@@ -872,7 +865,7 @@ namespace TBSMobile.View
                                                             MobileVideo = crmvd,
                                                             Employee = cremp,
                                                             Customer = crcust,
-                                                            Coordinator = crcoord,
+                                                            Supervisor = crcoord,
                                                             LastSync = crlSync,
                                                             Deleted = crdltd,
                                                             LastUpdated = crlUpdated
@@ -930,7 +923,6 @@ namespace TBSMobile.View
                                             var chposition = chitem.Position;
                                             var chcompany = chitem.Company;
                                             var chcompanyID = chitem.CompanyID;
-                                            var chcontactType = chitem.ContactType;
                                             var chretailerType = chitem.RetailerType;
                                             var chpresStreet = chitem.PresStreet;
                                             var chpresBarangay = chitem.PresBarangay;
@@ -953,7 +945,7 @@ namespace TBSMobile.View
                                             var chemail = chitem.Email;
                                             var chemployee = chitem.Employee;
                                             var chcustomer = chitem.Customer;
-                                            var chcoordinator = chitem.Coordinator;
+                                            var chSupervisor = chitem.Supervisor;
                                             var chlastSync = DateTime.Parse(current_datetime);
                                             var chlastUpdated = chitem.LastUpdated;
                                             var chdeleted = chitem.Deleted;
@@ -975,7 +967,6 @@ namespace TBSMobile.View
                                                         Position = chposition,
                                                         Company = chcompany,
                                                         CompanyID = chcompanyID,
-                                                        ContactType = chcontactType,
                                                         RetailerType = chretailerType,
                                                         PresStreet = chpresStreet,
                                                         PresBarangay = chpresBarangay,
@@ -998,7 +989,7 @@ namespace TBSMobile.View
                                                         MobileVideo = chmobileVideo,
                                                         Employee = chemployee,
                                                         Customer = chcustomer,
-                                                        Coordinator = chcoordinator,
+                                                        Supervisor = chSupervisor,
                                                         LastSync = chlastSync,
                                                         Deleted = chdeleted,
                                                         LastUpdated = chlastUpdated
@@ -1020,7 +1011,6 @@ namespace TBSMobile.View
                                                     Position = chposition,
                                                     Company = chcompany,
                                                     CompanyID = chcompanyID,
-                                                    ContactType = chcontactType,
                                                     RetailerType = chretailerType,
                                                     PresStreet = chpresStreet,
                                                     PresBarangay = chpresBarangay,
@@ -1043,7 +1033,7 @@ namespace TBSMobile.View
                                                     MobileVideo = chmobileVideo,
                                                     Employee = chemployee,
                                                     Customer = chcustomer,
-                                                    Coordinator = chcoordinator,
+                                                    Supervisor = chSupervisor,
                                                     LastSync = chlastSync,
                                                     Deleted = chdeleted,
                                                     LastUpdated = chlastUpdated
@@ -1100,7 +1090,6 @@ namespace TBSMobile.View
                                         var position = item.Position;
                                         var company = item.Company;
                                         var companyID = item.CompanyID;
-                                        var contactType = item.ContactType;
                                         var retailerType = item.RetailerType;
                                         var presStreet = item.PresStreet;
                                         var presBarangay = item.PresBarangay;
@@ -1123,7 +1112,7 @@ namespace TBSMobile.View
                                         var email = item.Email;
                                         var employee = item.Employee;
                                         var customer = item.Customer;
-                                        var coordinator = item.Coordinator;
+                                        var Supervisor = item.Supervisor;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -1138,7 +1127,6 @@ namespace TBSMobile.View
                                             Position = position,
                                             Company = company,
                                             CompanyID = companyID,
-                                            ContactType = contactType,
                                             RetailerType = retailerType,
                                             PresStreet = presStreet,
                                             PresBarangay = presBarangay,
@@ -1161,7 +1149,7 @@ namespace TBSMobile.View
                                             MobileVideo = mobileVideo,
                                             Employee = employee,
                                             Customer = customer,
-                                            Coordinator = coordinator,
+                                            Supervisor = Supervisor,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -1205,47 +1193,46 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
                     
-                    var getRetailerGroup = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator = ?", contact);
+                    var getRetailerGroup = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ?", contact);
                     var resultCount = getRetailerGroup.Result.Count;
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                     if(resultCount > 0)
                     {
                         int count = 1;
-                        
-                        var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+
+                        var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                         var changesresultCount = getOutletChanges.Result.Count;
 
                         if (changesresultCount > 0)
                         {
                             for (int i = 0; i < changesresultCount; i++)
                             {
-                                try
-                                {
-                                    syncStatus.Text = "Sending retailer outlet changes to server " + count + " out of " + changesresultCount;
-                                    var crresult = getOutletChanges.Result[i];
-                                    var crretailerCode = crresult.RetailerCode;
-                                    var crcontactID = crresult.ContactID;
-                                    var crpresStreet = crresult.PresStreet;
-                                    var crpresBarangay = crresult.PresBarangay;
-                                    var crpresDistrict = crresult.PresDistrict;
-                                    var crpresTown = crresult.PresTown;
-                                    var crpresProvince = crresult.PresProvince;
-                                    var crpresCountry = crresult.PresCountry;
-                                    var crtelephone1 = crresult.Telephone1;
-                                    var crtelephone2 = crresult.Telephone2;
-                                    var crmobile = crresult.Mobile;
-                                    var cremail = crresult.Email;
-                                    var crlandmark = crresult.Landmark;
-                                    var crgpsCoordinates = crresult.GPSCoordinates;
-                                    var crcoordinator = crresult.Coordinator;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
+                                syncStatus.Text = "Sending retailer outlet changes to server " + count + " out of " + changesresultCount;
 
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Pb3c6A";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
-                                    {
+                                var crresult = getOutletChanges.Result[i];
+                                var crretailerCode = crresult.RetailerCode;
+                                var crcontactID = crresult.ContactID;
+                                var crpresStreet = crresult.PresStreet;
+                                var crpresBarangay = crresult.PresBarangay;
+                                var crpresDistrict = crresult.PresDistrict;
+                                var crpresTown = crresult.PresTown;
+                                var crpresProvince = crresult.PresProvince;
+                                var crpresCountry = crresult.PresCountry;
+                                var crtelephone1 = crresult.Telephone1;
+                                var crtelephone2 = crresult.Telephone2;
+                                var crmobile = crresult.Mobile;
+                                var cremail = crresult.Email;
+                                var crlandmark = crresult.Landmark;
+                                var crgpsCoordinates = crresult.GPSCoordinates;
+                                var crsupervisor = crresult.Supervisor;
+                                var crdeleted = crresult.Deleted;
+                                var crlastUpdated = crresult.LastUpdated;
+
+                                var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Pb3c6A";
+                                string crcontentType = "application/json";
+                                JObject crjson = new JObject
+                                {
                                         { "RetailerCode", crretailerCode },
                                         { "ContactID", crcontactID },
                                         { "PresStreet", crpresStreet },
@@ -1260,121 +1247,22 @@ namespace TBSMobile.View
                                         { "Email", cremail },
                                         { "Landmark", crlandmark },
                                         { "GPSCoordinates", crgpsCoordinates },
-                                        { "Coordinator", crcoordinator },
+                                        { "Supervisor", crsupervisor },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
-                                    };
+                                };
 
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                HttpClient crclient = new HttpClient();
+                                var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
 
-                                    if (crresponse.StatusCode == HttpStatusCode.OK)
-                                    {
-                                        var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                        if (!string.IsNullOrEmpty(crcontent) || !crcontent.Equals("[]") || !crcontent.Equals("[[],[]]") || !crcontent.Equals("[[],[]]"))
-                                        {
-                                            var crretailerresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(crcontent);
-
-                                            for (int a = 0; a < crretailerresult.Count; a++)
-                                            {
-                                                try
-                                                {
-                                                    var critem = crretailerresult[a];
-                                                    var crrCode = critem.RetailerCode;
-                                                    var crcID = critem.ContactID;
-                                                    var crpStreet = critem.PresStreet;
-                                                    var crpBarangay = critem.PresBarangay;
-                                                    var crpDistrict = critem.PresDistrict;
-                                                    var crpTown = critem.PresTown;
-                                                    var crpProvince = critem.PresProvince;
-                                                    var crpCountry = critem.PresCountry;
-                                                    var crtel1 = critem.Telephone1;
-                                                    var crtel2 = critem.Telephone2;
-                                                    var crmob = critem.Mobile;
-                                                    var creml = critem.Email;
-                                                    var crlmark = critem.Landmark;
-                                                    var crgps = critem.GPSCoordinates;
-                                                    var crcoord = critem.Coordinator;
-                                                    var crlSync = DateTime.Parse(current_datetime);
-                                                    var crlUpdated = critem.LastUpdated;
-                                                    var crdltd = critem.Deleted;
-
-                                                    var crsql = "SELECT * FROM tblRetailerGroup WHERE RetailerCode = '" + crrCode + "'";
-                                                    var crgetRetailerOutlet = conn.QueryAsync<RetailerGroupTable>(crsql);
-                                                    var crresultCount = crgetRetailerOutlet.Result.Count;
-
-                                                    if (crresultCount > 0)
-                                                    {
-                                                        if (crlastUpdated > crgetRetailerOutlet.Result[0].LastUpdated)
-                                                        {
-                                                            var crretailer = new RetailerGroupTable
-                                                            {
-                                                                RetailerCode = crrCode,
-                                                                ContactID = crcID,
-                                                                PresStreet = crpStreet,
-                                                                PresBarangay = crpBarangay,
-                                                                PresDistrict = crpDistrict,
-                                                                PresTown = crpTown,
-                                                                PresProvince = crpProvince,
-                                                                PresCountry = crpCountry,
-                                                                Telephone1 = crtel1,
-                                                                Telephone2 = crtel2,
-                                                                Mobile = crmob,
-                                                                Email = creml,
-                                                                Landmark = crlmark,
-                                                                GPSCoordinates = crgps,
-                                                                Coordinator = crcoord,
-                                                                LastSync = crlSync,
-                                                                Deleted = crdltd,
-                                                                LastUpdated = crlUpdated
-                                                            };
-
-                                                            await conn.InsertOrReplaceAsync(crretailer);
-                                                            syncStatus.Text = "Syncing retailer outlet updates of " + crrCode;
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        var creretailer = new RetailerGroupTable
-                                                        {
-                                                            RetailerCode = crrCode,
-                                                            ContactID = crcID,
-                                                            PresStreet = crpStreet,
-                                                            PresBarangay = crpBarangay,
-                                                            PresDistrict = crpDistrict,
-                                                            PresTown = crpTown,
-                                                            PresProvince = crpProvince,
-                                                            PresCountry = crpCountry,
-                                                            Telephone1 = crtel1,
-                                                            Telephone2 = crtel2,
-                                                            Mobile = crmob,
-                                                            Email = creml,
-                                                            Landmark = crlmark,
-                                                            GPSCoordinates = crgps,
-                                                            Coordinator = crcoord,
-                                                            LastSync = crlSync,
-                                                            Deleted = crdltd,
-                                                            LastUpdated = crlUpdated
-                                                        };
-
-                                                        await conn.InsertOrReplaceAsync(creretailer);
-                                                        syncStatus.Text = "Syncing new retailer outlet (" + crrCode + ")";
-                                                    }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    Crashes.TrackError(ex);
-                                                }
-                                            }
-
-                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), crretailerCode);
-                                            count++;
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
+                                if (crresponse.StatusCode == HttpStatusCode.OK)
                                 {
-                                    Crashes.TrackError(ex);
+                                    var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(crcontent) || !crcontent.Equals("[]") || !crcontent.Equals("[[],[]]") || !crcontent.Equals("[[],[]]"))
+                                    {
+                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), crretailerCode);
+                                        count++;
+                                    }
                                 }
                             }
                         }
@@ -1418,7 +1306,7 @@ namespace TBSMobile.View
                                             var chemail = chitem.Email;
                                             var chlandmark = chitem.Landmark;
                                             var chgpsCoordinates = chitem.GPSCoordinates;
-                                            var chcoordinator = chitem.Coordinator;
+                                            var chSupervisor = chitem.Supervisor;
                                             var chlastSync = DateTime.Parse(current_datetime);
                                             var chlastUpdated = chitem.LastUpdated;
                                             var chdeleted = chitem.Deleted;
@@ -1446,7 +1334,7 @@ namespace TBSMobile.View
                                                         Email = chemail,
                                                         Landmark = chlandmark,
                                                         GPSCoordinates = chgpsCoordinates,
-                                                        Coordinator = chcoordinator,
+                                                        Supervisor = chSupervisor,
                                                         LastSync = chlastSync,
                                                         Deleted = chdeleted,
                                                         LastUpdated = chlastUpdated
@@ -1474,7 +1362,7 @@ namespace TBSMobile.View
                                                     Email = chemail,
                                                     Landmark = chlandmark,
                                                     GPSCoordinates = chgpsCoordinates,
-                                                    Coordinator = chcoordinator,
+                                                    Supervisor = chSupervisor,
                                                     LastSync = chlastSync,
                                                     Deleted = chdeleted,
                                                     LastUpdated = chlastUpdated
@@ -1537,7 +1425,7 @@ namespace TBSMobile.View
                                         var email = item.Email;
                                         var landmark = item.Landmark;
                                         var gpsCoordinates = item.GPSCoordinates;
-                                        var coordinator = item.Coordinator;
+                                        var Supervisor = item.Supervisor;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -1558,7 +1446,7 @@ namespace TBSMobile.View
                                             Email = email,
                                             Landmark = landmark,
                                             GPSCoordinates = gpsCoordinates,
-                                            Coordinator = coordinator,
+                                            Supervisor = Supervisor,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -1621,7 +1509,7 @@ namespace TBSMobile.View
                             {
                                 try
                                 {
-                                    syncStatus.Text = "Sending coordinator activity changes to server " + count + " out of " + changesresultCount;
+                                    syncStatus.Text = "Sending Supervisor activity changes to server " + count + " out of " + changesresultCount;
 
                                     var crresult = getCAFChanges.Result[i];
                                     var crcafNo = crresult.CAFNo;
@@ -1914,13 +1802,12 @@ namespace TBSMobile.View
                             {
                                 try
                                 {
-                                    syncStatus.Text = "Sending coordinator activity changes to server " + count + " out of " + changesresultCount;
+                                    syncStatus.Text = "Sending Supervisor activity changes to server " + count + " out of " + changesresultCount;
 
                                     var crresult = getActivityChanges.Result[i];
                                     var crcafNo = crresult.CAFNo;
                                     var crcontactId = crresult.ContactID;
-                                    var cractivity = crresult.Activity;
-                                    var cractivitySwitch = crresult.ActivitySwitch;
+                                    var cractivityid = crresult.ActivityID;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -1930,8 +1817,7 @@ namespace TBSMobile.View
                                     {
                                         { "CAFNo", crcafNo },
                                         { "ContactID", crcontactId },
-                                        { "Activity", cractivity },
-                                        { "ActivitySwitch", cractivitySwitch },
+                                        { "ActivityID", cractivityid },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -1988,8 +1874,7 @@ namespace TBSMobile.View
                                         var item = actresult[i];
                                         var cafNo = item.CAFNo;
                                         var contactId = item.ContactID;
-                                        var activity = item.Activity;
-                                        var activitySwitch = item.ActivitySwitch;
+                                        var activityid = item.ActivityID;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -1998,8 +1883,7 @@ namespace TBSMobile.View
                                         {
                                             CAFNo = cafNo,
                                             ContactID = contactId,
-                                            Activity = activity,
-                                            ActivitySwitch = activitySwitch,
+                                            ActivityID = activityid,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -2044,7 +1928,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
                     
-                    var getSub = conn.QueryAsync<SubscriptionData>("SELECT * FROM tblSubscription WHERE ContactID = ?", contact);
+                    var getSub = conn.QueryAsync<SubscriptionData>("SELECT * FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
                     var resultCount = getSub.Result.Count;
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     
@@ -2062,12 +1946,12 @@ namespace TBSMobile.View
                                     syncStatus.Text = "Getting device registration data from local database";
 
                                     var crresult = getSubscriptionChanges.Result[i];
-                                    var crregistrationNumber = crresult.RegistrationNumber;
+                                    var crserialNumber = crresult.SerialNumber;
                                     var crcontactID = crresult.ContactID;
+                                    var crdateStart = crresult.DateStart;
                                     var crnoOfDays = crresult.NoOfDays;
-                                    var crinputDate = crresult.InputDate;
-                                    var crexpirationDate = crresult.ExpirationDate;
-                                    var crproductKey = crresult.ProductKey;
+                                    var crtrials = crresult.Trials;
+                                    var crinputserialnumber = crresult.InputSerialNumber;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -2076,11 +1960,11 @@ namespace TBSMobile.View
                                     JObject crjson = new JObject
                                     {
                                         { "ContactID", crcontactID },
-                                        { "RegistrationNumber", crregistrationNumber },
+                                        { "SerialNumber", crserialNumber },
+                                        { "DateStart", crdateStart },
+                                        { "Trials", crtrials },
+                                        { "InputSerialNumber", crinputserialnumber },
                                         { "NoOfDays", crnoOfDays },
-                                        { "InputDate", crinputDate },
-                                        { "ExpirationDate", crexpirationDate },
-                                        { "ProductKey", crproductKey },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -2100,17 +1984,17 @@ namespace TBSMobile.View
                                                 try
                                                 {
                                                     var critem = crsubresult[i];
-                                                    var crregNumber = critem.RegistrationNumber;
+                                                    var crregNumber = critem.SerialNumber;
                                                     var crcID = critem.ContactID;
                                                     var crnoofDays = critem.NoOfDays;
-                                                    var criDate = critem.InputDate;
-                                                    var crexpDate = critem.ExpirationDate;
-                                                    var crpKey = critem.ProductKey;
+                                                    var crdatestart = critem.DateStart;
+                                                    var crtrls = critem.Trials;
+                                                    var crisn = critem.InputSerialNumber;
                                                     var crlSync = DateTime.Parse(current_datetime);
                                                     var crlUpdated = critem.LastUpdated;
                                                     var crdltd = critem.Deleted;
 
-                                                    var crsql = "SELECT * FROM tblSubscription WHERE ContactID = '" + crcontactID + "' AND RegistrationNumber = '" + crregNumber + "'";
+                                                    var crsql = "SELECT * FROM tblSubscription WHERE ContactID = '" + crcontactID + "' AND SerialNumber = '" + crregNumber + "'";
                                                     var crgetSubscription = conn.QueryAsync<SubscriptionTable>(crsql);
                                                     var crresultCount = crgetSubscription.Result.Count;
 
@@ -2121,11 +2005,11 @@ namespace TBSMobile.View
                                                             var crsub = new SubscriptionTable
                                                             {
                                                                 ContactID = crcID,
-                                                                RegistrationNumber = crregNumber,
+                                                                SerialNumber = crregNumber,
                                                                 NoOfDays = crnoofDays,
-                                                                InputDate = criDate,
-                                                                ExpirationDate = crexpDate,
-                                                                ProductKey = crpKey,
+                                                                DateStart = crdatestart,
+                                                                Trials = crtrls,
+                                                                InputSerialNumber = crisn,
                                                                 LastSync = crlSync,
                                                                 Deleted = crdltd,
                                                                 LastUpdated = crlUpdated
@@ -2140,11 +2024,11 @@ namespace TBSMobile.View
                                                         var cresub = new SubscriptionTable
                                                         {
                                                             ContactID = crcID,
-                                                            RegistrationNumber = crregNumber,
+                                                            SerialNumber = crregNumber,
                                                             NoOfDays = crnoofDays,
-                                                            InputDate = criDate,
-                                                            ExpirationDate = crexpDate,
-                                                            ProductKey = crpKey,
+                                                            DateStart = crdatestart,
+                                                            Trials = crtrls,
+                                                            InputSerialNumber = crisn,
                                                             LastSync = crlSync,
                                                             Deleted = crdltd,
                                                             LastUpdated = crlUpdated
@@ -2197,17 +2081,17 @@ namespace TBSMobile.View
                                         for (int i = 0; i < chsubresult.Count; i++)
                                         {
                                             var chitem = chsubresult[i];
-                                            var chregistrationNumber = chitem.RegistrationNumber;
+                                            var chSerialNumber = chitem.SerialNumber;
                                             var chcontactID = chitem.ContactID;
                                             var chnoOfDays = chitem.NoOfDays;
-                                            var chinputDate = chitem.InputDate;
-                                            var chexpirationDate = chitem.ExpirationDate;
-                                            var chproductKey = chitem.ProductKey;
+                                            var chdateStart = chitem.DateStart;
+                                            var chtrials = chitem.Trials;
+                                            var chinputserialnumber = chitem.InputSerialNumber;
                                             var chlastSync = DateTime.Parse(current_datetime);
                                             var chlastUpdated = chitem.LastUpdated;
                                             var chdeleted = chitem.Deleted;
                                             
-                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND RegistrationNumber = ?", chcontactID, chregistrationNumber);
+                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND SerialNumber = ?", chcontactID, chSerialNumber);
                                             var chresultCount = chgetSubscription.Result.Count;
 
                                             if (chresultCount > 0)
@@ -2216,38 +2100,38 @@ namespace TBSMobile.View
                                                 {
                                                     var chsub = new SubscriptionTable
                                                     {
-                                                        RegistrationNumber = chregistrationNumber,
+                                                        SerialNumber = chSerialNumber,
                                                         ContactID = chcontactID,
                                                         NoOfDays = chnoOfDays,
-                                                        InputDate = chinputDate,
-                                                        ExpirationDate = chexpirationDate,
-                                                        ProductKey = chproductKey,
+                                                        DateStart = chdateStart,
+                                                        Trials = chtrials,
+                                                        InputSerialNumber = chinputserialnumber,
                                                         LastSync = chlastSync,
                                                         Deleted = chdeleted,
                                                         LastUpdated = chlastUpdated
                                                     };
 
                                                     await conn.InsertOrReplaceAsync(chsub);
-                                                    syncStatus.Text = "Syncing subscription updates of " + chregistrationNumber;
+                                                    syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
                                                 }
                                             }
                                             else
                                             {
                                                 var chesub = new SubscriptionTable
                                                 {
-                                                    RegistrationNumber = chregistrationNumber,
+                                                    SerialNumber = chSerialNumber,
                                                     ContactID = chcontactID,
                                                     NoOfDays = chnoOfDays,
-                                                    InputDate = chinputDate,
-                                                    ExpirationDate = chexpirationDate,
-                                                    ProductKey = chproductKey,
+                                                    DateStart = chdateStart,
+                                                    Trials = chtrials,
+                                                    InputSerialNumber = chinputserialnumber,
                                                     LastSync = chlastSync,
                                                     Deleted = chdeleted,
                                                     LastUpdated = chlastUpdated
                                                 };
 
                                                 await conn.InsertOrReplaceAsync(chesub);
-                                                syncStatus.Text = "Syncing new subscription (" + chregistrationNumber + ")";
+                                                syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
                                             }
                                         }
                                     }
@@ -2265,55 +2149,53 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting device registration data from server";
 
-                            var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qtF5Ej";
-                            string chcontentType = "application/json";
-                            JObject chjson = new JObject
+                            var sublink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qtF5Ej";
+                            string subcontentType = "application/json";
+                            JObject subjson = new JObject
                             {
                                 { "ContactID", contact },
                                 { "DeviceID", Constants.deviceID }
                             };
 
-                            HttpClient chclient = new HttpClient();
-                            var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
+                            HttpClient subclient = new HttpClient();
+                            var subresponse = await subclient.PostAsync(sublink, new StringContent(subjson.ToString(), Encoding.UTF8, subcontentType));
 
-                            if (chresponse.StatusCode == HttpStatusCode.OK)
+                            if (subresponse.StatusCode == HttpStatusCode.OK)
                             {
-                                var chcontent = await chresponse.Content.ReadAsStringAsync();
+                                var subcontent = await subresponse.Content.ReadAsStringAsync();
 
-                                if (!string.IsNullOrEmpty(chcontent))
+                                if (!string.IsNullOrEmpty(subcontent))
                                 {
                                     int count = 1;
 
-                                    var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent);
-                                    for (int i = 0; i < chsubresult.Count; i++)
+                                    var subsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(subcontent);
+                                    for (int i = 0; i < subsubresult.Count; i++)
                                     {
-                                        syncStatus.Text = "Syncing device registration " + count + " out of " + chsubresult.Count;
+                                        syncStatus.Text = "Syncing device registration " + count + " out of " + subsubresult.Count;
 
-                                        var chitem = chsubresult[i];
-                                        var chregistrationNumber = chitem.RegistrationNumber;
-                                        var chcontactID = chitem.ContactID;
-                                        var chnoOfDays = chitem.NoOfDays;
-                                        var chinputDate = chitem.InputDate;
-                                        var chexpirationDate = chitem.ExpirationDate;
-                                        var chproductKey = chitem.ProductKey;
-                                        var chlastSync = DateTime.Parse(current_datetime);
-                                        var chlastUpdated = chitem.LastUpdated;
-                                        var chdeleted = chitem.Deleted;
+                                        var subitem = subsubresult[i];
+                                        var subSerialNumber = subitem.SerialNumber;
+                                        var subnoOfDays = subitem.NoOfDays;
+                                        var subdateStart = subitem.DateStart;
+                                        var subtrials = subitem.Trials;
+                                        var subinputserialnumber = subitem.InputSerialNumber;
+                                        var sublastSync = DateTime.Parse(current_datetime);
+                                        var sublastUpdated = subitem.LastUpdated;
+                                        var subdeleted = subitem.Deleted;
 
-                                        var chsub = new SubscriptionTable
+                                        var subsub = new SubscriptionTable
                                         {
-                                            RegistrationNumber = chregistrationNumber,
-                                            ContactID = chcontactID,
-                                            NoOfDays = chnoOfDays,
-                                            InputDate = chinputDate,
-                                            ExpirationDate = chexpirationDate,
-                                            ProductKey = chproductKey,
-                                            LastSync = chlastSync,
-                                            Deleted = chdeleted,
-                                            LastUpdated = chlastUpdated
+                                            SerialNumber = subSerialNumber,
+                                            NoOfDays = subnoOfDays,
+                                            DateStart = subdateStart,
+                                            Trials = subtrials,
+                                            InputSerialNumber = subinputserialnumber,
+                                            LastSync = sublastSync,
+                                            Deleted = subdeleted,
+                                            LastUpdated = sublastUpdated
                                         };
 
-                                        await conn.InsertOrReplaceAsync(chsub);
+                                        await conn.InsertOrReplaceAsync(subsub);
 
                                         count++;
                                     }
@@ -2833,50 +2715,50 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting towns from server";
 
-                            var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=F9jq3k";
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                            var twlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=F9jq3k";
+                            string twcontentType = "application/json";
+                            JObject twjson = new JObject
                             {
                                 { "ContactID", contact }
                             };
 
-                            HttpClient client = new HttpClient();
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            HttpClient twclient = new HttpClient();
+                            var twresponse = await twclient.PostAsync(twlink, new StringContent(twjson.ToString(), Encoding.UTF8, twcontentType));
 
-                            if (response.StatusCode == HttpStatusCode.OK)
+                            if (twresponse.StatusCode == HttpStatusCode.OK)
                             {
-                                var content = await response.Content.ReadAsStringAsync();
+                                var twcontent = await twresponse.Content.ReadAsStringAsync();
 
-                                if (!string.IsNullOrEmpty(content))
+                                if (!string.IsNullOrEmpty(twcontent))
                                 {
-                                    int count = 1;
+                                    int twcount = 1;
 
-                                    var townresult = JsonConvert.DeserializeObject<List<TownData>>(content);
-                                    for (int i = 0; i < townresult.Count; i++)
+                                    var twtownresult = JsonConvert.DeserializeObject<List<TownData>>(twcontent);
+                                    for (int i = 0; i < twtownresult.Count; i++)
                                     {
-                                        syncStatus.Text = "Syncing towns " + count + " out of " + townresult.Count;
+                                        syncStatus.Text = "Syncing towns " + twcount + " out of " + twtownresult.Count;
 
-                                        var item = townresult[i];
-                                        var townID = item.TownID;
-                                        var provinceID = item.ProvinceID;
-                                        var town = item.Town;
-                                        var lastSync = DateTime.Parse(current_datetime);
-                                        var lastUpdated = item.LastUpdated;
-                                        var deleted = item.Deleted;
+                                        var twitem = twtownresult[i];
+                                        var twtownID = twitem.TownID;
+                                        var twprovinceID = twitem.ProvinceID;
+                                        var twtown = twitem.Town;
+                                        var twlastSync = DateTime.Parse(current_datetime);
+                                        var twlastUpdated = twitem.LastUpdated;
+                                        var twdeleted = twitem.Deleted;
 
-                                        var twn = new TownTable
+                                        var twtwn = new TownTable
                                         {
-                                            ProvinceID = provinceID,
-                                            TownID = townID,
-                                            Town = town,
-                                            LastSync = lastSync,
-                                            Deleted = deleted,
-                                            LastUpdated = lastUpdated
+                                            ProvinceID = twprovinceID,
+                                            TownID = twtownID,
+                                            Town = twtown,
+                                            LastSync = twlastSync,
+                                            Deleted = twdeleted,
+                                            LastUpdated = twlastUpdated
                                         };
 
-                                        await conn.InsertOrReplaceAsync(twn);
+                                        await conn.InsertOrReplaceAsync(twtwn);
 
-                                        count++;
+                                        twcount++;
                                     }
                                 }
                             }

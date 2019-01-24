@@ -380,7 +380,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
+                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND RetailerType != 'RT00004' AND Supervisor='" + contact + "' ORDER BY FileAs LIMIT 3";
                     var getUser = conn.QueryAsync<ContactsTable>(sql);
                     var resultCount = getUser.Result.Count;
 
@@ -640,7 +640,7 @@ namespace TBSMobile.View
                     { "Mobile", mobile },
                     { "Email", email },
                     { "GPSCoordinates", location },
-                    { "Coordinator", contact },
+                    { "Supervisor", contact },
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
 
@@ -668,7 +668,7 @@ namespace TBSMobile.View
                         Mobile = mobile,
                         Email = email,
                         GPSCoordinates = location,
-                        Coordinator = contact,
+                        Supervisor = contact,
                         LastSync = DateTime.Parse(current_datetime),
                         LastUpdated = DateTime.Parse(current_datetime)
                     };
@@ -726,7 +726,7 @@ namespace TBSMobile.View
                     Mobile = mobile,
                     Email = email,
                     GPSCoordinates = location,
-                    Coordinator = contact,
+                    Supervisor = contact,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 

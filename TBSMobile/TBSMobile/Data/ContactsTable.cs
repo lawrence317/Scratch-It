@@ -25,8 +25,6 @@ namespace TBSMobile.Data
         [MaxLength(100)]
         public string CompanyID { get; set; }
         [MaxLength(100)]
-        public string ContactType { get; set; }
-        [MaxLength(100)]
         public string RetailerType { get; set; }
         [MaxLength(300)]
         public string PresStreet { get; set; }
@@ -63,7 +61,7 @@ namespace TBSMobile.Data
         [MaxLength(2)]
         public int Customer { get; set; }
         [MaxLength(50)]
-        public string Coordinator { get; set; }
+        public string Supervisor { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
         public int Deleted { get; set; }

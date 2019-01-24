@@ -94,20 +94,16 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Rekorida'", caf);
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00001'", caf);
                 var contactResultCount = getCaf.Result.Count;
 
                 if (contactResultCount > 0)
                 {
-                    var contactResult = getCaf.Result[0];
-                    if (contactResult.ActivitySwitch == 1)
-                    {
-                        lblRekorida.Text = "True";
-                    }
-                    else
-                    {
-                        lblRekorida.Text = "False";
-                    }
+                    lblRekorida.Text = "True";
+                }
+                else
+                {
+                    lblRekorida.Text = "False";
                 }
             }
             catch (Exception ex)
@@ -123,20 +119,16 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Merchandizing'", caf);
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00002'", caf);
                 var contactResultCount = getCaf.Result.Count;
 
                 if (contactResultCount > 0)
                 {
-                    var contactResult = getCaf.Result[0];
-                    if (contactResult.ActivitySwitch == 1)
-                    {
-                        lblMerchandizing.Text = "True";
-                    }
-                    else
-                    {
-                        lblMerchandizing.Text = "False";
-                    }
+                    lblMerchandizing.Text = "True";
+                }
+                else
+                {
+                    lblMerchandizing.Text = "False";
                 }
             }
             catch (Exception ex)
@@ -152,20 +144,16 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Trade Check'", caf);
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00003'", caf);
                 var contactResultCount = getCaf.Result.Count;
 
                 if (contactResultCount > 0)
                 {
-                    var contactResult = getCaf.Result[0];
-                    if (contactResult.ActivitySwitch == 1)
-                    {
-                        lblTradeCheck.Text = "True";
-                    }
-                    else
-                    {
-                        lblTradeCheck.Text = "False";
-                    }
+                    lblTradeCheck.Text = "True";
+                }
+                else
+                {
+                    lblTradeCheck.Text = "False";
                 }
             }
             catch (Exception ex)
@@ -181,20 +169,16 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'Others'", caf);
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'ACT00004'", caf);
                 var contactResultCount = getCaf.Result.Count;
 
                 if (contactResultCount > 0)
                 {
-                    var contactResult = getCaf.Result[0];
-                    if (contactResult.ActivitySwitch == 1)
-                    {
-                        lblOthers.Text = "True";
-                    }
-                    else
-                    {
-                        lblOthers.Text = "False";
-                    }
+                    lblOthers.Text = "True";
+                }
+                else
+                {
+                    lblOthers.Text = "False";
                 }
             }
             catch (Exception ex)

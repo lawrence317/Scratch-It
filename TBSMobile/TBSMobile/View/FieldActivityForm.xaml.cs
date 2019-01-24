@@ -267,7 +267,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND ContactType='Retailer' AND Coordinator='" + contact + "' ORDER BY FileAs LIMIT 3";
+                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND RetailerType != 'RT00004' AND Supervisor='" + contact + "' ORDER BY FileAs LIMIT 3";
                     var getUser = conn.QueryAsync<ContactsTable>(sql);
                     var resultCount = getUser.Result.Count;
 
@@ -345,7 +345,7 @@ namespace TBSMobile.View
                     {
                         var result = getCode.Result.FirstOrDefault();
                         entRetailerCode.Text = result.RetailerCode;
-                        entEmployeeNumber.Text = result.Coordinator;
+                        entEmployeeNumber.Text = result.Supervisor;
                         entStreet.Text = result.PresStreet;
                         entBarangay.Text = result.PresBarangay;
                         entProvinceCode.Text = result.PresProvince;
@@ -1305,46 +1305,46 @@ namespace TBSMobile.View
                 var videourl = entVideoUrl.Text;
                 var otherconcern = entOthers.Text;
                 var remarks = entRemarks.Text;
-                int rekorida;
-                int merchandizing;
-                int tradecheck;
-                int others;
+                string rekorida;
+                string merchandizing;
+                string tradecheck;
+                string others;
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (swRekorida.IsToggled == true)
                 {
-                    rekorida = 1;
+                    rekorida = "ACT00001";
                 }
                 else
                 {
-                    rekorida = 0;
+                    rekorida = "";
                 }
 
                 if (swMerchandizing.IsToggled == true)
                 {
-                    merchandizing = 1;
+                    merchandizing = "ACT00002";
                 }
                 else
                 {
-                    merchandizing = 0;
+                    merchandizing = "";
                 }
 
                 if (swTradeCheck.IsToggled == true)
                 {
-                    tradecheck = 1;
+                    tradecheck = "ACT00003";
                 }
                 else
                 {
-                    tradecheck = 0;
+                    tradecheck = "";
                 }
 
                 if (swOthers.IsToggled == true)
                 {
-                    others = 1;
+                    others = "ACT00004";
                 }
                 else
                 {
-                    others = 0;
+                    others = "";
                 }
 
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
@@ -1493,53 +1493,61 @@ namespace TBSMobile.View
 
                                             await conn.InsertAsync(caf_insert);
 
-                                            var rekorida_insert = new ActivityTable
+                                            if (swRekorida.IsToggled == true)
                                             {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Rekorida",
-                                                ActivitySwitch = rekorida,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var rekorida_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    ActivityID = "ACT00001",
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(rekorida_insert);
+                                                await conn.InsertAsync(rekorida_insert);
+                                            }
 
-                                            var merchandizing_insert = new ActivityTable
+                                            if (swMerchandizing.IsToggled == true)
                                             {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Merchandizing",
-                                                ActivitySwitch = merchandizing,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var merchandizing_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    ActivityID = "ACT00002",
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(merchandizing_insert);
+                                                await conn.InsertAsync(merchandizing_insert);
+                                            }
 
-                                            var trade_check_insert = new ActivityTable
+                                            if (swTradeCheck.IsToggled == true)
                                             {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Trade Check",
-                                                ActivitySwitch = tradecheck,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var trade_check_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    ActivityID = "ACT00003",
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(trade_check_insert);
+                                                await conn.InsertAsync(trade_check_insert);
+                                            }
 
-                                            var others_insert = new ActivityTable
+                                            if (swOthers.IsToggled == true)
                                             {
-                                                CAFNo = caf,
-                                                ContactID = employeeNumber,
-                                                Activity = "Others",
-                                                ActivitySwitch = others,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                var others_insert = new ActivityTable
+                                                {
+                                                    CAFNo = caf,
+                                                    ContactID = employeeNumber,
+                                                    ActivityID = "ACT00004",
+                                                    LastSync = DateTime.Parse(current_datetime),
+                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                };
 
-                                            await conn.InsertAsync(others_insert);
+                                                await conn.InsertAsync(others_insert);
+                                            }
 
                                             Analytics.TrackEvent("Sent Field Activity Form");
                                             await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
@@ -1594,50 +1602,13 @@ namespace TBSMobile.View
             var videourl = entVideoUrl.Text;
             var otherconcern = entOthers.Text;
             var remarks = entRemarks.Text;
-            int rekorida;
-            int merchandizing;
-            int tradecheck;
-            int others;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            if (swRekorida.IsToggled == true)
-            {
-                rekorida = 1;
-            }
-            else
-            {
-                rekorida = 0;
-            }
-
-            if (swMerchandizing.IsToggled == true)
-            {
-                merchandizing = 1;
-            }
-            else
-            {
-                merchandizing = 0;
-            }
-
-            if (swTradeCheck.IsToggled == true)
-            {
-                tradecheck = 1;
-            }
-            else
-            {
-                tradecheck = 0;
-            }
-
-            if (swOthers.IsToggled == true)
-            {
-                others = 1;
-            }
-            else
-            {
-                others = 0;
-            }
 
             var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();            
+            var conn = db.GetConnection();
+
+            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
 
             var caf_insert = new CAFTable
             {
@@ -1662,52 +1633,58 @@ namespace TBSMobile.View
 
             await conn.InsertAsync(caf_insert);
 
-            var rekorida_insert = new ActivityTable
+            if (swRekorida.IsToggled == true)
             {
-                CAFNo = caf,
-                ContactID = employeeNumber,
-                Activity = "Rekorida",
-                ActivitySwitch = rekorida,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
+                var rekorida_insert = new ActivityTable
+                {
+                    CAFNo = caf,
+                    ContactID = employeeNumber,
+                    ActivityID = "ACT00001",
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
 
-            await conn.InsertAsync(rekorida_insert);
+                await conn.InsertAsync(rekorida_insert);
+            }
 
-            var merchandizing_insert = new ActivityTable
+            if (swMerchandizing.IsToggled == true)
             {
-                CAFNo = caf,
-                ContactID = employeeNumber,
-                Activity = "Merchandizing",
-                ActivitySwitch = merchandizing,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
+                var merchandizing_insert = new ActivityTable
+                {
+                    CAFNo = caf,
+                    ContactID = employeeNumber,
+                    ActivityID = "ACT00002",
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
 
-            await conn.InsertAsync(merchandizing_insert);
+                await conn.InsertAsync(merchandizing_insert);
+            }
 
-            var trade_check_insert = new ActivityTable
+            if (swTradeCheck.IsToggled == true)
             {
-                CAFNo = caf,
-                ContactID = employeeNumber,
-                Activity = "Trade Check",
-                ActivitySwitch = tradecheck,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
+                var trade_check_insert = new ActivityTable
+                {
+                    CAFNo = caf,
+                    ContactID = employeeNumber,
+                    ActivityID = "ACT00003",
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
 
-            await conn.InsertAsync(trade_check_insert);
+                await conn.InsertAsync(trade_check_insert);
+            }
 
-            var others_insert = new ActivityTable
+            if (swOthers.IsToggled == true)
             {
-                CAFNo = caf,
-                ContactID = employeeNumber,
-                Activity = "Others",
-                ActivitySwitch = others,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
+                var others_insert = new ActivityTable
+                {
+                    CAFNo = caf,
+                    ContactID = employeeNumber,
+                    ActivityID = "ACT00004",
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
 
-            await conn.InsertAsync(others_insert);
+                await conn.InsertAsync(others_insert);
+            }
 
-            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
-            
             Analytics.TrackEvent("Sent Field Activity Form");
             await DisplayAlert("Offline Save", "Your activity has been saved offline. Connect to the server to send your activity", "Got it");
             await Application.Current.MainPage.Navigation.PopAsync();
@@ -1739,48 +1716,48 @@ namespace TBSMobile.View
             var videourl = entVideoUrl.Text;
             var otherconcern = entOthers.Text;
             var remarks = entRemarks.Text;
-            int rekorida;
-            int merchandizing;
-            int tradecheck;
-            int others;
+            string rekorida;
+            string merchandizing;
+            string tradecheck;
+            string others;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             var recipients = entrecipient.Text;
             var emailMessenger = CrossMessaging.Current.EmailMessenger;
 
             if (swRekorida.IsToggled == true)
             {
-                rekorida = 1;
+                rekorida = "True";
             }
             else
             {
-                rekorida = 0;
+                rekorida = "False";
             }
 
             if (swMerchandizing.IsToggled == true)
             {
-                merchandizing = 1;
+                merchandizing = "True";
             }
             else
             {
-                merchandizing = 0;
+                merchandizing = "False";
             }
 
             if (swTradeCheck.IsToggled == true)
             {
-                tradecheck = 1;
+                tradecheck = "True";
             }
             else
             {
-                tradecheck = 0;
+                tradecheck = "False";
             }
 
             if (swOthers.IsToggled == true)
             {
-                others = 1;
+                others = "True";
             }
             else
             {
-                others = 0;
+                others = "False";
             }
 
             if (!string.IsNullOrEmpty(recipients))
@@ -1844,7 +1821,7 @@ namespace TBSMobile.View
                         var db = DependencyService.Get<ISQLiteDB>();
                         var conn = db.GetConnection();
 
-                        var getCode = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail");
+                        var getCode = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ?", employeeNumber);
                         var resultCount = getCode.Result.Count;
                         if (resultCount > 0)
                         {

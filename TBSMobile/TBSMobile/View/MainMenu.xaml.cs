@@ -67,11 +67,11 @@ namespace TBSMobile.View
                                 var db = DependencyService.Get<ISQLiteDB>();
                                 var conn = db.GetConnection();
 
-                                var contactchangessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                                var contactchangessql = "SELECT * FROM tblContacts WHERE Supervisor = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                                 var getcontactschanges = conn.QueryAsync<ContactsTable>(contactchangessql);
                                 var contactchangesresultCount = getcontactschanges.Result.Count;
 
-                                var retaileroutletchangessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                                var retaileroutletchangessql = "SELECT * FROM tblRetailerGroup WHERE Supervisor = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                                 var getretaileroutletchanges = conn.QueryAsync<RetailerGroupTable>(retaileroutletchangessql);
                                 var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
 
@@ -356,11 +356,11 @@ namespace TBSMobile.View
                                 var db = DependencyService.Get<ISQLiteDB>();
                                 var conn = db.GetConnection();
 
-                                var contactchangessql = "SELECT * FROM tblContacts WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                                var contactchangessql = "SELECT * FROM tblContacts WHERE Supervisor = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                                 var getcontactschanges = conn.QueryAsync<ContactsTable>(contactchangessql);
                                 var contactchangesresultCount = getcontactschanges.Result.Count;
 
-                                var retaileroutletchangessql = "SELECT * FROM tblRetailerGroup WHERE Coordinator = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
+                                var retaileroutletchangessql = "SELECT * FROM tblRetailerGroup WHERE Supervisor = '" + contact + "' AND LastUpdated > LastSync AND Deleted != '1'";
                                 var getretaileroutletchanges = conn.QueryAsync<RetailerGroupTable>(retaileroutletchangessql);
                                 var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
 
@@ -539,7 +539,6 @@ namespace TBSMobile.View
             public string Position { get; set; }
             public string Company { get; set; }
             public string CompanyID { get; set; }
-            public string ContactType { get; set; }
             public string RetailerType { get; set; }
             public string PresStreet { get; set; }
             public string PresBarangay { get; set; }
@@ -562,7 +561,7 @@ namespace TBSMobile.View
             public string MobileVideo { get; set; }
             public int Employee { get; set; }
             public int Customer { get; set; }
-            public string Coordinator { get; set; }
+            public string Supervisor { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -586,7 +585,7 @@ namespace TBSMobile.View
             public string Email { get; set; }
             public string Landmark { get; set; }
             public string GPSCoordinates { get; set; }
-            public string Coordinator { get; set; }
+            public string Supervisor { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -619,8 +618,7 @@ namespace TBSMobile.View
         {
             public string CAFNo { get; set; }
             public string ContactID { get; set; }
-            public string Activity { get; set; }
-            public int ActivitySwitch { get; set; }
+            public string ActivityID { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -651,7 +649,7 @@ namespace TBSMobile.View
 
                     int count = 1;
                     
-                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Coordinator = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getContactsChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -669,7 +667,6 @@ namespace TBSMobile.View
                             var crposition = crresult.Position;
                             var crcompany = crresult.Company;
                             var crcompanyID = crresult.CompanyID;
-                            var crcontactType = crresult.ContactType;
                             var crretailerType = crresult.RetailerType;
                             var crpresStreet = crresult.PresStreet;
                             var crpresBarangay = crresult.PresBarangay;
@@ -692,7 +689,7 @@ namespace TBSMobile.View
                             var crmobileVideo = crresult.MobileVideo;
                             var cremployee = crresult.Employee;
                             var crcustomer = crresult.Customer;
-                            var crcoordinator = crresult.Coordinator;
+                            var crsupervisor = crresult.Supervisor;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -708,7 +705,6 @@ namespace TBSMobile.View
                                 { "Position", crposition },
                                 { "Company", crcompany },
                                 { "CompanyID", crcompanyID },
-                                { "ContactType", crcontactType },
                                 { "RetailerType", crretailerType },
                                 { "PresStreet", crpresStreet },
                                 { "PresBarangay", crpresBarangay },
@@ -727,7 +723,7 @@ namespace TBSMobile.View
                                 { "MobileVideo", crmobileVideo },
                                 { "Employee", cremployee },
                                 { "Customer", crcustomer },
-                                { "Coordinator", crcoordinator },
+                                { "Supervisor", crsupervisor },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -910,7 +906,7 @@ namespace TBSMobile.View
 
                     int count = 1;
                     
-                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Coordinator = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getOutletChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -934,7 +930,7 @@ namespace TBSMobile.View
                             var cremail = crresult.Email;
                             var crlandmark = crresult.Landmark;
                             var crgpsCoordinates = crresult.GPSCoordinates;
-                            var crcoordinator = crresult.Coordinator;
+                            var crsupervisor = crresult.Supervisor;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -942,23 +938,23 @@ namespace TBSMobile.View
                             string crcontentType = "application/json";
                             JObject crjson = new JObject
                             {
-                                { "RetailerCode", crretailerCode },
-                                { "ContactID", crcontactID },
-                                { "PresStreet", crpresStreet },
-                                { "PresBarangay", crpresBarangay },
-                                { "PresDistrict", crpresDistrict },
-                                { "PresTown", crpresTown },
-                                { "PresProvince", crpresProvince },
-                                { "PresCountry", crpresCountry },
-                                { "Telephone1", crtelephone1 },
-                                { "Telephone2", crtelephone2 },
-                                { "Mobile", crmobile },
-                                { "Email", cremail },
-                                { "Landmark", crlandmark },
-                                { "GPSCoordinates", crgpsCoordinates },
-                                { "Coordinator", crcoordinator },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
+                                    { "RetailerCode", crretailerCode },
+                                    { "ContactID", crcontactID },
+                                    { "PresStreet", crpresStreet },
+                                    { "PresBarangay", crpresBarangay },
+                                    { "PresDistrict", crpresDistrict },
+                                    { "PresTown", crpresTown },
+                                    { "PresProvince", crpresProvince },
+                                    { "PresCountry", crpresCountry },
+                                    { "Telephone1", crtelephone1 },
+                                    { "Telephone2", crtelephone2 },
+                                    { "Mobile", crmobile },
+                                    { "Email", cremail },
+                                    { "Landmark", crlandmark },
+                                    { "GPSCoordinates", crgpsCoordinates },
+                                    { "Supervisor", crsupervisor },
+                                    { "Deleted", crdeleted },
+                                    { "LastUpdated", crlastUpdated }
                             };
 
                             HttpClient crclient = new HttpClient();
@@ -1023,7 +1019,7 @@ namespace TBSMobile.View
                         for (int i = 0; i < changesresultCount; i++)
                         {
                             
-                            lblStatus.Text = "Sending coordinator activity changes to server " + count + " out of " + changesresultCount;
+                            lblStatus.Text = "Sending Supervisor activity changes to server " + count + " out of " + changesresultCount;
 
                             var crresult = getCAFChanges.Result[i];
                             var crcafNo = crresult.CAFNo;
@@ -1259,8 +1255,7 @@ namespace TBSMobile.View
                             var crresult = getActivityChanges.Result[i];
                             var crcafNo = crresult.CAFNo;
                             var crcontactId = crresult.ContactID;
-                            var cractivity = crresult.Activity;
-                            var cractivitySwitch = crresult.ActivitySwitch;
+                            var cractivityID = crresult.ActivityID;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1270,8 +1265,7 @@ namespace TBSMobile.View
                             {
                                 { "CAFNo", crcafNo },
                                 { "ContactID", crcontactId },
-                                { "Activity", cractivity },
-                                { "ActivitySwitch", cractivitySwitch },
+                                { "ActivityID", cractivityID },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };

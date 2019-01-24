@@ -13,9 +13,9 @@ namespace TBSMobile.Data
         [MaxLength(10)]
         public string UserID { get; set; }
         [MaxLength(10)]
-        public string UserPassword { get; set; }
+        public string UsrPassword { get; set; }
         [MaxLength(30)]
-        public string UserType { get; set; }
+        public string UserTypeID { get; set; }
         [MaxLength(30)]
         public string UserStatus { get; set; }
         public DateTime LastSync { get; set; }

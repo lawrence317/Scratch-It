@@ -15,13 +15,13 @@ namespace TBSMobile.View
     public partial class RetailerGroupList : ContentPage
     {
         string contactID;
-        string coordinator;
+        string Supervisor;
 
         public RetailerGroupList(ContactsTable item)
         {
             InitializeComponent();
             this.contactID = item.ContactID;
-            this.coordinator = item.Coordinator;
+            this.Supervisor = item.Supervisor;
             GetRetailerGroup(item.ContactID);
             searchCategory.SelectedIndex = 0;
         }
