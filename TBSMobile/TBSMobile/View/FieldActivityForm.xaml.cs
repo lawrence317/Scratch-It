@@ -1565,6 +1565,12 @@ namespace TBSMobile.View
                                         Send_offline();
                                     }
                                 }
+                                else
+                                {
+                                    Analytics.TrackEvent("Sent Field Activity Form");
+                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                    await Application.Current.MainPage.Navigation.PopAsync();
+                                }
                             }
                         }
                     }
