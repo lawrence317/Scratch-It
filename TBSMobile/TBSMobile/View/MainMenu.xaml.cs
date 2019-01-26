@@ -27,6 +27,7 @@ namespace TBSMobile.View
         string database;
         string ipaddress;
         byte[] pingipaddress;
+        string synccount;
 
         public MainMenu(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
@@ -866,6 +867,8 @@ namespace TBSMobile.View
                         }
                     }
 
+                    synccount += "Total Retailer sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+
                     SyncRetailerOutlet(host, database, contact, ipaddress, pingipaddress);
                 }
                 catch (Exception ex)
@@ -971,6 +974,8 @@ namespace TBSMobile.View
                             }
                         }
                     }
+
+                    synccount += "Total Retailer Outlet sync: " + (count - 1) + " out of " + changesresultCount + "\n";
 
                     SyncCaf(host, database, contact, ipaddress, pingipaddress);
                 }
@@ -1201,6 +1206,8 @@ namespace TBSMobile.View
                                 }
                             }
                         }
+
+                        synccount += "Total Field Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     SyncActivities(host, database, contact, ipaddress, pingipaddress);
@@ -1283,6 +1290,8 @@ namespace TBSMobile.View
                                 }
                             }
                         }
+
+                        synccount += "Total Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     SyncEmail(host, database, contact, ipaddress, pingipaddress);
@@ -1359,6 +1368,8 @@ namespace TBSMobile.View
                                 count++;
                             }
                         }
+
+                        synccount += "Total Email sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     OnSyncComplete();
@@ -1395,7 +1406,8 @@ namespace TBSMobile.View
             {
                 if (reply.Status == IPStatus.Success)
                 {
-                    DisplayAlert("Sync Completed", "Sync successfully", "Got it");
+                    DisplayAlert("Sync Completed", "Sync Summary: \n\n" + synccount , "Got it");
+                    synccount = "";
                     lblStatus.Text = "Online - Connected to server";
                     lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
                 }

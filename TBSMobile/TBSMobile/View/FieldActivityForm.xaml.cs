@@ -401,7 +401,7 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(result.GPSCoordinates))
                         {
-                            if (result.GPSCoordinates == "0.000,0.000")
+                            if (string.IsNullOrEmpty(result.GPSCoordinates))
                             {
                                 GetGPS();
                             }
@@ -1190,7 +1190,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    string sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
+                    var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%"+keyword+"%' ORDER BY Province LIMIT 3";
                     var getProvince = conn.QueryAsync<ProvinceTable>(sql);
                     var resultCount = getProvince.Result.Count;
 

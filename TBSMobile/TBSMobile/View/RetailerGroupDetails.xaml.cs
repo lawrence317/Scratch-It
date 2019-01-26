@@ -79,8 +79,8 @@ namespace TBSMobile.View
                     var town = "";
 
                     var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
-                    var getTownResultCount = getProvince.Result.Count;
-                    if (getProvinceResultCount > 0)
+                    var getTownResultCount = getTown.Result.Count;
+                    if (getTownResultCount > 0)
                     {
                         var townResult = getTown.Result[0];
                         town = townResult.Town;

@@ -26,6 +26,7 @@ namespace TBSMobile.View
         string database;
         string ipaddress;
         byte[] pingipaddress;
+        string synccount = "Sync Summary: \n\n";
 
         public SyncPage(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
@@ -497,6 +498,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Retailer Outlet sync: " + (count - 1) + " out of " + userresult.Count + "\n";
                                 }
                             }
                         }
@@ -888,6 +891,8 @@ namespace TBSMobile.View
                                     Crashes.TrackError(ex);
                                 }
                             }
+
+                            synccount += "Total Retailer sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                         }
                         else
                         {
@@ -1079,7 +1084,7 @@ namespace TBSMobile.View
                                     var contactsresult = JsonConvert.DeserializeObject<List<ContactsData>>(content);
                                     for (int i = 0; i < contactsresult.Count; i++)
                                     {
-                                        syncStatus.Text = "Syncing retailer changes " + count + " out of " + contactsresult.Count;
+                                        syncStatus.Text = "Syncing retailer " + count + " out of " + contactsresult.Count;
 
                                         var item = contactsresult[i];
                                         var contactID = item.ContactID;
@@ -1159,6 +1164,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total User sync: " + (count - 1) + " out of " + contactsresult.Count + "\n";
                                 }
                             }
                         }
@@ -1265,6 +1272,8 @@ namespace TBSMobile.View
                                     }
                                 }
                             }
+
+                            synccount += "Total Retailer  Outlet sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                         }
                         else
                         {
@@ -1456,6 +1465,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Retailer Outlet sync: " + (count - 1) + " out of " + contactsresult.Count + "\n";
                                 }
                             }
                         }
@@ -1673,6 +1684,8 @@ namespace TBSMobile.View
                                     Crashes.TrackError(ex);
                                 }
                             }
+
+                            synccount += "Total Field Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                         }
                     }
                     else
@@ -1750,6 +1763,8 @@ namespace TBSMobile.View
                                         await conn.InsertOrReplaceAsync(caf);
                                         count++;
                                     }
+
+                                    synccount += "Total Field Activity sync: " + (count - 1) + " out of " + cafresult.Count + "\n";
                                 }
                             }
                         }
@@ -1840,6 +1855,8 @@ namespace TBSMobile.View
                                     Crashes.TrackError(ex);
                                 }
                             }
+
+                            synccount += "Total Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
                         }
                     }
                     else
@@ -1893,6 +1910,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Activity sync: " + (count - 1) + " out of " + actresult.Count + "\n";
                                 }
                             }
                         }
@@ -2201,6 +2220,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Subscription sync: " + (count - 1) + " out of " + subsubresult.Count + "\n";
                                 }
                             }
                         }
@@ -2557,6 +2578,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Province sync: " + (count - 1) + " out of " + provinceresult.Count + "\n";
                                 }
                             }
                         }
@@ -2613,6 +2636,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Province sync: " + (count - 1) + " out of " + provinceresult.Count + "\n";
                                 }
                             }
                         }
@@ -2703,6 +2728,8 @@ namespace TBSMobile.View
 
                                         count++;
                                     }
+
+                                    synccount += "Total Town sync: " + (count - 1) + " out of " + townresult.Count + "\n";
                                 }
                             }
                         }
@@ -2762,6 +2789,8 @@ namespace TBSMobile.View
 
                                         twcount++;
                                     }
+
+                                    synccount += "Total Town sync: " + (twcount - 1) + " out of " + twtownresult.Count + "\n";
                                 }
                             }
                         }
@@ -2787,7 +2816,16 @@ namespace TBSMobile.View
         
         public void OnSyncComplete()
         {
-            syncStatus.Text = "Data sync successfully";
+            
+            if(synccount == "Sync Summary: \n\n")
+            {
+                syncStatus.Text = "Data has been synced successfully";
+            }
+            else
+            {
+                syncStatus.Text = synccount;
+            }
+
             btnContinue.IsVisible = true;
         }
         
