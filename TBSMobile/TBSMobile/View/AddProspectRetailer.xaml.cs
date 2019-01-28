@@ -770,6 +770,7 @@ namespace TBSMobile.View
                 var videourl = entVideoUrl.Text;
                 int employee = 0;
                 int customer = 1;
+                int deleted = 0;
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=9Fcq8C";
@@ -800,6 +801,7 @@ namespace TBSMobile.View
                     { "Employee", employee },
                     { "Customer", customer },
                     { "Supervisor", contact },
+                    { "Deleted", deleted },
                     { "LastSync", current_datetime },
                     { "LastUpdated", current_datetime }
                 };
@@ -930,6 +932,7 @@ namespace TBSMobile.View
                                                                     Employee = employee,
                                                                     Customer = customer,
                                                                     Supervisor = contact,
+                                                                    Deleted = deleted,
                                                                     LastSync = DateTime.Parse(current_datetime),
                                                                     LastUpdated = DateTime.Parse(current_datetime)
                                                                 };
