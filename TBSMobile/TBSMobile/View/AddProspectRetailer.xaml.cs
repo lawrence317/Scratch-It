@@ -809,127 +809,148 @@ namespace TBSMobile.View
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    byte[] Photo1Data = File.ReadAllBytes(photo1url);
-
-                    var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
-                    string ph1contentType = "application/json";
-                    JObject ph1json = new JObject
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
                     {
-                        { "ContactID", id },
-                        { "Photo1", Photo1Data }
-                    };
+                        byte[] Photo1Data = File.ReadAllBytes(photo1url);
 
-                    HttpClient ph1client = new HttpClient();
-                    var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
-
-                    if (ph1response.StatusCode == HttpStatusCode.OK)
-                    {
-                        byte[] Photo2Data = File.ReadAllBytes(photo2url);
-
-                        var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
-                        string ph2contentType = "application/json";
-                        JObject ph2json = new JObject
+                        var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
+                        string ph1contentType = "application/json";
+                        JObject ph1json = new JObject
                         {
                             { "ContactID", id },
-                            { "Photo2", Photo2Data }
+                            { "Photo1", Photo1Data }
                         };
 
-                        HttpClient ph2client = new HttpClient();
-                        var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+                        HttpClient ph1client = new HttpClient();
+                        var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
 
-                        if (ph2response.StatusCode == HttpStatusCode.OK)
+                        if (ph1response.StatusCode == HttpStatusCode.OK)
                         {
-                            byte[] Photo3Data = File.ReadAllBytes(photo3url);
-
-                            var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
-                            string ph3contentType = "application/json";
-                            JObject ph3json = new JObject
+                            var ph1content = await ph1response.Content.ReadAsStringAsync();
+                            if (!string.IsNullOrEmpty(ph1content))
                             {
-                                { "ContactID", id },
-                                { "Photo3", Photo3Data }
-                            };
+                                byte[] Photo2Data = File.ReadAllBytes(photo2url);
 
-                            HttpClient ph3client = new HttpClient();
-                            var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
-
-                            if (ph3response.StatusCode == HttpStatusCode.OK)
-                            {
-                                try
+                                var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
+                                string ph2contentType = "application/json";
+                                JObject ph2json = new JObject
                                 {
-                                    if (!string.IsNullOrEmpty(videourl))
+                                    { "ContactID", id },
+                                    { "Photo2", Photo2Data }
+                                };
+
+                                HttpClient ph2client = new HttpClient();
+                                var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+
+                                if (ph2response.StatusCode == HttpStatusCode.OK)
+                                {
+                                    var ph2content = await ph2response.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(ph2content))
                                     {
-                                        byte[] VideoData;
+                                        byte[] Photo3Data = File.ReadAllBytes(photo3url);
 
-                                        if (!string.IsNullOrEmpty(videourl))
+                                        var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
+                                        string ph3contentType = "application/json";
+                                        JObject ph3json = new JObject
                                         {
-                                            VideoData = File.ReadAllBytes(videourl);
-                                        }
-                                        else
-                                        {
-                                            VideoData = null;
-                                        }
-
-                                        var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
-                                        string vidcontentType = "application/json";
-                                        JObject vidjson = new JObject
-                                        {
-                                           { "ContactID", id },
-                                           { "Video", VideoData }
+                                            { "ContactID", id },
+                                            { "Photo3", Photo3Data }
                                         };
 
-                                        HttpClient vidclient = new HttpClient();
-                                        var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+                                        HttpClient ph3client = new HttpClient();
+                                        var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
 
-                                        if (vidresponse.StatusCode == HttpStatusCode.OK)
+                                        if (ph3response.StatusCode == HttpStatusCode.OK)
                                         {
-                                            var db = DependencyService.Get<ISQLiteDB>();
-                                            var conn = db.GetConnection();
-
-                                            var retailer = new ContactsTable
+                                            var ph3content = await ph3response.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(ph3content))
                                             {
-                                                ContactID = id,
-                                                FileAs = firstName + " " + lastName + " " + middleName,
-                                                FirstName = firstName,
-                                                MiddleName = middleName,
-                                                LastName = lastName,
-                                                RetailerType = retailerType,
-                                                PresStreet = street,
-                                                PresBarangay = barangay,
-                                                PresDistrict = district,
-                                                PresTown = town,
-                                                PresProvince = province,
-                                                PresCountry = country,
-                                                Landmark = landmark,
-                                                Telephone1 = telephone1,
-                                                Telephone2 = telephone2,
-                                                Mobile = mobile,
-                                                Email = email,
-                                                Photo1 = photo1url,
-                                                Photo2 = photo2url,
-                                                Photo3 = photo3url,
-                                                Video = videourl,
-                                                MobilePhoto1 = photo1url,
-                                                MobilePhoto2 = photo2url,
-                                                MobilePhoto3 = photo3url,
-                                                MobileVideo = videourl,
-                                                Employee = employee,
-                                                Customer = customer,
-                                                Supervisor = contact,
-                                                LastSync = DateTime.Parse(current_datetime),
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
+                                                try
+                                                {
+                                                    if (!string.IsNullOrEmpty(videourl))
+                                                    {
+                                                        byte[] VideoData;
 
-                                            await conn.InsertAsync(retailer);
-                                            Analytics.TrackEvent("Sent Prospect Retailer");
-                                            await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
-                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                        if (!string.IsNullOrEmpty(videourl))
+                                                        {
+                                                            VideoData = File.ReadAllBytes(videourl);
+                                                        }
+                                                        else
+                                                        {
+                                                            VideoData = null;
+                                                        }
+
+                                                        var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
+                                                        string vidcontentType = "application/json";
+                                                        JObject vidjson = new JObject
+                                                        {
+                                                           { "ContactID", id },
+                                                           { "Video", VideoData }
+                                                        };
+
+                                                        HttpClient vidclient = new HttpClient();
+                                                        var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                        if (vidresponse.StatusCode == HttpStatusCode.OK)
+                                                        {
+                                                            var vidcontent = await vidresponse.Content.ReadAsStringAsync();
+                                                            if (!string.IsNullOrEmpty(vidcontent))
+                                                            {
+                                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                                var conn = db.GetConnection();
+
+                                                                var retailer = new ContactsTable
+                                                                {
+                                                                    ContactID = id,
+                                                                    FileAs = firstName + " " + lastName + " " + middleName,
+                                                                    FirstName = firstName,
+                                                                    MiddleName = middleName,
+                                                                    LastName = lastName,
+                                                                    RetailerType = retailerType,
+                                                                    PresStreet = street,
+                                                                    PresBarangay = barangay,
+                                                                    PresDistrict = district,
+                                                                    PresTown = town,
+                                                                    PresProvince = province,
+                                                                    PresCountry = country,
+                                                                    Landmark = landmark,
+                                                                    Telephone1 = telephone1,
+                                                                    Telephone2 = telephone2,
+                                                                    Mobile = mobile,
+                                                                    Email = email,
+                                                                    Photo1 = photo1url,
+                                                                    Photo2 = photo2url,
+                                                                    Photo3 = photo3url,
+                                                                    Video = videourl,
+                                                                    MobilePhoto1 = photo1url,
+                                                                    MobilePhoto2 = photo2url,
+                                                                    MobilePhoto3 = photo3url,
+                                                                    MobileVideo = videourl,
+                                                                    Employee = employee,
+                                                                    Customer = customer,
+                                                                    Supervisor = contact,
+                                                                    LastSync = DateTime.Parse(current_datetime),
+                                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                                };
+
+                                                                await conn.InsertAsync(retailer);
+
+                                                                Analytics.TrackEvent("Sent Prospect Retailer");
+                                                                await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
+                                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    Crashes.TrackError(ex);
+                                                    Send_offline();
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
-                                    Send_offline();
                                 }
                             }
                         }
