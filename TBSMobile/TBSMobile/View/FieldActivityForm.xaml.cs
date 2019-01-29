@@ -317,7 +317,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=? AND Delete != '1'", code);
+                    var getCode = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode=? AND Deleted != '1'", code);
                     var resultCount = getCode.Result.Count;
 
                     entStreet.IsEnabled = true;

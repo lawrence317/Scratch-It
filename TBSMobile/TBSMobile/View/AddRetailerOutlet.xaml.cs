@@ -515,7 +515,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' AND Delete != '1' ORDER BY Province LIMIT 3";
+                    var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' AND Deleted != '1' ORDER BY Province LIMIT 3";
                     var getProvince = conn.QueryAsync<ProvinceTable>(sql);
                     var resultCount = getProvince.Result.Count;
 

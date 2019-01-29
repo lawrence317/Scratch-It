@@ -311,11 +311,13 @@ namespace TBSMobile.View
 
                                         var chuserresult = JsonConvert.DeserializeObject<List<UserData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chuserresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing user update " + changescount + " out of " + chuserresult.Count;
+                                            syncStatus.Text = "Checking user update " + servercount + " out of " + chuserresult.Count;
 
                                             var item = chuserresult[i];
                                             var chcontactID = item.ContactID;
@@ -333,7 +335,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetUser.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetUser.Result[0].LastUpdated)
                                                 {
                                                     var chuser = new UserTable
                                                     {
@@ -349,6 +351,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chuser);
                                                     syncStatus.Text = "Syncing user updates of " + chuserID;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -367,12 +371,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheuser);
                                                 syncStatus.Text = "Syncing new user (" + chuserID + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced user updates: " + (changescount - 1) + " out of " + chuserresult.Count + "\n";
+                                        synccount += "Total synced updated user: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new user: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -411,11 +418,13 @@ namespace TBSMobile.View
 
                                         var chuserresult = JsonConvert.DeserializeObject<List<UserData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chuserresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing user update " + changescount + " out of " + chuserresult.Count;
+                                            syncStatus.Text = "Checking user update " + servercount + " out of " + chuserresult.Count;
 
                                             var item = chuserresult[i];
                                             var chcontactID = item.ContactID;
@@ -433,7 +442,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                               if(chlastUpdated >= chgetUser.Result[0].LastUpdated)
+                                               if(chlastUpdated > chgetUser.Result[0].LastUpdated)
                                                {
                                                     var chuser = new UserTable
                                                     {
@@ -449,6 +458,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chuser);
                                                     syncStatus.Text = "Syncing user updates of " + chuserID;
+
+                                                    updatecount++;
                                                }
                                             }
                                             else
@@ -467,12 +478,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheuser);
                                                 syncStatus.Text = "Syncing new user (" + chuserID + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced user updates: " + (changescount - 1) + " out of " + chuserresult.Count + "\n";
+                                        synccount += "Total synced updated user: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new user: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -828,11 +842,13 @@ namespace TBSMobile.View
                                             var chcontactsresults = JsonConvert.DeserializeObject<List<ContactsData>>(chcontent, settings);
                                             var chcount = chcontactsresults.Count;
 
-                                            int changescount = 1;
+                                            int updatecount = 1;
+                                            int newcount = 1;
+                                            int servercount = 1;
 
                                             for (int i = 0; i < chcount; i++)
                                             {
-                                                syncStatus.Text = "Syncing retailer update " + changescount + " out of " + chcount;
+                                                syncStatus.Text = "Checking retailer update " + servercount + " out of " + chcount;
 
                                                 var chitem = chcontactsresults[i];
                                                 var chcontactID = chitem.ContactID;
@@ -875,7 +891,7 @@ namespace TBSMobile.View
 
                                                 if (chresultCount > 0)
                                                 {
-                                                    if (chlastUpdated >= chgetRetailer.Result[0].LastUpdated)
+                                                    if (chlastUpdated > chgetRetailer.Result[0].LastUpdated)
                                                     {
                                                         var chretailer = new ContactsTable
                                                         {
@@ -917,6 +933,8 @@ namespace TBSMobile.View
 
                                                         await conn.InsertOrReplaceAsync(chretailer);
                                                         syncStatus.Text = "Syncing retailer updates of " + chfileAs;
+
+                                                        updatecount++;
                                                     }
                                                 }
                                                 else
@@ -961,12 +979,15 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(cheretailer);
                                                     syncStatus.Text = "Syncing new retailer (" + chfileAs + ")";
+
+                                                    newcount++;
                                                 }
 
-                                                changescount++;
+                                                servercount++;
                                             }
 
-                                            synccount += "Total synced retailer updates: " + (changescount - 1) + " out of " + chcount + "\n";
+                                            synccount += "Total synced updated retailer: " + (updatecount - 1) + "\n";
+                                            synccount += "Total synced new retailer: " + (newcount - 1) + "\n";
                                         }
                                         catch (Exception ex)
                                         {
@@ -1013,11 +1034,13 @@ namespace TBSMobile.View
                                             var chcontactsresults = JsonConvert.DeserializeObject<List<ContactsData>>(chcontent, settings);
                                             var chcount = chcontactsresults.Count;
 
-                                            int changescount = 1;
+                                            int updatecount = 1;
+                                            int newcount = 1;
+                                            int servercount = 1;
 
                                             for (int i = 0; i < chcount; i++)
                                             {
-                                                syncStatus.Text = "Syncing retailer update " + changescount + " out of " + chcount;
+                                                syncStatus.Text = "Checking retailer update " + servercount + " out of " + chcount;
 
                                                 var chitem = chcontactsresults[i];
                                                 var chcontactID = chitem.ContactID;
@@ -1060,7 +1083,7 @@ namespace TBSMobile.View
 
                                                 if (chresultCount > 0)
                                                 {
-                                                    if (chlastUpdated >= chgetRetailer.Result[0].LastUpdated)
+                                                    if (chlastUpdated > chgetRetailer.Result[0].LastUpdated)
                                                     {
                                                         var chretailer = new ContactsTable
                                                         {
@@ -1102,6 +1125,8 @@ namespace TBSMobile.View
 
                                                         await conn.InsertOrReplaceAsync(chretailer);
                                                         syncStatus.Text = "Syncing retailer updates of " + chfileAs;
+
+                                                        updatecount++;
                                                     }
                                                 }
                                                 else
@@ -1146,12 +1171,15 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(cheretailer);
                                                     syncStatus.Text = "Syncing new retailer (" + chfileAs + ")";
+
+                                                    newcount++;
                                                 }
 
-                                                changescount++;
+                                                servercount++;
                                             }
 
-                                            synccount += "Total synced retailer updates: " + (changescount - 1) + " out of " + chcount + "\n";
+                                            synccount += "Total synced updated retailer: " + (updatecount - 1) + "\n";
+                                            synccount += "Total synced new retailer: " + (newcount - 1) + "\n";
                                         }
                                         catch (Exception ex)
                                         {
@@ -1420,11 +1448,13 @@ namespace TBSMobile.View
 
                                         var chcontactsresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chcontactsresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing retailer outlet update " + changescount + " out of " + chcontactsresult.Count;
+                                            syncStatus.Text = "Checking retailer outlet update " + servercount + " out of " + chcontactsresult.Count;
 
                                             var chitem = chcontactsresult[i];
                                             var chretailerCode = chitem.RetailerCode;
@@ -1451,7 +1481,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetRetailerOutlet.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetRetailerOutlet.Result[0].LastUpdated)
                                                 {
                                                     var chretailer = new RetailerGroupTable
                                                     {
@@ -1477,6 +1507,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chretailer);
                                                     syncStatus.Text = "Syncing retailer outlet updates of " + chretailerCode;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -1505,12 +1537,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheretailer);
                                                 syncStatus.Text = "Syncing new retailer outlet (" + chretailerCode + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced retailer outlet updates: " + (changescount - 1) + " out of " + chcontactsresult.Count + "\n";
+                                        synccount += "Total synced updated retailer outlet: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new retailer outlet: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -1549,11 +1584,13 @@ namespace TBSMobile.View
 
                                         var chcontactsresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chcontactsresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing retailer outlet update " + changescount + " out of " + chcontactsresult.Count;
+                                            syncStatus.Text = "Checking retailer outlet update " + servercount + " out of " + chcontactsresult.Count;
 
                                             var chitem = chcontactsresult[i];
                                             var chretailerCode = chitem.RetailerCode;
@@ -1580,7 +1617,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetRetailerOutlet.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetRetailerOutlet.Result[0].LastUpdated)
                                                 {
                                                     var chretailer = new RetailerGroupTable
                                                     {
@@ -1606,6 +1643,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chretailer);
                                                     syncStatus.Text = "Syncing retailer outlet updates of " + chretailerCode;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -1634,12 +1673,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheretailer);
                                                 syncStatus.Text = "Syncing new retailer outlet (" + chretailerCode + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced retailer outlet updates: " + (changescount - 1) + " out of " + chcontactsresult.Count + "\n";
+                                        synccount += "Total synced updated retailer outlet: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new retailer outlet: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -2321,11 +2363,13 @@ namespace TBSMobile.View
 
                                         var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chsubresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing device registration update " + changescount + " out of " + chsubresult.Count;
+                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
 
                                             var chitem = chsubresult[i];
                                             var chSerialNumber = chitem.SerialNumber;
@@ -2343,7 +2387,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetSubscription.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
                                                 {
                                                     var chsub = new SubscriptionTable
                                                     {
@@ -2360,6 +2404,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chsub);
                                                     syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -2379,12 +2425,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(chesub);
                                                 syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced device registration updates: " + (changescount - 1) + " out of " + chsubresult.Count + "\n";
+                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -2424,11 +2473,13 @@ namespace TBSMobile.View
 
                                         var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         for (int i = 0; i < chsubresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing device registration update " + changescount + " out of " + chsubresult.Count;
+                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
 
                                             var chitem = chsubresult[i];
                                             var chSerialNumber = chitem.SerialNumber;
@@ -2446,7 +2497,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetSubscription.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
                                                 {
                                                     var chsub = new SubscriptionTable
                                                     {
@@ -2463,6 +2514,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(chsub);
                                                     syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -2482,12 +2535,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(chesub);
                                                 syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced device registration updates: " + (changescount - 1) + " out of " + chsubresult.Count + "\n";
+                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -2678,12 +2734,14 @@ namespace TBSMobile.View
                                             MissingMemberHandling = MissingMemberHandling.Ignore
                                         };
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         var chemailresult = JsonConvert.DeserializeObject<List<EmailData>>(chcontent, settings);
                                         for (int i = 0; i < chemailresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing email recipient update " + changescount + " out of " + chemailresult.Count;
+                                            syncStatus.Text = "Checking email recipient update " + servercount + " out of " + chemailresult.Count;
 
                                             var chitem = chemailresult[i];
                                             var chcontactID = chitem.ContactID;
@@ -2697,7 +2755,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetEmail.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetEmail.Result[0].LastUpdated)
                                                 {
                                                     var cheml = new UserEmailTable
                                                     {
@@ -2710,6 +2768,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(cheml);
                                                     syncStatus.Text = "Syncing email recipient updates of " + chcontactID;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -2725,12 +2785,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheeml);
                                                 syncStatus.Text = "Syncing email recipient (" + chcontactID + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced email recipient updates: " + (changescount - 1) + " out of " + chemailresult.Count + "\n";
+                                        synccount += "Total synced updated email recipient: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new email recipient: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -2767,12 +2830,14 @@ namespace TBSMobile.View
                                             MissingMemberHandling = MissingMemberHandling.Ignore
                                         };
 
-                                        int changescount = 1;
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
 
                                         var chemailresult = JsonConvert.DeserializeObject<List<EmailData>>(chcontent, settings);
                                         for (int i = 0; i < chemailresult.Count; i++)
                                         {
-                                            syncStatus.Text = "Syncing email recipient update " + changescount + " out of " + chemailresult.Count;
+                                            syncStatus.Text = "Checking email recipient update " + servercount + " out of " + chemailresult.Count;
 
                                             var chitem = chemailresult[i];
                                             var chcontactID = chitem.ContactID;
@@ -2786,7 +2851,7 @@ namespace TBSMobile.View
 
                                             if (chresultCount > 0)
                                             {
-                                                if (chlastUpdated >= chgetEmail.Result[0].LastUpdated)
+                                                if (chlastUpdated > chgetEmail.Result[0].LastUpdated)
                                                 {
                                                     var cheml = new UserEmailTable
                                                     {
@@ -2799,6 +2864,8 @@ namespace TBSMobile.View
 
                                                     await conn.InsertOrReplaceAsync(cheml);
                                                     syncStatus.Text = "Syncing email recipient updates of " + chcontactID;
+
+                                                    updatecount++;
                                                 }
                                             }
                                             else
@@ -2814,12 +2881,15 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(cheeml);
                                                 syncStatus.Text = "Syncing email recipient (" + chcontactID + ")";
+
+                                                newcount++;
                                             }
 
-                                            changescount++;
+                                            servercount++;
                                         }
 
-                                        synccount += "Total synced email recipient updates: " + (changescount - 1) + " out of " + chemailresult.Count + "\n";
+                                        synccount += "Total synced updated email recipient: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new email recipient: " + (newcount - 1) + "\n";
                                     }
                                 }
                             }
@@ -2949,7 +3019,9 @@ namespace TBSMobile.View
 
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    int count = 1;
+                                    int updatecount = 1;
+                                    int newcount = 1;
+                                    int servercount = 1;
 
                                     var settings = new JsonSerializerSettings
                                     {
@@ -2960,7 +3032,7 @@ namespace TBSMobile.View
                                     var provinceresult = JsonConvert.DeserializeObject<List<ProvinceData>>(content, settings);
                                     for (int i = 0; i < provinceresult.Count; i++)
                                     {
-                                        syncStatus.Text = "Syncing province update " + count + " out of " + provinceresult.Count;
+                                        syncStatus.Text = "Checking province update " + servercount + " out of " + provinceresult.Count;
 
                                         var item = provinceresult[i];
                                         var provinceID = item.ProvinceID;
@@ -2974,7 +3046,7 @@ namespace TBSMobile.View
 
                                         if (chresultCount > 0)
                                         {
-                                            if (lastUpdated >= chgetProvince.Result[0].LastUpdated)
+                                            if (lastUpdated > chgetProvince.Result[0].LastUpdated)
                                             {
                                                 var prov = new ProvinceTable
                                                 {
@@ -2987,6 +3059,8 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(prov);
                                                 syncStatus.Text = "Syncing province updates of " + province;
+
+                                                updatecount++;
                                             }
                                         }
                                         else
@@ -3002,12 +3076,15 @@ namespace TBSMobile.View
 
                                             await conn.InsertOrReplaceAsync(prov);
                                             syncStatus.Text = "Syncing new province (" + province + ")";
+
+                                            newcount++;
                                         }
-                                        
-                                        count++;
+
+                                        servercount++;
                                     }
 
-                                    synccount += "Total synced province updates: " + (count - 1) + " out of " + provinceresult.Count + "\n";
+                                    synccount += "Total synced updated province: " + (updatecount - 1) + "\n";
+                                    synccount += "Total synced new province: " + (newcount - 1) + "\n";
                                 }
                             }
                         }
@@ -3136,7 +3213,9 @@ namespace TBSMobile.View
 
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    int count = 1;
+                                    int updatecount = 1;
+                                    int newcount = 1;
+                                    int servercount = 1;
 
                                     var settings = new JsonSerializerSettings
                                     {
@@ -3147,7 +3226,7 @@ namespace TBSMobile.View
                                     var townresult = JsonConvert.DeserializeObject<List<TownData>>(content, settings);
                                     for (int i = 0; i < townresult.Count; i++)
                                     {
-                                        syncStatus.Text = "Syncing town update " + count + " out of " + townresult.Count;
+                                        syncStatus.Text = "Checking town update " + servercount + " out of " + townresult.Count;
 
                                         var item = townresult[i];
                                         var townID = item.TownID;
@@ -3162,7 +3241,7 @@ namespace TBSMobile.View
 
                                         if (chresultCount > 0)
                                         {
-                                            if (lastUpdated >= chgetTown.Result[0].LastUpdated)
+                                            if (lastUpdated > chgetTown.Result[0].LastUpdated)
                                             {
                                                 var twn = new TownTable
                                                 {
@@ -3176,6 +3255,8 @@ namespace TBSMobile.View
 
                                                 await conn.InsertOrReplaceAsync(twn);
                                                 syncStatus.Text = "Syncing town updates of " + town;
+
+                                                updatecount++;
                                             }
                                         }
                                         else
@@ -3192,12 +3273,15 @@ namespace TBSMobile.View
 
                                             await conn.InsertOrReplaceAsync(twn);
                                             syncStatus.Text = "Syncing new town (" + town + ")";
+
+                                            newcount++;
                                         }
 
-                                        count++;
+                                        servercount++;
                                     }
 
-                                    synccount += "Total synced town updates: " + (count - 1) + " out of " + townresult.Count + "\n";
+                                    synccount += "Total synced updated town: " + (updatecount - 1) + "\n";
+                                    synccount += "Total synced new town: " + (newcount - 1) + "\n";
                                 }
                             }
                         }
