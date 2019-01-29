@@ -641,6 +641,8 @@ namespace TBSMobile.View
 
             if (reply.Status == IPStatus.Success)
             {
+                lblStatus.Text = "Initializing retailer sync";
+
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -867,7 +869,7 @@ namespace TBSMobile.View
                         }
                     }
 
-                    synccount += "Total Retailer sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+                    synccount += "Total synced retailer: " + (count - 1) + " out of " + changesresultCount + "\n";
 
                     SyncRetailerOutlet(host, database, contact, ipaddress, pingipaddress);
                 }
@@ -900,6 +902,8 @@ namespace TBSMobile.View
 
             if (reply.Status == IPStatus.Success)
             {
+                lblStatus.Text = "Initializing retailer sync";
+
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -975,7 +979,7 @@ namespace TBSMobile.View
                         }
                     }
 
-                    synccount += "Total Retailer Outlet sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+                    synccount += "Total synced retailer outlet changes: " + (count - 1) + " out of " + changesresultCount + "\n";
 
                     SyncCaf(host, database, contact, ipaddress, pingipaddress);
                 }
@@ -1008,6 +1012,8 @@ namespace TBSMobile.View
 
             if (reply.Status == IPStatus.Success)
             {
+                lblStatus.Text = "Initializing field activity sync";
+
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -1207,7 +1213,7 @@ namespace TBSMobile.View
                             }
                         }
 
-                        synccount += "Total Field Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+                        synccount += "Total synced field activity: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     SyncActivities(host, database, contact, ipaddress, pingipaddress);
@@ -1242,6 +1248,8 @@ namespace TBSMobile.View
 
             if (reply.Status == IPStatus.Success)
             {
+                lblStatus.Text = "Initializing activity sync";
+
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -1291,7 +1299,7 @@ namespace TBSMobile.View
                             }
                         }
 
-                        synccount += "Total Activity sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+                        synccount += "Total synced activity: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     SyncEmail(host, database, contact, ipaddress, pingipaddress);
@@ -1326,6 +1334,8 @@ namespace TBSMobile.View
 
             if (reply.Status == IPStatus.Success)
             {
+                lblStatus.Text = "Initializing email recipient sync";
+
                 try
                 {
                     var db = DependencyService.Get<ISQLiteDB>();
@@ -1369,7 +1379,7 @@ namespace TBSMobile.View
                             }
                         }
 
-                        synccount += "Total Email sync: " + (count - 1) + " out of " + changesresultCount + "\n";
+                        synccount += "Total synced email recipient changes: " + (count - 1) + " out of " + changesresultCount + "\n";
                     }
 
                     OnSyncComplete();

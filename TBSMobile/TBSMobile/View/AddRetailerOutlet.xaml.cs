@@ -64,7 +64,7 @@ namespace TBSMobile.View
                             var db = DependencyService.Get<ISQLiteDB>();
                             var conn = db.GetConnection();
 
-                            string sql = "SELECT * FROM tblContacts WHERE ContactID = '" + selected + "'";
+                            string sql = "SELECT * FROM tblContacts WHERE ContactID = '" + selected + "' AND Deleted != '1'";
                             var getContact = conn.QueryAsync<ContactsTable>(sql);
                             var resultCount = getContact.Result.Count;
 
@@ -380,7 +380,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND RetailerType != 'RT00004' AND Supervisor='" + contact + "' ORDER BY FileAs LIMIT 3";
+                    string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND RetailerType != 'RT00004' AND Deleted != '1' AND Supervisor='" + contact + "' ORDER BY FileAs LIMIT 3";
                     var getUser = conn.QueryAsync<ContactsTable>(sql);
                     var resultCount = getUser.Result.Count;
 
@@ -515,7 +515,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' ORDER BY Province LIMIT 3";
+                    var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' AND Delete != '1' ORDER BY Province LIMIT 3";
                     var getProvince = conn.QueryAsync<ProvinceTable>(sql);
                     var resultCount = getProvince.Result.Count;
 
@@ -581,7 +581,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=?", item.ProvinceID).Result;
+                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=? AND Deleted != '1'", item.ProvinceID).Result;
 
                 if (getTown != null && getTown.Count > 0)
                 {
