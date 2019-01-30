@@ -326,6 +326,11 @@ namespace TBSMobile.View
                     entLandmark.IsEnabled = true;
                     btnGotoPage2.IsEnabled = true;
                     entCountry.IsEnabled = false;
+                    entTelephone1.IsEnabled = true;
+                    entTelephone2.IsEnabled = true;
+                    entMobile.IsEnabled = true;
+                    entEmail.IsEnabled = true;
+                    entLandmark.IsEnabled = true;
 
                     outletvalidator.IsVisible = false;
                     outletnamevalidator.IsVisible = false;
@@ -921,6 +926,8 @@ namespace TBSMobile.View
         {
             if (string.IsNullOrEmpty(entPhoto1Url.Text) || string.IsNullOrEmpty(entPhoto2Url.Text) || string.IsNullOrEmpty(entPhoto3Url.Text))
             {
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+
                 if (string.IsNullOrEmpty(entPhoto1Url.Text))
                 {
                     photovideovalidator.IsVisible = true;

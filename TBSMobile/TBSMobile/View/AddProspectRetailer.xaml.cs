@@ -358,6 +358,7 @@ namespace TBSMobile.View
 
                         if(string.IsNullOrEmpty(entPhoto1Url.Text) || string.IsNullOrEmpty(entPhoto2Url.Text) || string.IsNullOrEmpty(entPhoto3Url.Text))
                         {
+                            await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
                             photovideovalidator.IsVisible = true;
                         }
                         else

@@ -280,7 +280,7 @@
                                     </Label.FontFamily>
                                 </Label>
                                 <StackLayout>
-                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                    <Grid ColumnSpacing="10" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnPage1Next_Clicked" x:Name="btnPage1Next" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
@@ -358,7 +358,7 @@
                                     </local:CustomEntry>
                                 </Frame>
                                 <StackLayout>
-                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                    <Grid ColumnSpacing="10" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnBackPage1_Clicked" x:Name="btnBackPage1" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
@@ -378,7 +378,7 @@
                             </StackLayout>
                           
                             <StackLayout x:Name="acPage3" IsVisible="False">
-                                <Grid RowSpacing="0">
+                                <Grid RowSpacing="0" ColumnSpacing="10">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*"/>
@@ -457,7 +457,7 @@
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entVideoUrl"/>
                               
                                 <StackLayout>
-                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                    <Grid ColumnSpacing="10" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnPage2Back_Clicked" x:Name="btnBackPage2" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">

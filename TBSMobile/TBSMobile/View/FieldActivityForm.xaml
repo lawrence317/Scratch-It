@@ -523,7 +523,7 @@
                             </StackLayout>
 
                             <StackLayout Orientation="Vertical" x:Name="fafPage4" Spacing="5" IsVisible="False">
-                                <Grid RowSpacing="0">
+                                <Grid RowSpacing="0" ColumnSpacing="10">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*"/>

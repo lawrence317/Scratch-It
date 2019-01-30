@@ -273,7 +273,7 @@
                                 </Label>
                                 <Entry IsVisible="False" IsEnabled="False" StyleClass="fieldForm" x:Name="entLocation"/>
                                 <StackLayout>
-                                    <Grid ColumnSpacing="5">
+                                    <Grid ColumnSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
@@ -355,7 +355,7 @@
                                 </Frame>
                                 
                                 <StackLayout>
-                                    <Grid ColumnSpacing="5">
+                                    <Grid ColumnSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnGoBackToPage1_Clicked" x:Name="btnGoBackToPage1" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
