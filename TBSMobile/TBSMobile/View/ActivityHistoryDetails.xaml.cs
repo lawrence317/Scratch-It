@@ -169,7 +169,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND Activity = 'ACT00004'", caf);
+                var getCaf = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00004'", caf);
                 var contactResultCount = getCaf.Result.Count;
 
                 if (contactResultCount > 0)

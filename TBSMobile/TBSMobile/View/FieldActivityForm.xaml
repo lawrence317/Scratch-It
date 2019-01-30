@@ -17,12 +17,16 @@
         <StackLayout Orientation="Vertical">
             <Frame StyleClass="fafFrame" CornerRadius="5">
                 <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand">
-                    <ScrollView>
+                    <ScrollView x:Name="scroll">
                         <StackLayout Orientation="Vertical">
                             <StackLayout Orientation="Vertical" x:Name="fafPage1" Spacing="5">
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entEmployeeNumber"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entCafNo"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entRetailer"/>
+                                <Entry IsVisible="False" IsEnabled="False" x:Name="entProvinceCode"/>
+                                <Entry IsVisible="False" IsEnabled="False" x:Name="entRetailerCode"/>
+                                <Entry IsVisible="False" IsEnabled="False" x:Name="entTownCode"/>
+                                
                                 <Label Text="Retailer" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -76,8 +80,6 @@
                                         </local:CustomPicker.FontFamily>
                                     </local:CustomPicker>
                                 </Frame>
-                                
-                                <Entry IsVisible="False" IsEnabled="False" x:Name="entRetailerCode"/>
                                 <Label Text="Please choose the retailer outlet" x:Name="outletvalidator" StyleClass="validation" IsVisible="False">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -143,8 +145,6 @@
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                 </ListView>
-
-                                <Entry IsVisible="False" IsEnabled="False" x:Name="entProvinceCode"/>
                                 <Label Text="Please choose a province" x:Name="provincevalidator" StyleClass="validation" IsVisible="False">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -169,8 +169,6 @@
                                         </local:CustomPicker.FontFamily>
                                     </local:CustomPicker>
                                 </Frame>
-
-                                <Entry IsVisible="False" IsEnabled="False" x:Name="entTownCode"/>
                                 <Label Text="Please choose the city/town/municipality" x:Name="cityvalidator" StyleClass="validation" IsVisible="False">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -268,6 +266,20 @@
                                     </Label.FontFamily>
                                 </Label>
 
+                                <StackLayout>
+                                    <Grid ColumnSpacing="10" RowSpacing="0">
+                                        <Button Grid.Row="0" Grid.Column="1" IsEnabled="False" StyleClass="btn-nav" Clicked="btnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+
+                            <StackLayout Orientation="Vertical" x:Name="fafPage2" Spacing="5" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -336,9 +348,16 @@
                                     </local:CustomEntry>
                                 </Frame>
 
-                                <StackLayout x:Name="page1nav">
+                                <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="0">
-                                        <Button Grid.Row="0" Grid.Column="1" IsEnabled="False" StyleClass="btn-nav" Clicked="btnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="btnGoBacktoPage1_Clicked" StyleClass="btn-nav" x:Name="btnGoBacktoPage1" Text="Back">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="btnGotoPage3_Clicked" StyleClass="btn-nav" x:Name="btnGotoPage3" Text="Next">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -348,7 +367,8 @@
                                     </Grid>
                                 </StackLayout>
                             </StackLayout>
-                            <StackLayout Orientation="Vertical" x:Name="fafPage2" Spacing="5" IsVisible="False">
+
+                            <StackLayout Orientation="Vertical" x:Name="fafPage3" Spacing="5" IsVisible="False">
                                 <Label Text="On-site Location" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -365,6 +385,7 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                
                                 <Label Text="Activity Date" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -381,6 +402,7 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                
                                 <Label Text="Start Time" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -397,6 +419,7 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                
                                 <Grid VerticalOptions="Center">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="30"/>
@@ -429,7 +452,7 @@
                                         </Label.FontFamily>
                                     </Label>
                                     <Switch Grid.Row="2" Grid.Column="1" VerticalOptions="Center" x:Name="swTradeCheck" Toggled="Activity_Toggled"/>
-                                    
+
                                     <Label VerticalTextAlignment="Center" Grid.Row="3" Grid.Column="0" Text="Others" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -446,7 +469,7 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
-                                
+
                                 <Frame StyleClass="fieldFrame" x:Name="OthersFrame" CornerRadius="4" BorderColor="#e8eaed" IsVisible="False" HasShadow="False">
                                     <local:CustomEntry PlaceholderColor="#DED8D5" Unfocused="entOthers_Unfocused" x:Name="entOthers" StyleClass="fieldForm">
                                         <local:CustomEntry.FontFamily>
@@ -479,6 +502,27 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                <StackLayout>
+                                    <Grid ColumnSpacing="10" RowSpacing="0">
+                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="btnGoBacktoPage2_Clicked"  StyleClass="btn-nav" x:Name="btnGoBacktoPage2" Text="Back">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage4_Clicked"  StyleClass="btn-nav" x:Name="btnGotoPage4" Text="Next">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+
+                            <StackLayout Orientation="Vertical" x:Name="fafPage4" Spacing="5" IsVisible="False">
                                 <Grid RowSpacing="0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
@@ -556,17 +600,17 @@
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto2Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto3Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entVideoUrl"/>
-                                
-                                <StackLayout x:Name="page2nav" IsVisible="False">
+
+                                <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="0">
-                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="btnGoBacktoPage1_Clicked" StyleClass="btn-nav" x:Name="btnGoBacktoPage1" Text="Back">
+                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="BtnGoBacktoPage3_Clicked"  StyleClass="btn-nav" x:Name="btnGoBacktoPage3" Text="Back">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="btnGotoPage3_Clicked" StyleClass="btn-nav" x:Name="btnGotoPage3" Text="Next">
+                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage5_Clicked"  StyleClass="btn-nav" x:Name="btnGotoPage5" Text="Next">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -576,7 +620,8 @@
                                     </Grid>
                                 </StackLayout>
                             </StackLayout>
-                            <StackLayout Orientation="Vertical" x:Name="fafPage3" IsVisible="False">
+
+                            <StackLayout Orientation="Vertical" x:Name="fafPage5" Spacing="5" IsVisible="False">
                                 <Label Text="Email Submission" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -601,9 +646,10 @@
                                     </Label.FontFamily>
                                 </Label>
                                 <Switch x:Name="swFillup"/>
-                                <StackLayout x:Name="page3nav" IsVisible="False">
+
+                                <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="0">
-                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="btnGoBacktoPage2_Clicked"  StyleClass="btn-nav" x:Name="btnGoBacktoPage3" Text="Back">
+                                        <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="BtnGoBacktoPage4_Clicked"  StyleClass="btn-nav" x:Name="btnGoBacktoPage4" Text="Back">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

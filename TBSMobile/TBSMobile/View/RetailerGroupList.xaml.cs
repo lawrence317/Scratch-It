@@ -1,4 +1,5 @@
-﻿using Microsoft.AppCenter.Crashes;
+﻿using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,22 @@ namespace TBSMobile.View
     {
         string contactID;
         string Supervisor;
+        string contact;
+        string host;
+        string database;
+        string ipaddress;
+        byte[] pingipaddress;
 
-        public RetailerGroupList(ContactsTable item)
+        public RetailerGroupList(ContactsTable item, string host, string database, string contact, string ipaddress, byte[] pingipaddress)
         {
             InitializeComponent();
             this.contactID = item.ContactID;
             this.Supervisor = item.Supervisor;
+            this.contact = contact;
+            this.host = host;
+            this.database = database;
+            this.ipaddress = ipaddress;
+            this.pingipaddress = pingipaddress;
             GetRetailerGroup(item.ContactID);
             searchCategory.SelectedIndex = 0;
         }
@@ -1015,6 +1026,44 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
+            }
+        }
+
+        private async void addRetailerOutlet_Activated(object sender, EventArgs e)
+        {
+            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+
+            if (string.IsNullOrEmpty(appdate))
+            {
+                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+            }
+            else
+            {
+                try
+                {
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    {
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        var selected = contactID;
+
+                        Analytics.TrackEvent("Opened Add Retailer Outlet");
+
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, pingipaddress, selected))
+                        {
+                            BarBackgroundColor = Color.FromHex("#e67e22")
+                        });
+                    }
+                    else
+                    {
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             }
         }
     }

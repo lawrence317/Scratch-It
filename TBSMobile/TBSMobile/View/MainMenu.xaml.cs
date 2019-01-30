@@ -312,9 +312,6 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
-                        Preferences.Set("username", String.Empty, "private_prefs");
-                        Preferences.Set("password", String.Empty, "private_prefs");
                         Analytics.TrackEvent("Logged Out");
                         await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }

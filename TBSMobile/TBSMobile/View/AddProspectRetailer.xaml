@@ -279,7 +279,7 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
-                                <StackLayout x:Name="page1nav">
+                                <StackLayout>
                                     <Grid ColumnSpacing="5" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnPage1Next_Clicked" x:Name="btnPage1Next" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
@@ -291,6 +291,7 @@
                                     </Grid>
                                 </StackLayout>
                             </StackLayout>
+                          
                             <StackLayout x:Name="acPage2" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
@@ -356,6 +357,27 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                <StackLayout>
+                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnBackPage1_Clicked" x:Name="btnBackPage1" Text="Back" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnGotoPage3_Clicked" x:Name="btnGotoPage3" Text="Next" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+                          
+                            <StackLayout x:Name="acPage3" IsVisible="False">
                                 <Grid RowSpacing="0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
@@ -433,8 +455,8 @@
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto2Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto3Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entVideoUrl"/>
-                                
-                                <StackLayout x:Name="page2nav" IsVisible="False">
+                              
+                                <StackLayout>
                                     <Grid ColumnSpacing="5" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnPage2Back_Clicked" x:Name="btnBackPage2" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
@@ -443,7 +465,7 @@
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAddContacts_Clicked" x:Name="btnAddContacts" Text="Add Retailer" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAddContacts_Clicked" x:Name="btnAddContacts" Text="Send" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

@@ -106,161 +106,60 @@ namespace TBSMobile.View
 
         private async void btnAdd_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text) ||
-               string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) || 
-               string.IsNullOrEmpty(entProvinceCode.Text) || string.IsNullOrEmpty(entCountry.Text))
+            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+
+            if (string.IsNullOrEmpty(appdate))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
-
-                if (string.IsNullOrEmpty(entContact.Text))
-                {
-                    namevalidator.IsVisible = true;
-                    RetailerNameFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    namevalidator.IsVisible = false;
-                    RetailerNameFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entRetailerCode.Text))
-                {
-                    codevalidator.IsVisible = true;
-                    RetailerCodeFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    codevalidator.IsVisible = false;
-                    RetailerCodeFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entLandmark.Text))
-                {
-                    outletnamevalidator.IsVisible = true;
-                    OutletNameFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    outletnamevalidator.IsVisible = false;
-                    OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entStreet.Text))
-                {
-                    streetvalidator.IsVisible = true;
-                    StreetFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    streetvalidator.IsVisible = false;
-                    StreetFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entBarangay.Text))
-                {
-                    barangayvalidator.IsVisible = true;
-                    BarangayFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    barangayvalidator.IsVisible = false;
-                    BarangayFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (townPicker.SelectedIndex < 0)
-                {
-                    cityvalidator.IsVisible = true;
-                    TownFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    cityvalidator.IsVisible = false;
-                    TownFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entProvinceCode.Text))
-                {
-                    provincevalidator.IsVisible = true;
-                    ProvinceFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    provincevalidator.IsVisible = false;
-                    ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entCountry.Text))
-                {
-                    countryvalidator.IsVisible = true;
-                    CountryFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    countryvalidator.IsVisible = false;
-                    CountryFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
+                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
             }
             else
             {
-                var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
-
-                if (string.IsNullOrEmpty(appdate))
+                try
                 {
-                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-                }
-                else
-                {
-                    try
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
-                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        var confirm = await DisplayAlert("Sending Confirmation", "Are you sure you want to send this form?", "Yes", "No");
+
+                        if (confirm == true)
                         {
-                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                            namevalidator.IsVisible = false;
+                            codevalidator.IsVisible = false;
+                            outletnamevalidator.IsVisible = false;
+                            streetvalidator.IsVisible = false;
+                            barangayvalidator.IsVisible = false;
+                            cityvalidator.IsVisible = false;
+                            provincevalidator.IsVisible = false;
+                            districtvalidator.IsVisible = false;
+                            countryvalidator.IsVisible = false;
 
-                            var confirm = await DisplayAlert("Sending Confirmation", "Are you sure you want to send this form?", "Yes", "No");
+                            btnAdd.IsEnabled = false;
 
-                            if (confirm == true)
+                            if (CrossConnectivity.Current.IsConnected)
                             {
-                                namevalidator.IsVisible = false;
-                                codevalidator.IsVisible = false;
-                                outletnamevalidator.IsVisible = false;
-                                streetvalidator.IsVisible = false;
-                                barangayvalidator.IsVisible = false;
-                                cityvalidator.IsVisible = false;
-                                provincevalidator.IsVisible = false;
-                                districtvalidator.IsVisible = false;
-                                countryvalidator.IsVisible = false;
-
-                                btnAdd.IsEnabled = false;
-
-                                if (CrossConnectivity.Current.IsConnected)
+                                var ping = new Ping();
+                                var reply = ping.Send(new IPAddress(pingipaddress), 5000);
+                                if (reply.Status == IPStatus.Success)
                                 {
-                                    var ping = new Ping();
-                                    var reply = ping.Send(new IPAddress(pingipaddress), 5000);
-                                    if (reply.Status == IPStatus.Success)
-                                    {
-                                        var optimalSpeed = 300000;
-                                        var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
+                                    var optimalSpeed = 300000;
+                                    var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
-                                        if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
+                                    if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
+                                    {
+                                        var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
+                                        if (sendconfirm == true)
                                         {
-                                            var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
-                                            if (sendconfirm == true)
-                                            {
-                                                Send_online();
-                                            }
-                                            else
-                                            {
-                                                Send_offline();
-                                            }
+                                            Send_online();
                                         }
                                         else
                                         {
-                                            Send_online();
+                                            Send_offline();
                                         }
                                     }
                                     else
                                     {
-                                        Send_offline();
+                                        Send_online();
                                     }
                                 }
                                 else
@@ -268,19 +167,22 @@ namespace TBSMobile.View
                                     Send_offline();
                                 }
                             }
-                        }
-                        else
-                        {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                            await Navigation.PopToRootAsync();
+                            else
+                            {
+                                Send_offline();
+                            }
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Crashes.TrackError(ex);
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
                     }
                 }
-                
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             }
         }
 
@@ -337,9 +239,6 @@ namespace TBSMobile.View
 
                 NameSearch.Text = item.FileAs;
                 lstName.IsVisible = false;
-
-                outletnamevalidator.IsVisible = false;
-                OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
 
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
@@ -595,6 +494,12 @@ namespace TBSMobile.View
                     townPicker.SelectedIndex = -1;
                     entTownCode.Text = null;
                 }
+
+                provincevalidator.IsVisible = false;
+                ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+
+                cityvalidator.IsVisible = false;
+                TownFrame.BorderColor = Color.FromHex("#e8eaed");
             }
             catch (Exception ex)
             {
@@ -735,6 +640,149 @@ namespace TBSMobile.View
                 Analytics.TrackEvent("Sent Prospect Retailer");
                 await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to send your activity", "Got it");
                 await Application.Current.MainPage.Navigation.PopModalAsync();
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        private async void BtnGotoPage2_Clicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text) ||
+               string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) ||
+               string.IsNullOrEmpty(entProvinceCode.Text) || string.IsNullOrEmpty(entCountry.Text))
+            {
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+
+                if (string.IsNullOrEmpty(entContact.Text))
+                {
+                    namevalidator.IsVisible = true;
+                    RetailerNameFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    namevalidator.IsVisible = false;
+                    RetailerNameFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entRetailerCode.Text))
+                {
+                    codevalidator.IsVisible = true;
+                    RetailerCodeFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    codevalidator.IsVisible = false;
+                    RetailerCodeFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entLandmark.Text))
+                {
+                    outletnamevalidator.IsVisible = true;
+                    OutletNameFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    outletnamevalidator.IsVisible = false;
+                    OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entStreet.Text))
+                {
+                    streetvalidator.IsVisible = true;
+                    StreetFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    streetvalidator.IsVisible = false;
+                    StreetFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entBarangay.Text))
+                {
+                    barangayvalidator.IsVisible = true;
+                    BarangayFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    barangayvalidator.IsVisible = false;
+                    BarangayFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (townPicker.SelectedIndex < 0)
+                {
+                    cityvalidator.IsVisible = true;
+                    TownFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    cityvalidator.IsVisible = false;
+                    TownFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entProvinceCode.Text))
+                {
+                    provincevalidator.IsVisible = true;
+                    ProvinceFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    provincevalidator.IsVisible = false;
+                    ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (string.IsNullOrEmpty(entCountry.Text))
+                {
+                    countryvalidator.IsVisible = true;
+                    CountryFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    countryvalidator.IsVisible = false;
+                    CountryFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+            }
+            else
+            {
+                try
+                {
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    {
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        fafPage1.IsVisible = false;
+                        fafPage2.IsVisible = true;
+                    }
+                    else
+                    {
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+        }
+
+        private async void BtnGoBackToPage1_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                {
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                    fafPage2.IsVisible = false;
+                    fafPage1.IsVisible = true;
+                }
+                else
+                {
+                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                    await Navigation.PopToRootAsync();
+                }
             }
             catch (Exception ex)
             {

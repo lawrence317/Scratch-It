@@ -1057,7 +1057,7 @@ namespace TBSMobile.View
 
                             ContactsTable item = (ContactsTable)e.Item;
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item, host, database, contact, ipaddress, pingipaddress))
                             {
                                 BarBackgroundColor = Color.FromHex("#e67e22")
                             });

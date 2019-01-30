@@ -94,10 +94,10 @@ namespace TBSMobile.View
             }
 
             var username = Preferences.Get("username", String.Empty, "private_prefs");
-            var password = Preferences.Get("password", String.Empty, "private_prefs");
+            //var password = Preferences.Get("password", String.Empty, "private_prefs");
 
             entUser.Text = username;
-            entPassword.Text = password;
+            //entPassword.Text = password;
 
             entUser.Completed += (s, e) => entPassword.Focus();
             entPassword.Completed += (s, e) => Login();

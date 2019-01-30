@@ -210,8 +210,6 @@ namespace TBSMobile.View
 
                             acPage1.IsVisible = false;
                             acPage2.IsVisible = true;
-                            page1nav.IsVisible = false;
-                            page2nav.IsVisible = true;
                         }
                         else
                         {
@@ -227,7 +225,7 @@ namespace TBSMobile.View
             }
         }
 
-        private async void btnPage2Back_Clicked(object sender, EventArgs e)
+        private async void btnBackPage1_Clicked(object sender, EventArgs e)
         {
             var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
@@ -245,9 +243,6 @@ namespace TBSMobile.View
 
                         acPage1.IsVisible = true;
                         acPage2.IsVisible = false;
-
-                        page1nav.IsVisible = true;
-                        page2nav.IsVisible = false;
                     }
                     else
                     {
@@ -260,6 +255,70 @@ namespace TBSMobile.View
                     Crashes.TrackError(ex);
                 }
             }
+        }
+
+        private async void btnGotoPage3_Clicked(object sender, EventArgs e)
+        {
+            var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+
+            if (string.IsNullOrEmpty(appdate))
+            {
+                Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+            }
+            else
+            {
+                try
+                {
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    {
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        acPage3.IsVisible = true;
+                        acPage2.IsVisible = false;
+                    }
+                    else
+                    {
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+        }
+
+        private async void btnPage2Back_Clicked(object sender, EventArgs e)
+        {
+                var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
+
+                if (string.IsNullOrEmpty(appdate))
+                {
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                }
+                else
+                {
+                    try
+                    {
+                        if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                        {
+                            Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                            acPage2.IsVisible = true;
+                            acPage3.IsVisible = false;
+                        }
+                        else
+                        {
+                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                            await Navigation.PopToRootAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
+                }
         }
 
         public void SetTempId()
@@ -736,6 +795,12 @@ namespace TBSMobile.View
                     townPicker.SelectedIndex = -1;
                     entTownCode.Text = null;
                 }
+
+                provincevalidator.IsVisible = false;
+                ProvinceFrame.BorderColor = Color.FromHex("#e8eaed");
+
+                cityvalidator.IsVisible = false;
+                TownFrame.BorderColor = Color.FromHex("#e8eaed");
             }
             catch (Exception ex)
             {

@@ -10,6 +10,7 @@
         <StyleSheet Source="/Stylesheet/globalstylesheet.css" />
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="plus.png" Text="Add Retailer Outlet" Order="Primary" x:Name="addRetailerOutlet" Activated="addRetailerOutlet_Activated"/>
         <ToolbarItem Text="Sort By Retailer Code" Order="Secondary" x:Name="sbRCode" Activated="sbRCode_Activated"/>
         <ToolbarItem Text="Sort By Street" Order="Secondary" x:Name="sbStreet" Activated="sbStreet_Activated"/>
         <ToolbarItem Text="Sort By Barangay" Order="Secondary" x:Name="sbBarangay" Activated="sbBarangay_Activated"/>

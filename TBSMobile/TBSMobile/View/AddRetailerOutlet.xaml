@@ -13,7 +13,7 @@
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
             <Frame StyleClass="fafFrame" CornerRadius="5">
-                <StackLayout Orientation="Vertical" HeightRequest="550">
+                <StackLayout Orientation="Vertical">
                     <ScrollView>
                         <StackLayout>
                             <StackLayout x:Name="fafPage1">
@@ -271,7 +271,21 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
-
+                                <Entry IsVisible="False" IsEnabled="False" StyleClass="fieldForm" x:Name="entLocation"/>
+                                <StackLayout>
+                                    <Grid ColumnSpacing="5">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+                            
+                            <StackLayout x:Name="fafPage2" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -339,9 +353,16 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                <Entry IsVisible="False" IsEnabled="False" StyleClass="fieldForm" x:Name="entLocation"/>
-                                <StackLayout x:Name="page1nav">
-                                    <Grid ColumnSpacing="5" RowSpacing="10">
+                                
+                                <StackLayout>
+                                    <Grid ColumnSpacing="5">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnGoBackToPage1_Clicked" x:Name="btnGoBackToPage1" Text="Back" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
                                         <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAdd" Text="Add" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
