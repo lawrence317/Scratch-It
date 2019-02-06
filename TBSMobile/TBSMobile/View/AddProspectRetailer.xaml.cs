@@ -1009,6 +1009,52 @@ namespace TBSMobile.View
                                                                 await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
                                                                 await Application.Current.MainPage.Navigation.PopModalAsync();
                                                             }
+                                                            else
+                                                            {
+                                                                var db = DependencyService.Get<ISQLiteDB>();
+                                                                var conn = db.GetConnection();
+
+                                                                var retailer = new ContactsTable
+                                                                {
+                                                                    ContactID = id,
+                                                                    FileAs = firstName + " " + lastName + " " + middleName,
+                                                                    FirstName = firstName,
+                                                                    MiddleName = middleName,
+                                                                    LastName = lastName,
+                                                                    RetailerType = retailerType,
+                                                                    PresStreet = street,
+                                                                    PresBarangay = barangay,
+                                                                    PresDistrict = district,
+                                                                    PresTown = town,
+                                                                    PresProvince = province,
+                                                                    PresCountry = country,
+                                                                    Landmark = landmark,
+                                                                    Telephone1 = telephone1,
+                                                                    Telephone2 = telephone2,
+                                                                    Mobile = mobile,
+                                                                    Email = email,
+                                                                    Photo1 = photo1url,
+                                                                    Photo2 = photo2url,
+                                                                    Photo3 = photo3url,
+                                                                    Video = videourl,
+                                                                    MobilePhoto1 = photo1url,
+                                                                    MobilePhoto2 = photo2url,
+                                                                    MobilePhoto3 = photo3url,
+                                                                    MobileVideo = videourl,
+                                                                    Employee = employee,
+                                                                    Customer = customer,
+                                                                    Supervisor = contact,
+                                                                    Deleted = deleted,
+                                                                    LastSync = DateTime.Parse(current_datetime),
+                                                                    LastUpdated = DateTime.Parse(current_datetime)
+                                                                };
+
+                                                                await conn.InsertAsync(retailer);
+
+                                                                Analytics.TrackEvent("Sent Prospect Retailer");
+                                                                await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
+                                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                            }
                                                         }
                                                     }
                                                 }

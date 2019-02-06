@@ -580,7 +580,7 @@ namespace TBSMobile.View
 
                     await conn.InsertAsync(retailer_group_insert);
 
-                    Analytics.TrackEvent("Sent Prospect Retailer");
+                    Analytics.TrackEvent("Sent Retailer Outlet");
                     await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
                     await Application.Current.MainPage.Navigation.PopModalAsync();
                 }
