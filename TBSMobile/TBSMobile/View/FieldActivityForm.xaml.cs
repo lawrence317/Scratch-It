@@ -167,7 +167,7 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(null, null, true);
+                    position = await locator.GetPositionAsync(TimeSpan.FromSeconds(30), null, true);
                     entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
                 }
             }
@@ -195,9 +195,8 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(null, null, true);
+                    position = await locator.GetPositionAsync(TimeSpan.FromSeconds(30), null, true);
                     entLocation.Text = position.Latitude + "," + position.Longitude;
-                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
                 }
             }
             catch (Exception ex)
@@ -1557,7 +1556,7 @@ namespace TBSMobile.View
                     { "MobilePhoto2", photo2url },
                     { "MobilePhoto3", photo3url },
                     { "MobileVideo", videourl },
-                    { "GPSLocation", actlocation },
+                    { "GPSCoordinates", actlocation },
                     { "Rekorida", rekorida },
                     { "Merchandizing", merchandizing },
                     { "TradeCheck", tradecheck },
