@@ -227,77 +227,7 @@ namespace TBSMobile.View
                                     using (StreamReader reader = new StreamReader(response.GetResponseStream()))
                                     {
                                         var content = reader.ReadToEnd();
-
-                                        /*if (!content.Equals("[]") || !string.IsNullOrWhiteSpace(content) || !string.IsNullOrEmpty(content))
-                                        {
-                                            try
-                                            {
-                                                if (content.Equals("[{\"Message\":\"SubscriptionExp\"}]"))
-                                                {
-                                                    await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
-
-                                                    var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                                    var body = "Good Day!<br/><br/> " +
-                                                        "This user needs new product key.<br/><br/>" +
-                                                        "Username: " + userName + "<br/>" +
-                                                        "Device ID: " + Constants.deviceID + "<br/>";
-
-                                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                                    if (emailMessenger.CanSendEmail)
-                                                    {
-                                                        var emailsend = new EmailMessageBuilder()
-                                                        .To(Constants.email)
-                                                        .Subject(subject)
-                                                        .BodyAsHtml(body)
-                                                        .Build();
-
-                                                        emailMessenger.SendEmail(emailsend);
-                                                    }
-                                                }
-                                                else if (content.Equals("[{\"Message\":\"Subscription\"}]"))
-                                                {
-                                                    await DisplayAlert("Login Error", "Your device is not registered, please contact your administrator to register your device", "Send Email");
-
-                                                    var subject = "Register Device: " + userName + " - " + Constants.deviceID;
-                                                    var body = "Good Day!<br/><br/> " +
-                                                        "This user needs to register the device.<br/><br/>" +
-                                                        "Username: " + userName + "<br/>" +
-                                                        "Device ID: " + Constants.deviceID + "<br/>";
-
-                                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                                    if (emailMessenger.CanSendEmail)
-                                                    {
-                                                        var emailsend = new EmailMessageBuilder()
-                                                        .To(Constants.email)
-                                                        .Subject(subject)
-                                                        .BodyAsHtml(body)
-                                                        .Build();
-
-                                                        emailMessenger.SendEmail(emailsend);
-                                                    }
-                                                }
-                                                else if (content.Equals("[{\"Message\":\"Credential\"}]"))
-                                                {
-                                                    await DisplayAlert("Login Error", "Username or password is incorrect", "Got it");
-                                                }
-                                                else
-                                                {
-                                                    var result = JsonConvert.DeserializeObject<List<UserTable>>(content);
-                                                    var contactID = result[0].ContactID;
-
-                                                    Preferences.Set("username", userName, "private_prefs");
-                                                    Preferences.Set("password", password, "private_prefs");
-                                                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
-
-                                                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress, pingipaddress));
-                                                }
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                Crashes.TrackError(ex);
-                                            }
-                                        }*/
-
+                                        
                                         if (!content.Equals("[]") || !string.IsNullOrWhiteSpace(content) || !string.IsNullOrEmpty(content))
                                         {
                                             if (content.Equals("[{\"Message\":\"SubscriptionExp\"}]"))
@@ -366,8 +296,11 @@ namespace TBSMobile.View
 
                                                     if (trialresponse.IsSuccessStatusCode)
                                                     {
-                                                        var crcontent = await trialresponse.Content.ReadAsStringAsync();
-                                                        await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
+                                                        var trcontent = await trialresponse.Content.ReadAsStringAsync();
+                                                        if (!string.IsNullOrEmpty(trcontent) || !trcontent.Equals("[]") || !trcontent.Equals("[[],[]]") || !trcontent.Equals("[[],[]]"))
+                                                        {
+                                                            await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
+                                                        }
                                                     }
                                                 }
                                                 else

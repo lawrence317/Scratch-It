@@ -48,6 +48,7 @@ namespace TBSMobile.View
             SetCAFNo();
             getRecipients();
             GetGPS();
+            GetGPSLocation();
             entEmployeeNumber.Text = contact;
             dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#3498db");
@@ -148,25 +149,60 @@ namespace TBSMobile.View
             entCafNo.Text = finalString;
         }
 
+        public async void GetGPSLocation()
+        {
+            Position position = null;
+            try
+            {
+                var locator = CrossGeolocator.Current;
+                locator.DesiredAccuracy = 30;
+
+                if (!locator.IsGeolocationAvailable)
+                {
+                    await DisplayAlert("GPS Error", "GPS location not available", "Ok");
+                }
+                else if (!locator.IsGeolocationEnabled)
+                {
+                    await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
+                }
+                else
+                {
+                    position = await locator.GetPositionAsync(null, null, true);
+                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("GPS Error", "Unable to get location " + ex, "Ok");
+            }
+        }
+
         public async void GetGPS()
         {
             Position position = null;
+            try
+            {
+                var locator = CrossGeolocator.Current;
+                locator.DesiredAccuracy = 30;
 
-            var locator = CrossGeolocator.Current;
-            locator.DesiredAccuracy = 30;
-
-            if (!locator.IsGeolocationAvailable)
-            {
-                await DisplayAlert("GPS Error", "GPS location not available", "Ok");
+                if (!locator.IsGeolocationAvailable)
+                {
+                    await DisplayAlert("GPS Error", "GPS location not available", "Ok");
+                }
+                else if (!locator.IsGeolocationEnabled)
+                {
+                    await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
+                }
+                else
+                {
+                    position = await locator.GetPositionAsync(null, null, true);
+                    entLocation.Text = position.Latitude + "," + position.Longitude;
+                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
+                }
             }
-            else if (!locator.IsGeolocationEnabled)
+            catch (Exception ex)
             {
-                await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
-            }
-            else
-            {
-                position = await locator.GetPositionAsync(null, null, true);
-                entLocation.Text = position.Latitude + "," + position.Longitude;
+                await DisplayAlert("GPS Error", "Unable to get location " + ex, "Ok");
             }
         }
 
@@ -339,6 +375,8 @@ namespace TBSMobile.View
                     cityvalidator.IsVisible = false;
                     provincevalidator.IsVisible = false;
                     countryvalidator.IsVisible = false;
+
+                    entLocation.Text = null;
 
                     if (resultCount > 0)
                     {
@@ -835,11 +873,11 @@ namespace TBSMobile.View
 
         private async void BtnGotoPage4_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(entLocation.Text) || (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)))
+            if (string.IsNullOrEmpty(entLocation.Text) || string.IsNullOrEmpty(entOnsiteLocation.Text) || (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)))
             {
                 await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
 
-                if (string.IsNullOrEmpty(entLocation.Text))
+                if (string.IsNullOrEmpty(entLocation.Text) || string.IsNullOrEmpty(entOnsiteLocation.Text))
                 {
                     await DisplayAlert("Form Required", "Please wait for the device to capture your location", "Got it");
                 }
@@ -1044,7 +1082,7 @@ namespace TBSMobile.View
 
                                     if (reply.Status == IPStatus.Success)
                                     {
-                                        var optimalSpeed = 300000;
+                                        var optimalSpeed = 5000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -1441,6 +1479,7 @@ namespace TBSMobile.View
                 var mobile = entMobile.Text;
                 var email = entEmail.Text;
                 var location = entLocation.Text;
+                var actlocation = entOnsiteLocation.Text;
                 var date = dpDate.Text;
                 var startTime = tpTime.Text;
                 var endTime = DateTime.Now.ToString("HH:mm:ss");
@@ -1518,6 +1557,7 @@ namespace TBSMobile.View
                     { "MobilePhoto2", photo2url },
                     { "MobilePhoto3", photo3url },
                     { "MobileVideo", videourl },
+                    { "GPSLocation", actlocation },
                     { "Rekorida", rekorida },
                     { "Merchandizing", merchandizing },
                     { "TradeCheck", tradecheck },
@@ -1650,6 +1690,7 @@ namespace TBSMobile.View
                                                                     MobilePhoto2 = photo2url,
                                                                     MobilePhoto3 = photo3url,
                                                                     MobileVideo = videourl,
+                                                                    GPSCoordinates = actlocation,
                                                                     Remarks = remarks,
                                                                     OtherConcern = otherconcern,
                                                                     LastSync = DateTime.Parse(current_datetime),
@@ -1754,6 +1795,7 @@ namespace TBSMobile.View
                                                         MobilePhoto2 = photo2url,
                                                         MobilePhoto3 = photo3url,
                                                         MobileVideo = videourl,
+                                                        GPSCoordinates = actlocation,
                                                         Remarks = remarks,
                                                         OtherConcern = otherconcern,
                                                         LastSync = DateTime.Parse(current_datetime),
@@ -1854,6 +1896,7 @@ namespace TBSMobile.View
             var mobile = entMobile.Text;
             var email = entEmail.Text;
             var location = entLocation.Text;
+            var actlocation = entOnsiteLocation.Text;
             var date = dpDate.Text;
             var startTime = tpTime.Text;
             var endTime = DateTime.Now.ToString("HH:mm:ss");
@@ -1887,6 +1930,7 @@ namespace TBSMobile.View
                 MobilePhoto2 = photo2url,
                 MobilePhoto3 = photo3url,
                 MobileVideo = videourl,
+                GPSCoordinates = actlocation,
                 Remarks = remarks,
                 OtherConcern = otherconcern,
                 LastUpdated = DateTime.Parse(current_datetime)

@@ -87,7 +87,7 @@ namespace TBSMobile.View
 
         private async void btnPage1Next_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(entFirstName.Text) || string.IsNullOrEmpty(entMiddleName.Text) || string.IsNullOrEmpty(entLastName.Text) || string.IsNullOrEmpty(entLandmark.Text) ||
+            if (string.IsNullOrEmpty(entFirstName.Text) || string.IsNullOrEmpty(entMiddleName.Text) || string.IsNullOrEmpty(entLastName.Text) ||
                 string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) || string.IsNullOrEmpty(entProvinceCode.Text) ||
                 string.IsNullOrEmpty(entCountry.Text))
             {
@@ -124,17 +124,6 @@ namespace TBSMobile.View
                 {
                     lastnamevalidator.IsVisible = false;
                     LastNameFrame.BorderColor = Color.FromHex("#e8eaed");
-                }
-
-                if (string.IsNullOrEmpty(entLandmark.Text))
-                {
-                    outletnamevalidator.IsVisible = true;
-                    OutletNameFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    outletnamevalidator.IsVisible = false;
-                    OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
                 }
 
                 if (string.IsNullOrEmpty(entStreet.Text))
@@ -504,20 +493,6 @@ namespace TBSMobile.View
             {
                 countryvalidator.IsVisible = false;
                 CountryFrame.BorderColor = Color.FromHex("#e8eaed");
-            }
-        }
-
-        private void entLandmark_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (string.IsNullOrEmpty(entLandmark.Text))
-            {
-                outletnamevalidator.IsVisible = true;
-                OutletNameFrame.BorderColor = Color.FromHex("#e74c3c");
-            }
-            else
-            {
-                outletnamevalidator.IsVisible = false;
-                OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
             }
         }
 

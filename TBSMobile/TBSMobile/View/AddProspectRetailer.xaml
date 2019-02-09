@@ -264,7 +264,7 @@
                                     </Label.FontFamily>
                                 </Label>
                                 <Frame StyleClass="fieldFrame" x:Name="OutletNameFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
-                                    <local:CustomEntry StyleClass="fieldForm" Unfocused="entLandmark_Unfocused" x:Name="entLandmark">
+                                    <local:CustomEntry StyleClass="fieldForm" x:Name="entLandmark">
                                         <local:CustomEntry.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -272,13 +272,6 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                <Label Text="Please input the outlet name" x:Name="outletnamevalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
                                 <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="10">
                                         <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnPage1Next_Clicked" x:Name="btnPage1Next" Text="Next" BorderRadius="6">

@@ -605,6 +605,7 @@ namespace TBSMobile.View
             public string MobilePhoto2 { get; set; }
             public string MobilePhoto3 { get; set; }
             public string MobileVideo { get; set; }
+            public string GPSCoordinates { get; set; }
             public string Remarks { get; set; }
             public string OtherConcern { get; set; }
             public DateTime LastSync { get; set; }
@@ -1044,6 +1045,7 @@ namespace TBSMobile.View
                             var crmobilePhoto2 = crresult.MobilePhoto2;
                             var crmobilePhoto3 = crresult.MobilePhoto3;
                             var crmobileVideo = crresult.MobileVideo;
+                            var crgpsCoordinates = crresult.GPSCoordinates;
                             var crremarks = crresult.Remarks;
                             var crotherConcern = crresult.OtherConcern;
                             var crdeleted = crresult.Deleted;
@@ -1063,6 +1065,7 @@ namespace TBSMobile.View
                                 { "MobilePhoto2", crmobilePhoto2 },
                                 { "MobilePhoto3", crmobilePhoto3 },
                                 { "MobileVideo", crmobileVideo },
+                                { "GPSCoordinates", crgpsCoordinates },
                                 { "Remarks", crremarks },
                                 { "OtherConcern", crotherConcern },
                                 { "Deleted", crdeleted },

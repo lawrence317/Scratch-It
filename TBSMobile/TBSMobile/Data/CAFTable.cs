@@ -29,6 +29,8 @@ namespace TBSMobile.Data
         public string Remarks { get; set; }
         [MaxLength(1000)]
         public string OtherConcern { get; set; }
+        [MaxLength(200)]
+        public string GPSCoordinates { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
         public int Deleted { get; set; }

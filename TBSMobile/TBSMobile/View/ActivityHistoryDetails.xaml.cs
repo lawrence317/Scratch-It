@@ -77,6 +77,7 @@ namespace TBSMobile.View
                     lblEndTime.Text = contactResult.EndTime.ToString("hh:mm:ss");
                     lblOtherConcern.Text = contactResult.OtherConcern;
                     lblRemarks.Text = contactResult.Remarks;
+                    lblActivityLocation.Text = contactResult.GPSCoordinates;
                     lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy HH:mm:ss");
                     lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy HH:mm:ss");
                 }

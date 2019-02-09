@@ -155,6 +155,7 @@ namespace TBSMobile.View
             public string MobileVideo { get; set; }
             public string Remarks { get; set; }
             public string OtherConcern { get; set; }
+            public string GPSCoordinates { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -1846,6 +1847,7 @@ namespace TBSMobile.View
                                     var crmobilePhoto2 = crresult.MobilePhoto2;
                                     var crmobilePhoto3 = crresult.MobilePhoto3;
                                     var crmobileVideo = crresult.MobileVideo;
+                                    var crgpsLocation = crresult.GPSCoordinates;
                                     var crremarks = crresult.Remarks;
                                     var crotherConcern = crresult.OtherConcern;
                                     var crdeleted = crresult.Deleted;
@@ -1865,6 +1867,7 @@ namespace TBSMobile.View
                                         { "MobilePhoto2", crmobilePhoto2 },
                                         { "MobilePhoto3", crmobilePhoto3 },
                                         { "MobileVideo", crmobileVideo },
+                                        { "GPSCoordinates", crgpsLocation },
                                         { "Remarks", crremarks },
                                         { "OtherConcern", crotherConcern },
                                         { "Deleted", crdeleted },
@@ -2047,6 +2050,7 @@ namespace TBSMobile.View
                                         var mobilePhoto2 = item.MobilePhoto2;
                                         var mobilePhoto3 = item.MobilePhoto3;
                                         var mobileVideo = item.MobileVideo;
+                                        var gpsCoordinates = item.GPSCoordinates;
                                         var remarks = item.Remarks;
                                         var otherConcern = item.OtherConcern;
                                         var lastSync = DateTime.Parse(current_datetime);
@@ -2069,6 +2073,7 @@ namespace TBSMobile.View
                                             MobilePhoto2 = mobilePhoto2,
                                             MobilePhoto3 = mobilePhoto3,
                                             MobileVideo = mobileVideo,
+                                            GPSCoordinates = gpsCoordinates,
                                             Remarks = remarks,
                                             OtherConcern = otherConcern,
                                             LastSync = lastSync,

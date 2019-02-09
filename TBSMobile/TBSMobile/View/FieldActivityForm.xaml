@@ -376,6 +376,23 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="OnsiteLocationFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry IsEnabled="false" StyleClass="fieldForm" x:Name="entOnsiteLocation">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+
+                                <Label Text="Retailer Outlet Location" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
                                 <Frame StyleClass="fieldFrame" x:Name="LocationFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
                                     <local:CustomEntry IsEnabled="false" StyleClass="fieldForm" x:Name="entLocation">
                                         <local:CustomEntry.FontFamily>
@@ -385,7 +402,7 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                
+
                                 <Label Text="Activity Date" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">

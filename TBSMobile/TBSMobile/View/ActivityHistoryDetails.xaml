@@ -69,7 +69,7 @@
                     </Frame>
                     <Frame StyleClass="detailsFrame" Grid.Row="3" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
-                            <Label Text="On-site Location" StyleClass="lstTitle">
+                            <Label Text="Retailer Outlet Location" StyleClass="lstTitle">
                                 <Label.FontFamily>
                                     <OnPlatform x:TypeArguments="x:String">
                                         <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
@@ -77,6 +77,24 @@
                                 </Label.FontFamily>
                             </Label>
                             <Label StyleClass="lstDetails" x:Name="lblRetailerLocation">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="3" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
+                            <Label Text="On-site Location" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblActivityLocation">
                                 <Label.FontFamily>
                                     <OnPlatform x:TypeArguments="x:String">
                                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
