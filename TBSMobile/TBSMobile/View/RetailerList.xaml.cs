@@ -18,16 +18,15 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
 
-        public RetailerList (string host, string database, string contact, string ipaddress, byte[] pingipaddress)
+        public RetailerList (string host, string database, string contact, string ipaddress)
 		{
 			InitializeComponent ();
             this.contact = contact;
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
+            
             GetRetailer();
             searchCategory.SelectedIndex = 0;
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#e67e22");
@@ -219,7 +218,7 @@ namespace TBSMobile.View
 
                             string selected = "";
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, pingipaddress, selected))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, selected))
                             {
                                 BarBackgroundColor = Color.FromHex("#e67e22")
                             });
@@ -1057,7 +1056,7 @@ namespace TBSMobile.View
 
                             ContactsTable item = (ContactsTable)e.Item;
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item, host, database, contact, ipaddress, pingipaddress))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item, host, database, contact, ipaddress))
                             {
                                 BarBackgroundColor = Color.FromHex("#e67e22")
                             });

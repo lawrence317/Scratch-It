@@ -10,6 +10,15 @@
     </ContentPage.Resources>
     <ContentPage.Content>
         <StackLayout>
+            <Grid RowSpacing="0" ColumnSpacing="0">
+                <Label StyleClass="lblstatus" VerticalTextAlignment="Center" x:Name="lblStatus" Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String">
+                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                        </OnPlatform>
+                    </Label.FontFamily>
+                </Label>
+            </Grid>
             <ListView IsPullToRefreshEnabled="True" SeparatorVisibility="None" Refreshing="lstActivity_Refreshing" x:Name="lstActivity" ItemTapped="lstActivity_ItemTapped" ItemSelected="lstActivity_ItemSelected" HasUnevenRows="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>

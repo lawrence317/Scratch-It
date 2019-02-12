@@ -21,9 +21,8 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
 
-        public RetailerGroupList(ContactsTable item, string host, string database, string contact, string ipaddress, byte[] pingipaddress)
+        public RetailerGroupList(ContactsTable item, string host, string database, string contact, string ipaddress)
         {
             InitializeComponent();
             this.contactID = item.ContactID;
@@ -32,7 +31,7 @@ namespace TBSMobile.View
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
+            
             GetRetailerGroup(item.ContactID);
             searchCategory.SelectedIndex = 0;
         }
@@ -1049,7 +1048,7 @@ namespace TBSMobile.View
 
                         Analytics.TrackEvent("Opened Add Retailer Outlet");
 
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, pingipaddress, selected))
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, selected))
                         {
                             BarBackgroundColor = Color.FromHex("#e67e22")
                         });

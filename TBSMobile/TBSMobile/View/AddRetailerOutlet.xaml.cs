@@ -14,6 +14,7 @@ using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Newtonsoft.Json;
 
 namespace TBSMobile.View
 {
@@ -24,17 +25,15 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
         string selected;
 
-        public AddRetailerOutlet (string host, string database, string contact, string ipaddress, byte[] pingipaddress, string selected)
+        public AddRetailerOutlet (string host, string database, string contact, string ipaddress, string selected)
 		{
 			InitializeComponent ();
             this.contact = contact;
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
             this.selected = selected;
             SetTempRetailerCode();
         }
@@ -138,11 +137,11 @@ namespace TBSMobile.View
 
                             if (CrossConnectivity.Current.IsConnected)
                             {
-                                var ping = new Ping();
-                                var reply = ping.Send(new IPAddress(pingipaddress), 5000);
-                                if (reply.Status == IPStatus.Success)
+                                Ping ping = new Ping();
+                                PingReply pingresult = ping.Send(ipaddress);
+                                if (pingresult.Status.ToString() == "Success")
                                 {
-                                    var optimalSpeed = 300000;
+                                    var optimalSpeed = 50000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                     if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -507,8 +506,19 @@ namespace TBSMobile.View
             }
         }
 
+        public class ServerMessage
+        {
+            public string Message { get; set; }
+        }
+
         public async void Send_online()
         {
+            var settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+
             var id = entContact.Text;
             var retailerCode = entRetailerCode.Text;
             var street = entStreet.Text;
@@ -552,37 +562,53 @@ namespace TBSMobile.View
                 HttpClient client = new HttpClient();
                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (response.IsSuccessStatusCode)
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var retailer_group_insert = new RetailerGroupTable
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
                     {
-                        ContactID = id,
-                        RetailerCode = retailerCode,
-                        PresStreet = street,
-                        PresBarangay = barangay,
-                        PresDistrict = district,
-                        PresTown = town,
-                        PresProvince = province,
-                        PresCountry = country,
-                        Landmark = landmark,
-                        Telephone1 = telephone1,
-                        Telephone2 = telephone2,
-                        Mobile = mobile,
-                        Email = email,
-                        GPSCoordinates = location,
-                        Supervisor = contact,
-                        LastSync = DateTime.Parse(current_datetime),
-                        LastUpdated = DateTime.Parse(current_datetime)
-                    };
+                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                    await conn.InsertAsync(retailer_group_insert);
+                        var dataitem = dataresult[0];
+                        var datamessage = dataitem.Message;
 
-                    Analytics.TrackEvent("Sent Retailer Outlet");
-                    await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
-                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                        if (datamessage.Equals("Inserted"))
+                        {
+                            var db = DependencyService.Get<ISQLiteDB>();
+                            var conn = db.GetConnection();
+
+                            var retailer_group_insert = new RetailerGroupTable
+                            {
+                                ContactID = id,
+                                RetailerCode = retailerCode,
+                                PresStreet = street,
+                                PresBarangay = barangay,
+                                PresDistrict = district,
+                                PresTown = town,
+                                PresProvince = province,
+                                PresCountry = country,
+                                Landmark = landmark,
+                                Telephone1 = telephone1,
+                                Telephone2 = telephone2,
+                                Mobile = mobile,
+                                Email = email,
+                                GPSCoordinates = location,
+                                Supervisor = contact,
+                                LastSync = DateTime.Parse(current_datetime),
+                                LastUpdated = DateTime.Parse(current_datetime)
+                            };
+
+                            await conn.InsertAsync(retailer_group_insert);
+
+                            Analytics.TrackEvent("Sent Retailer Outlet");
+                            await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
+                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                        }
+                    }
+                }
+                else
+                {
+                    Send_offline();
                 }
             }
             catch (Exception ex)

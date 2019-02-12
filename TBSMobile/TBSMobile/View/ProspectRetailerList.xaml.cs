@@ -18,16 +18,15 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
-
-        public ProspectRetailerList(string host, string database, string contact, string ipaddress, byte[] pingipaddress)
+        
+        public ProspectRetailerList(string host, string database, string contact, string ipaddress)
         {
             InitializeComponent();
             this.contact = contact;
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
+            
             Init();
         }
 
@@ -942,7 +941,7 @@ namespace TBSMobile.View
                         {
                             Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddProspectRetailer(host, database, contact, ipaddress, pingipaddress))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddProspectRetailer(host, database, contact, ipaddress))
                             {
                                 BarBackgroundColor = Color.FromHex("#1abc9c")
                             });

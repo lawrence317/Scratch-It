@@ -1,7 +1,9 @@
 ﻿using Microsoft.AppCenter.Crashes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using TBSMobile.Data;
@@ -18,9 +20,9 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
+        
 
-        public ActivityHistoryList (string host, string database, string contact, string ipaddress, byte[] pingipaddress)
+        public ActivityHistoryList (string host, string database, string contact, string ipaddress)
 		{
 			InitializeComponent ();
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#f1c40f");
@@ -28,7 +30,7 @@ namespace TBSMobile.View
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
+            
             GetActivity(contact);
         }
 

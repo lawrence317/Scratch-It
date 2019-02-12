@@ -18,9 +18,8 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        byte[] pingipaddress;
-
-        public UnsyncedData (string host, string database, string contact, string ipaddress, byte[] pingipaddress)
+        
+        public UnsyncedData (string host, string database, string contact, string ipaddress)
 		{
 			InitializeComponent ();
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#2ecc71");
@@ -28,7 +27,7 @@ namespace TBSMobile.View
             this.host = host;
             this.database = database;
             this.ipaddress = ipaddress;
-            this.pingipaddress = pingipaddress;
+            
             GetRetailerGroup(contact);
             GetActivity(contact);
             GetProspectRetailer(contact);

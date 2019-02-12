@@ -91,7 +91,7 @@
     background-color: #feffff;
 }
 
-.btnFAF, .btnPR, .btnRO, .btnLogout, .btnAH, .btnUI {
+.btnFAF, .btnPR, .btnRO, .btnLogout, .btnAH, .btnUI, .btnResend {
     color: #feffff;
     font-size: 22;
     padding-top: 40;
@@ -119,6 +119,10 @@
 
 .btnUI {
     background-color: #2ecc71;
+}
+
+.btnResend{
+    background-color: #34495e;
 }
 
 .faf, .prd, .rod, .aro, .ahd {
