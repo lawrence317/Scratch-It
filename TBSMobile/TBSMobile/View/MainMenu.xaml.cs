@@ -108,6 +108,7 @@ namespace TBSMobile.View
                                             btnUI.IsEnabled = false;
                                             btnPR.IsEnabled = false;
                                             btnRetailer.IsEnabled = false;
+                                            btnResend.IsEnabled = false;
                                         }
                                         else
                                         {
@@ -119,6 +120,7 @@ namespace TBSMobile.View
                                             btnUI.IsEnabled = true;
                                             btnPR.IsEnabled = true;
                                             btnRetailer.IsEnabled = true;
+                                            btnResend.IsEnabled = true;
                                         }
                                     }
                                     else
@@ -130,6 +132,7 @@ namespace TBSMobile.View
                                         btnUI.IsEnabled = false;
                                         btnPR.IsEnabled = false;
                                         btnRetailer.IsEnabled = false;
+                                        btnResend.IsEnabled = false;
                                     }
                                 }
                                 else
@@ -142,6 +145,7 @@ namespace TBSMobile.View
                                     btnUI.IsEnabled = true;
                                     btnPR.IsEnabled = true;
                                     btnRetailer.IsEnabled = true;
+                                    btnResend.IsEnabled = true;
                                 }
                             }
                             else
@@ -154,6 +158,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
                         else
@@ -166,6 +171,7 @@ namespace TBSMobile.View
                             btnUI.IsEnabled = true;
                             btnPR.IsEnabled = true;
                             btnRetailer.IsEnabled = true;
+                            btnResend.IsEnabled = true;
                         }
                     }
                     else
@@ -383,7 +389,7 @@ namespace TBSMobile.View
                                         lblStatus.Text = "Initializing data sync";
                                         lblStatus.BackgroundColor = Color.FromHex("#27ae60");
 
-                                        var confirm = await DisplayAlert("Auto-sync Connection Speed Warning", "Slow connection detected. Do you want to sync the data?", "Yes", "No");
+                                        var confirm = await DisplayAlert("Auto-sync Connection Speed Warning", "Slow connection detected. Do you want to sync the data?  Please do not turn off/lock your device during the syncing process.", "Yes", "No");
                                         if (confirm == true)
                                         {
                                             SyncRetailer(host, database, contact, ipaddress);
@@ -393,6 +399,7 @@ namespace TBSMobile.View
                                             btnUI.IsEnabled = false;
                                             btnPR.IsEnabled = false;
                                             btnRetailer.IsEnabled = false;
+                                            btnResend.IsEnabled = false;
                                         }
                                         else
                                         {
@@ -404,6 +411,7 @@ namespace TBSMobile.View
                                             btnUI.IsEnabled = true;
                                             btnPR.IsEnabled = true;
                                             btnRetailer.IsEnabled = true;
+                                            btnResend.IsEnabled = true;
                                         }
                                     }
                                     else
@@ -415,6 +423,7 @@ namespace TBSMobile.View
                                         btnUI.IsEnabled = false;
                                         btnPR.IsEnabled = false;
                                         btnRetailer.IsEnabled = false;
+                                        btnResend.IsEnabled = false;
                                     }
                                 }
                                 else
@@ -427,6 +436,7 @@ namespace TBSMobile.View
                                     btnUI.IsEnabled = true;
                                     btnPR.IsEnabled = true;
                                     btnRetailer.IsEnabled = true;
+                                    btnResend.IsEnabled = true;
                                 }
                             }
                             else
@@ -439,6 +449,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
                         else
@@ -451,6 +462,7 @@ namespace TBSMobile.View
                             btnUI.IsEnabled = true;
                             btnPR.IsEnabled = true;
                             btnRetailer.IsEnabled = true;
+                            btnResend.IsEnabled = true;
                         }
                     }
                     else
@@ -866,12 +878,7 @@ namespace TBSMobile.View
                                                                                 else
                                                                                 {
                                                                                     lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                                                                                    btnFAF.IsEnabled = true;
-                                                                                    btnAH.IsEnabled = true;
-                                                                                    btnLogout.IsEnabled = true;
-                                                                                    btnUI.IsEnabled = true;
-                                                                                    btnPR.IsEnabled = true;
-                                                                                    btnRetailer.IsEnabled = true;
+                                                                                    OnSyncComplete();
                                                                                 }
                                                                             }
                                                                             else
@@ -885,12 +892,7 @@ namespace TBSMobile.View
                                                                 else
                                                                 {
                                                                     lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                                                                    btnFAF.IsEnabled = true;
-                                                                    btnAH.IsEnabled = true;
-                                                                    btnLogout.IsEnabled = true;
-                                                                    btnUI.IsEnabled = true;
-                                                                    btnPR.IsEnabled = true;
-                                                                    btnRetailer.IsEnabled = true;
+                                                                    OnSyncComplete();
                                                                 }
                                                             }
                                                         }
@@ -898,12 +900,7 @@ namespace TBSMobile.View
                                                     else
                                                     {
                                                         lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                                                        btnFAF.IsEnabled = true;
-                                                        btnAH.IsEnabled = true;
-                                                        btnLogout.IsEnabled = true;
-                                                        btnUI.IsEnabled = true;
-                                                        btnPR.IsEnabled = true;
-                                                        btnRetailer.IsEnabled = true;
+                                                        OnSyncComplete();
                                                     }
                                                 }
                                             }
@@ -911,12 +908,7 @@ namespace TBSMobile.View
                                         else
                                         {
                                             lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                                            btnFAF.IsEnabled = true;
-                                            btnAH.IsEnabled = true;
-                                            btnLogout.IsEnabled = true;
-                                            btnUI.IsEnabled = true;
-                                            btnPR.IsEnabled = true;
-                                            btnRetailer.IsEnabled = true;
+                                            OnSyncComplete();
                                         }
                                     }
                                 }
@@ -924,12 +916,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
                     }
@@ -945,18 +932,17 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Syncing retailer failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -1064,6 +1050,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
                     }
@@ -1079,6 +1066,11 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
@@ -1091,6 +1083,7 @@ namespace TBSMobile.View
                 btnUI.IsEnabled = true;
                 btnPR.IsEnabled = true;
                 btnRetailer.IsEnabled = true;
+                btnResend.IsEnabled = true;
             }
         }
 
@@ -1262,12 +1255,12 @@ namespace TBSMobile.View
 
                                                                         if (ph3message.Equals("Inserted"))
                                                                         {
-                                                                            byte[] crVideoData;
-
-                                                                            crVideoData = File.ReadAllBytes(crvideo);
-
                                                                             if (!string.IsNullOrEmpty(crvideo))
                                                                             {
+                                                                                byte[] crVideoData;
+
+                                                                                crVideoData = File.ReadAllBytes(crvideo);
+
                                                                                 var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
                                                                                 string vidcontentType = "application/json";
                                                                                 JObject vidjson = new JObject
@@ -1306,6 +1299,7 @@ namespace TBSMobile.View
                                                                                     btnUI.IsEnabled = true;
                                                                                     btnPR.IsEnabled = true;
                                                                                     btnRetailer.IsEnabled = true;
+                                                                                    btnResend.IsEnabled = true;
                                                                                 }
                                                                             }
                                                                             else
@@ -1325,6 +1319,7 @@ namespace TBSMobile.View
                                                                     btnUI.IsEnabled = true;
                                                                     btnPR.IsEnabled = true;
                                                                     btnRetailer.IsEnabled = true;
+                                                                    btnResend.IsEnabled = true;
                                                                 }
                                                             }
                                                         }
@@ -1338,6 +1333,7 @@ namespace TBSMobile.View
                                                         btnUI.IsEnabled = true;
                                                         btnPR.IsEnabled = true;
                                                         btnRetailer.IsEnabled = true;
+                                                        btnResend.IsEnabled = true;
                                                     }
                                                 }
                                             }
@@ -1351,6 +1347,7 @@ namespace TBSMobile.View
                                             btnUI.IsEnabled = true;
                                             btnPR.IsEnabled = true;
                                             btnRetailer.IsEnabled = true;
+                                            btnResend.IsEnabled = true;
                                         }
                                     }
                                 }
@@ -1364,6 +1361,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
 
@@ -1380,6 +1378,11 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
@@ -1392,6 +1395,7 @@ namespace TBSMobile.View
                 btnUI.IsEnabled = true;
                 btnPR.IsEnabled = true;
                 btnRetailer.IsEnabled = true;
+                btnResend.IsEnabled = true;
             }
         }
 
@@ -1474,6 +1478,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
 
@@ -1490,6 +1495,11 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
@@ -1502,6 +1512,7 @@ namespace TBSMobile.View
                 btnUI.IsEnabled = true;
                 btnPR.IsEnabled = true;
                 btnRetailer.IsEnabled = true;
+                btnResend.IsEnabled = true;
             }
         }
 
@@ -1570,6 +1581,7 @@ namespace TBSMobile.View
                                 btnUI.IsEnabled = true;
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
+                                btnResend.IsEnabled = true;
                             }
                         }
 
@@ -1586,6 +1598,11 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
@@ -1598,6 +1615,7 @@ namespace TBSMobile.View
                 btnUI.IsEnabled = true;
                 btnPR.IsEnabled = true;
                 btnRetailer.IsEnabled = true;
+                btnResend.IsEnabled = true;
             }
         }
 
@@ -1625,7 +1643,7 @@ namespace TBSMobile.View
 
                     int count = 1;
 
-                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND Deleted != '1'", contact);
+                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ?  AND RetailerType = 'RT00004' AND Deleted != '1'", contact);
                     var changesresultCount = getContactsChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -1669,7 +1687,7 @@ namespace TBSMobile.View
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=nLm8YE";
+                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=GC2Tb2";
                             string crcontentType = "application/json";
                             JObject crjson = new JObject
                             {
@@ -1718,15 +1736,19 @@ namespace TBSMobile.View
                                     var datamessage = dataitem.Message;
 
                                     if (datamessage.Equals("Inserted"))
-                                    {
-                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
+                                    {                                        
                                         var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
                                         string ph1contentType = "application/json";
-                                        JObject ph1json = new JObject
+                                        JObject ph1json = string.IsNullOrEmpty(crphoto1)
+                                        ? new JObject
                                         {
-                                            { "ContactID", crcontactID },
-                                            { "Photo1", crPhoto1Data }
+                                            {"ContactID", crcontactID},
+                                            {"Photo1", ""}
+                                        }
+                                        : new JObject
+                                        {
+                                            {"ContactID", crcontactID},
+                                            {"Photo1", File.ReadAllBytes(crphoto1)}
                                         };
 
                                         HttpClient ph1client = new HttpClient();
@@ -1744,14 +1766,18 @@ namespace TBSMobile.View
 
                                                 if (ph1message.Equals("Inserted"))
                                                 {
-                                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
                                                     string ph2contentType = "application/json";
-                                                    JObject ph2json = new JObject
+                                                    JObject ph2json = string.IsNullOrEmpty(crphoto2)
+                                                    ? new JObject
                                                     {
-                                                        { "ContactID", crcontactID },
-                                                        { "Photo2", crPhoto2Data }
+                                                        {"ContactID", crcontactID},
+                                                        {"Photo2", ""}
+                                                    }
+                                                    : new JObject
+                                                    {
+                                                        {"ContactID", crcontactID},
+                                                        {"Photo2", File.ReadAllBytes(crphoto2)}
                                                     };
 
                                                     HttpClient ph2client = new HttpClient();
@@ -1769,14 +1795,18 @@ namespace TBSMobile.View
 
                                                             if (ph2message.Equals("Inserted"))
                                                             {
-                                                                byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                 var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
                                                                 string ph3contentType = "application/json";
-                                                                JObject ph3json = new JObject
+                                                                JObject ph3json = string.IsNullOrEmpty(crphoto3)
+                                                                ? new JObject
                                                                 {
-                                                                    { "ContactID", crcontactID },
-                                                                    { "Photo3", crPhoto3Data }
+                                                                    {"ContactID", crcontactID},
+                                                                    {"Photo3", ""}
+                                                                }
+                                                                : new JObject
+                                                                {
+                                                                    {"ContactID", crcontactID},
+                                                                    {"Photo3", File.ReadAllBytes(crphoto3)}
                                                                 };
 
                                                                 HttpClient ph3client = new HttpClient();
@@ -1831,12 +1861,7 @@ namespace TBSMobile.View
                                                                                 else
                                                                                 {
                                                                                     lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                                                    btnFAF.IsEnabled = true;
-                                                                                    btnAH.IsEnabled = true;
-                                                                                    btnLogout.IsEnabled = true;
-                                                                                    btnUI.IsEnabled = true;
-                                                                                    btnPR.IsEnabled = true;
-                                                                                    btnRetailer.IsEnabled = true;
+                                                                                    OnSyncComplete();
                                                                                 }
                                                                             }
                                                                             else
@@ -1850,12 +1875,7 @@ namespace TBSMobile.View
                                                                 else
                                                                 {
                                                                     lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                                    btnFAF.IsEnabled = true;
-                                                                    btnAH.IsEnabled = true;
-                                                                    btnLogout.IsEnabled = true;
-                                                                    btnUI.IsEnabled = true;
-                                                                    btnPR.IsEnabled = true;
-                                                                    btnRetailer.IsEnabled = true;
+                                                                    OnSyncComplete();
                                                                 }
                                                             }
                                                         }
@@ -1863,12 +1883,7 @@ namespace TBSMobile.View
                                                     else
                                                     {
                                                         lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                        btnFAF.IsEnabled = true;
-                                                        btnAH.IsEnabled = true;
-                                                        btnLogout.IsEnabled = true;
-                                                        btnUI.IsEnabled = true;
-                                                        btnPR.IsEnabled = true;
-                                                        btnRetailer.IsEnabled = true;
+                                                        OnSyncComplete();
                                                     }
                                                 }
                                             }
@@ -1876,12 +1891,7 @@ namespace TBSMobile.View
                                         else
                                         {
                                             lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                            btnFAF.IsEnabled = true;
-                                            btnAH.IsEnabled = true;
-                                            btnLogout.IsEnabled = true;
-                                            btnUI.IsEnabled = true;
-                                            btnPR.IsEnabled = true;
-                                            btnRetailer.IsEnabled = true;
+                                            OnSyncComplete();
                                         }
                                     }
                                 }
@@ -1889,12 +1899,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
                     }
@@ -1910,18 +1915,18 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -1949,7 +1954,7 @@ namespace TBSMobile.View
 
                     int count = 1;
 
-                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND Deleted != '1'", contact);
                     var changesresultCount = getOutletChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -1977,7 +1982,7 @@ namespace TBSMobile.View
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Pb3c6A";
+                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=xCPM3T";
                             string crcontentType = "application/json";
                             JObject crjson = new JObject
                             {
@@ -2023,12 +2028,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Re-syncing retailer outlet failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
                     }
@@ -2044,18 +2044,18 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing retailer outlet failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -2149,15 +2149,20 @@ namespace TBSMobile.View
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
                                         var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                                         string ph1contentType = "application/json";
-                                        JObject ph1json = new JObject
+                                        JObject ph1json = string.IsNullOrEmpty(crphoto1)
+                                        ? new JObject
                                         {
                                             { "CAFNo", crcafNo },
                                             { "CAFDate", crcafDate },
-                                            { "Photo1", crPhoto1Data }
+                                            { "Photo1", ""}
+                                        }
+                                        : new JObject
+                                        {
+                                            { "CAFNo", crcafNo },
+                                            { "CAFDate", crcafDate },
+                                            { "Photo1", File.ReadAllBytes(crphoto1)}
                                         };
 
                                         HttpClient ph1client = new HttpClient();
@@ -2175,15 +2180,20 @@ namespace TBSMobile.View
 
                                                 if (ph1message.Equals("Inserted"))
                                                 {
-                                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                                     string ph2contentType = "application/json";
-                                                    JObject ph2json = new JObject
+                                                    JObject ph2json = string.IsNullOrEmpty(crphoto2)
+                                                    ? new JObject
                                                     {
                                                         { "CAFNo", crcafNo },
                                                         { "CAFDate", crcafDate },
-                                                        { "Photo2", crPhoto2Data }
+                                                        { "Photo2", ""}
+                                                    }
+                                                    : new JObject
+                                                    {
+                                                        { "CAFNo", crcafNo },
+                                                        { "CAFDate", crcafDate },
+                                                        { "Photo2", File.ReadAllBytes(crphoto2)}
                                                     };
 
                                                     HttpClient ph2client = new HttpClient();
@@ -2201,15 +2211,20 @@ namespace TBSMobile.View
 
                                                             if (ph2message.Equals("Inserted"))
                                                             {
-                                                                byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                 var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
                                                                 string ph3contentType = "application/json";
-                                                                JObject ph3json = new JObject
+                                                                JObject ph3json = string.IsNullOrEmpty(crphoto3)
+                                                                ? new JObject
                                                                 {
                                                                     { "CAFNo", crcafNo },
                                                                     { "CAFDate", crcafDate },
-                                                                    { "Photo3", crPhoto3Data }
+                                                                    { "Photo3", ""}
+                                                                }
+                                                                : new JObject
+                                                                {
+                                                                    { "CAFNo", crcafNo },
+                                                                    { "CAFDate", crcafDate },
+                                                                    { "Photo3", File.ReadAllBytes(crphoto3)}
                                                                 };
 
                                                                 HttpClient ph3client = new HttpClient();
@@ -2227,12 +2242,12 @@ namespace TBSMobile.View
 
                                                                         if (ph3message.Equals("Inserted"))
                                                                         {
-                                                                            byte[] crVideoData;
-
-                                                                            crVideoData = File.ReadAllBytes(crvideo);
-
                                                                             if (!string.IsNullOrEmpty(crvideo))
                                                                             {
+                                                                                byte[] crVideoData;
+
+                                                                                crVideoData = File.ReadAllBytes(crvideo);
+
                                                                                 var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
                                                                                 string vidcontentType = "application/json";
                                                                                 JObject vidjson = new JObject
@@ -2265,12 +2280,7 @@ namespace TBSMobile.View
                                                                                 else
                                                                                 {
                                                                                     lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                                                    btnFAF.IsEnabled = true;
-                                                                                    btnAH.IsEnabled = true;
-                                                                                    btnLogout.IsEnabled = true;
-                                                                                    btnUI.IsEnabled = true;
-                                                                                    btnPR.IsEnabled = true;
-                                                                                    btnRetailer.IsEnabled = true;
+                                                                                    OnSyncComplete();
                                                                                 }
                                                                             }
                                                                             else
@@ -2284,12 +2294,7 @@ namespace TBSMobile.View
                                                                 else
                                                                 {
                                                                     lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                                    btnFAF.IsEnabled = true;
-                                                                    btnAH.IsEnabled = true;
-                                                                    btnLogout.IsEnabled = true;
-                                                                    btnUI.IsEnabled = true;
-                                                                    btnPR.IsEnabled = true;
-                                                                    btnRetailer.IsEnabled = true;
+                                                                    OnSyncComplete();
                                                                 }
                                                             }
                                                         }
@@ -2297,12 +2302,7 @@ namespace TBSMobile.View
                                                     else
                                                     {
                                                         lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                        btnFAF.IsEnabled = true;
-                                                        btnAH.IsEnabled = true;
-                                                        btnLogout.IsEnabled = true;
-                                                        btnUI.IsEnabled = true;
-                                                        btnPR.IsEnabled = true;
-                                                        btnRetailer.IsEnabled = true;
+                                                        OnSyncComplete();
                                                     }
                                                 }
                                             }
@@ -2310,12 +2310,7 @@ namespace TBSMobile.View
                                         else
                                         {
                                             lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                            btnFAF.IsEnabled = true;
-                                            btnAH.IsEnabled = true;
-                                            btnLogout.IsEnabled = true;
-                                            btnUI.IsEnabled = true;
-                                            btnPR.IsEnabled = true;
-                                            btnRetailer.IsEnabled = true;
+                                            OnSyncComplete();
                                         }
                                     }
                                 }
@@ -2323,12 +2318,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
 
@@ -2345,18 +2335,18 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -2433,12 +2423,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
 
@@ -2455,18 +2440,18 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -2529,12 +2514,7 @@ namespace TBSMobile.View
                             else
                             {
                                 lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                                btnFAF.IsEnabled = true;
-                                btnAH.IsEnabled = true;
-                                btnLogout.IsEnabled = true;
-                                btnUI.IsEnabled = true;
-                                btnPR.IsEnabled = true;
-                                btnRetailer.IsEnabled = true;
+                                OnSyncComplete();
                             }
                         }
 
@@ -2551,18 +2531,18 @@ namespace TBSMobile.View
                     if (seedata == true)
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing email failed. Server is unreachable.";
-                btnFAF.IsEnabled = true;
-                btnAH.IsEnabled = true;
-                btnLogout.IsEnabled = true;
-                btnUI.IsEnabled = true;
-                btnPR.IsEnabled = true;
-                btnRetailer.IsEnabled = true;
+                OnSyncComplete();
             }
         }
 
@@ -2598,44 +2578,60 @@ namespace TBSMobile.View
             btnUI.IsEnabled = true;
             btnPR.IsEnabled = true;
             btnRetailer.IsEnabled = true;
+            btnResend.IsEnabled = true;
         }
 
         private async void BtnResend_Clicked(object sender, EventArgs e)
         {
-            var optimalSpeed = 50000;
-            var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
-            var speeds = CrossConnectivity.Current.Bandwidths;
-
-            if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
+            if (CrossConnectivity.Current.IsConnected)
             {
-                lblStatus.Text = "Initializing data sync";
-                lblStatus.BackgroundColor = Color.FromHex("#27ae60");
+                Ping ping = new Ping();
+                PingReply pingresult = ping.Send(ipaddress);
 
-                var confirm = await DisplayAlert("Re-sync Connection Warning", "Slow connection detected. Do you want to re-sync the data?", "Yes", "No");
-                if (confirm == true)
+                if (pingresult.Status.ToString() == "Success")
                 {
-                    ReSyncRetailer(host, database, contact, ipaddress);
-                    btnFAF.IsEnabled = false;
-                    btnAH.IsEnabled = false;
-                    btnLogout.IsEnabled = false;
-                    btnUI.IsEnabled = false;
-                    btnPR.IsEnabled = false;
-                    btnRetailer.IsEnabled = false;
-                }
-                else
-                {
-                    var resync = await DisplayAlert("Re-sync Warning", "Do you want to re-sync the data?", "Yes", "No");
-                    if (confirm == true)
+                    var optimalSpeed = 50000;
+                    var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
+                    var speeds = CrossConnectivity.Current.Bandwidths;
+
+                    if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
                     {
-                        ReSyncRetailer(host, database, contact, ipaddress);
-                        btnFAF.IsEnabled = false;
-                        btnAH.IsEnabled = false;
-                        btnLogout.IsEnabled = false;
-                        btnUI.IsEnabled = false;
-                        btnPR.IsEnabled = false;
-                        btnRetailer.IsEnabled = false;
+                        lblStatus.Text = "Initializing data sync";
+                        lblStatus.BackgroundColor = Color.FromHex("#27ae60");
+
+                        var confirm = await DisplayAlert("Re-sync Connection Warning", "Slow connection detected. Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
+                        if (confirm == true)
+                        {
+                            ReSyncRetailer(host, database, contact, ipaddress);
+                            btnFAF.IsEnabled = false;
+                            btnAH.IsEnabled = false;
+                            btnLogout.IsEnabled = false;
+                            btnUI.IsEnabled = false;
+                            btnPR.IsEnabled = false;
+                            btnRetailer.IsEnabled = false;
+                            btnResend.IsEnabled = false;
+                        }
+                    }
+                    else
+                    {
+                        var resync = await DisplayAlert("Re-sync Warning", "Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
+                        if (resync == true)
+                        {
+                            ReSyncRetailer(host, database, contact, ipaddress);
+                            btnFAF.IsEnabled = false;
+                            btnAH.IsEnabled = false;
+                            btnLogout.IsEnabled = false;
+                            btnUI.IsEnabled = false;
+                            btnPR.IsEnabled = false;
+                            btnRetailer.IsEnabled = false;
+                            btnResend.IsEnabled = false;
+                        }
                     }
                 }
+            }
+            else
+            {
+                await DisplayAlert("Connection Error", "Server unreachable", "Got it");
             }
         }
     }

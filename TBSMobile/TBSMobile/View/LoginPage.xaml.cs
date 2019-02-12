@@ -311,7 +311,7 @@ namespace TBSMobile.View
                                                     var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
 
                                                     var trialitem = trialresult[0];
-                                                    var trialmessage = item.Message;
+                                                    var trialmessage = trialitem.Message;
 
                                                     if (trialmessage.Equals("Inserted"))
                                                     {
@@ -347,8 +347,8 @@ namespace TBSMobile.View
                                     }
                                     else
                                     {
-                                        var result = JsonConvert.DeserializeObject<List<UserTable>>(content);
-                                        var contactID = result[0].ContactID;
+                                        var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
+                                        var contactID = result[0].Message;
 
                                         Preferences.Set("username", userName, "private_prefs");
 
@@ -781,7 +781,7 @@ namespace TBSMobile.View
                 {
                     try
                     {
-                        Ping ping = new Ping();
+                       Ping ping = new Ping();
                        PingReply pingresult = ping.Send(ipaddress);
 
                         if (pingresult.Status.ToString() == "Success")

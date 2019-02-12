@@ -85,7 +85,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="3" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="On-site Location" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -103,7 +103,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="5" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Activity Date" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -121,7 +121,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="5" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Activity Start Time" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -139,7 +139,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="7" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Activity End Time" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -157,7 +157,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="7" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Rekorida" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -175,7 +175,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="9" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Merchandizing" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -193,7 +193,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="9" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Trade Check" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -211,7 +211,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="11" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Others" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -229,7 +229,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="11" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="12" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Other Concern" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -247,7 +247,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="12" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="13" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Remarks" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -265,7 +265,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="13" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="14" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Last Updated" StyleClass="lstTitle">
                                 <Label.FontFamily>
@@ -283,7 +283,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="14" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="15" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Last Sync" StyleClass="lstTitle">
                                 <Label.FontFamily>
