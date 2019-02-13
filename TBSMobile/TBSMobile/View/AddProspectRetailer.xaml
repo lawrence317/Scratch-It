@@ -90,7 +90,21 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
-
+                                
+                                <StackLayout>
+                                    <Grid ColumnSpacing="10" RowSpacing="10">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnPage1Next_Clicked" x:Name="btnPage1Next" Text="Next" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+                          
+                            <StackLayout x:Name="acPage2" IsVisible="False">
                                 <Label Text="Province" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -224,13 +238,6 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                <Label Text="Please input the district" x:Name="districtvalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
 
                                 <Label Text="Country" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
@@ -240,7 +247,7 @@
                                     </Label.FontFamily>
                                 </Label>
                                 <Frame StyleClass="fieldFrame" x:Name="CountryFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
-                                    <local:CustomEntry StyleClass="fieldForm" IsEnabled="False" Text="Philippines" Unfocused="entCountry_Unfocused" x:Name="entCountry">
+                                    <local:CustomEntry StyleClass="fieldForm" IsEnabled="False" Text="Philippines" x:Name="entCountry">
                                         <local:CustomEntry.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -248,13 +255,6 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                <Label Text="Please input the country" x:Name="countryvalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
 
                                 <Label Text="Outlet Name" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
@@ -272,9 +272,39 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
+                                <Label Text="Remarks" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="RemarksFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry StyleClass="fieldForm" x:Name="entRemarks">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Please input the remarks" x:Name="remarksvalidator" StyleClass="validation" IsVisible="False">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
                                 <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnPage1Next_Clicked" x:Name="btnPage1Next" Text="Next" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnBackPage1_Clicked" x:Name="btnBackPage1" Text="Back" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnGotoPage3_Clicked" x:Name="btnGotoPage3" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -285,7 +315,7 @@
                                 </StackLayout>
                             </StackLayout>
                           
-                            <StackLayout x:Name="acPage2" IsVisible="False">
+                            <StackLayout x:Name="acPage3" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -352,14 +382,14 @@
                                 </Frame>
                                 <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnBackPage1_Clicked" x:Name="btnBackPage1" Text="Back" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnPage2Back_Clicked" x:Name="btnBackPage2" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnGotoPage3_Clicked" x:Name="btnGotoPage3" Text="Next" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage4_Clicked" x:Name="btnGotoPage4" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -369,8 +399,8 @@
                                     </Grid>
                                 </StackLayout>
                             </StackLayout>
-                          
-                            <StackLayout x:Name="acPage3" IsVisible="False">
+                            
+                            <StackLayout x:Name="acPage4" IsVisible="False">
                                 <Grid RowSpacing="0" ColumnSpacing="10">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
@@ -448,10 +478,9 @@
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto2Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto3Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entVideoUrl"/>
-                              
                                 <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="btnPage2Back_Clicked" x:Name="btnBackPage2" Text="Back" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnBackPage3_Clicked" x:Name="btnBackPage3" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

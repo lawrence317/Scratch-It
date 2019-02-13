@@ -25,41 +25,41 @@ namespace TBSMobile
             AppCenter.Start("android=423c8020-f1af-4fba-b62f-c07e1fb382b6;", typeof(Analytics), typeof(Crashes), typeof(Distribute));
             Analytics.SetEnabledAsync(true);
 
-            Distribute.ReleaseAvailable = OnReleaseAvailable;
+            //Distribute.ReleaseAvailable = OnReleaseAvailable;
         }
 
-        bool OnReleaseAvailable(ReleaseDetails releaseDetails)
-        {
-            string versionName = releaseDetails.ShortVersion;
-            string versionCodeOrBuildNumber = releaseDetails.Version;
-            string releaseNotes = releaseDetails.ReleaseNotes;
-            Uri releaseNotesUrl = releaseDetails.ReleaseNotesUrl;
+        //bool OnReleaseAvailable(ReleaseDetails releaseDetails)
+        //{
+        //    string versionName = releaseDetails.ShortVersion;
+        //    string versionCodeOrBuildNumber = releaseDetails.Version;
+        //    string releaseNotes = releaseDetails.ReleaseNotes;
+        //    Uri releaseNotesUrl = releaseDetails.ReleaseNotesUrl;
 
-            var title = "Version " + versionName + " available!";
-            Task answer;
+        //    var title = "Version " + versionName + " available!";
+        //    Task answer;
 
-            if (releaseDetails.MandatoryUpdate)
-            {
-                answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install");
-            }
-            else
-            {
-                answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install", "Ask Later");
-            }
-            answer.ContinueWith((task) =>
-            {
-                if (releaseDetails.MandatoryUpdate || (task as Task<bool>).Result)
-                {
-                    Distribute.NotifyUpdateAction(UpdateAction.Update);
-                }
-                else
-                {
-                    Distribute.NotifyUpdateAction(UpdateAction.Postpone);
-                }
-            });
+        //    if (releaseDetails.MandatoryUpdate)
+        //    {
+        //        answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install");
+        //    }
+        //    else
+        //    {
+        //        answer = Current.MainPage.DisplayAlert(title, releaseNotes, "Download and Install", "Ask Later");
+        //    }
+        //    answer.ContinueWith((task) =>
+        //    {
+        //        if (releaseDetails.MandatoryUpdate || (task as Task<bool>).Result)
+        //        {
+        //            Distribute.NotifyUpdateAction(UpdateAction.Update);
+        //        }
+        //        else
+        //        {
+        //            Distribute.NotifyUpdateAction(UpdateAction.Postpone);
+        //        }
+        //    });
 
-            return true;
-        }
+        //    return true;
+        //}
 
         protected override void OnSleep ()
 		{

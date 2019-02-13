@@ -40,6 +40,8 @@ namespace TBSMobile.Data
         public string PresCountry { get; set; }
         [MaxLength(500)]
         public string Landmark { get; set; }
+        [MaxLength(500)]
+        public string CustomerRemarks { get; set; }
         [MaxLength(30)]
         public string Telephone1 { get; set; }
         [MaxLength(30)]

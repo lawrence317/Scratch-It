@@ -204,7 +204,7 @@ namespace TBSMobile.View
                 {
                     try
                     {
-                        Ping ping = new Ping();
+                       Ping ping = new Ping();
                        PingReply pingresult = ping.Send(ipaddress);
 
                         if (pingresult.Status.ToString() == "Success")

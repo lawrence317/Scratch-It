@@ -91,6 +91,7 @@ namespace TBSMobile.View
             public string PresProvince { get; set; }
             public string PresCountry { get; set; }
             public string Landmark { get; set; }
+            public string CustomerRemarks { get; set; }
             public string Telephone1 { get; set; }
             public string Telephone2 { get; set; }
             public string Mobile { get; set; }
@@ -582,6 +583,7 @@ namespace TBSMobile.View
                                     var crpresProvince = crresult.PresProvince;
                                     var crpresCountry = crresult.PresCountry;
                                     var crlandmark = crresult.Landmark;
+                                    var crremarks = crresult.CustomerRemarks;
                                     var crtelephone1 = crresult.Telephone1;
                                     var crtelephone2 = crresult.Telephone2;
                                     var crmobile = crresult.Mobile;
@@ -620,6 +622,7 @@ namespace TBSMobile.View
                                         { "PresProvince", crpresProvince },
                                         { "PresCountry", crpresCountry },
                                         { "Landmark", crlandmark },
+                                        { "Remarks", crremarks },
                                         { "Telephone1", crtelephone1 },
                                         { "Telephone2", crtelephone2 },
                                         { "Mobile", crmobile },
@@ -860,6 +863,7 @@ namespace TBSMobile.View
                                         var presProvince = item.PresProvince;
                                         var presCountry = item.PresCountry;
                                         var landmark = item.Landmark;
+                                        var remarks = item.CustomerRemarks;
                                         var telephone1 = item.Telephone1;
                                         var telephone2 = item.Telephone2;
                                         var mobile = item.Mobile;
@@ -897,6 +901,7 @@ namespace TBSMobile.View
                                             PresProvince = presProvince,
                                             PresCountry = presCountry,
                                             Landmark = landmark,
+                                            CustomerRemarks = remarks,
                                             Telephone1 = telephone1,
                                             Telephone2 = telephone2,
                                             Mobile = mobile,
@@ -1020,6 +1025,7 @@ namespace TBSMobile.View
                                     var chpresProvince = chitem.PresProvince;
                                     var chpresCountry = chitem.PresCountry;
                                     var chlandmark = chitem.Landmark;
+                                    var chremarks = chitem.CustomerRemarks;
                                     var chtelephone1 = chitem.Telephone1;
                                     var chtelephone2 = chitem.Telephone2;
                                     var chmobile = chitem.Mobile;
@@ -1064,6 +1070,7 @@ namespace TBSMobile.View
                                                 PresProvince = chpresProvince,
                                                 PresCountry = chpresCountry,
                                                 Landmark = chlandmark,
+                                                CustomerRemarks = chremarks,
                                                 Telephone1 = chtelephone1,
                                                 Telephone2 = chtelephone2,
                                                 Mobile = chmobile,
@@ -1109,6 +1116,7 @@ namespace TBSMobile.View
                                             PresProvince = chpresProvince,
                                             PresCountry = chpresCountry,
                                             Landmark = chlandmark,
+                                            CustomerRemarks = chremarks,
                                             Telephone1 = chtelephone1,
                                             Telephone2 = chtelephone2,
                                             Mobile = chmobile,
