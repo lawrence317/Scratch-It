@@ -572,7 +572,7 @@
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage6_Clicked" StyleClass="btn-nav"  x:Name="btnGotoPage6" Text="Send">
+                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage6_Clicked" StyleClass="btn-nav"  x:Name="btnGotoPage6" Text="Next">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -671,7 +671,7 @@
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage7_Clicked" StyleClass="btn-nav"  x:Name="btnGotoPage7" Text="Send">
+                                        <Button Grid.Row="0" Grid.Column="1" BorderRadius="6" Clicked="BtnGotoPage7_Clicked" StyleClass="btn-nav"  x:Name="btnGotoPage7" Text="Next">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

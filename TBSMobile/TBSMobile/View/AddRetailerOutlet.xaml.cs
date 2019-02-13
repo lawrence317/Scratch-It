@@ -133,7 +133,7 @@ namespace TBSMobile.View
                             districtvalidator.IsVisible = false;
                             countryvalidator.IsVisible = false;
 
-                            btnAdd.IsEnabled = false;
+                            btnAddOutlet.IsEnabled = false;
 
                             if (CrossConnectivity.Current.IsConnected)
                             {
@@ -675,9 +675,7 @@ namespace TBSMobile.View
 
         private async void BtnGotoPage2_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text) ||
-               string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) ||
-               string.IsNullOrEmpty(entProvinceCode.Text) || string.IsNullOrEmpty(entCountry.Text))
+            if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text))
             {
                 await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
 
@@ -712,7 +710,83 @@ namespace TBSMobile.View
                 {
                     outletnamevalidator.IsVisible = false;
                     OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
+                }            }
+            else
+            {
+                try
+                {
+                    if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                    {
+                        Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                        fafPage1.IsVisible = false;
+                        fafPage2.IsVisible = true;
+                    }
+                    else
+                    {
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await Navigation.PopToRootAsync();
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+        }
+
+        private async void BtnGoBackToPage1_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                {
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                    fafPage2.IsVisible = false;
+                    fafPage1.IsVisible = true;
+                }
+                else
+                {
+                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                    await Navigation.PopToRootAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        private async void BtnGoBackToPage2_Clicked(object sender, EventArgs e)
+        {
+            try
+            {
+                if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
+                {
+                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
+                    fafPage3.IsVisible = false;
+                    fafPage2.IsVisible = true;
+                }
+                else
+                {
+                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                    await Navigation.PopToRootAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        private async void BtnGotoPage3_Clicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) ||
+               string.IsNullOrEmpty(entProvinceCode.Text) || string.IsNullOrEmpty(entCountry.Text))
+            {
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
 
                 if (string.IsNullOrEmpty(entStreet.Text))
                 {
@@ -777,8 +851,8 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        fafPage1.IsVisible = false;
-                        fafPage2.IsVisible = true;
+                        fafPage2.IsVisible = false;
+                        fafPage3.IsVisible = true;
                     }
                     else
                     {
@@ -790,29 +864,6 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
                 }
-            }
-        }
-
-        private async void BtnGoBackToPage1_Clicked(object sender, EventArgs e)
-        {
-            try
-            {
-                if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
-                {
-                    Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
-                    fafPage2.IsVisible = false;
-                    fafPage1.IsVisible = true;
-                }
-                else
-                {
-                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
-                    await Navigation.PopToRootAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
             }
         }
     }

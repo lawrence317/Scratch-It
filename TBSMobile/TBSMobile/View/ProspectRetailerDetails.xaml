@@ -139,6 +139,24 @@
                     </Frame>
                     <Frame StyleClass="detailsFrame" Grid.Row="7" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
+                            <Label Text="Remarks" StyleClass="lstTitle">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Md.otf#HelveticaNeueLTPro-Md"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                            <Label StyleClass="lstDetails" x:Name="lblRemarks">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String">
+                                        <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                    </OnPlatform>
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                    <Frame StyleClass="detailsFrame" Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                        <StackLayout>
                             <Label Text="Last Updated" StyleClass="lstTitle">
                                 <Label.FontFamily>
                                     <OnPlatform x:TypeArguments="x:String">
@@ -155,7 +173,7 @@
                             </Label>
                         </StackLayout>
                     </Frame>
-                    <Frame StyleClass="detailsFrame" Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
+                    <Frame StyleClass="detailsFrame" Grid.Row="9" Grid.Column="0" CornerRadius="0" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <Label Text="Last Sync" StyleClass="lstTitle">
                                 <Label.FontFamily>

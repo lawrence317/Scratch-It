@@ -106,7 +106,20 @@
                                         </OnPlatform>
                                     </Label.FontFamily>
                                 </Label>
-
+                                <StackLayout>
+                                    <Grid ColumnSpacing="10">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                    </Grid>
+                                </StackLayout>
+                            </StackLayout>
+                            
+                            <StackLayout x:Name="fafPage2" IsVisible="False">
                                 <Label Text="Province" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -274,7 +287,14 @@
                                 <Entry IsVisible="False" IsEnabled="False" StyleClass="fieldForm" x:Name="entLocation"/>
                                 <StackLayout>
                                     <Grid ColumnSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage2_Clicked" x:Name="btnGotoPage2" Text="Next" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnGoBackToPage1_Clicked" x:Name="btnGoBackToPage1" Text="Back" BorderRadius="6">
+                                            <Button.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </Button.FontFamily>
+                                        </Button>
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="BtnGotoPage3_Clicked" x:Name="btnGotoPage3" Text="Next" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -285,7 +305,7 @@
                                 </StackLayout>
                             </StackLayout>
                             
-                            <StackLayout x:Name="fafPage2" IsVisible="False">
+                            <StackLayout x:Name="fafPage3" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
@@ -353,17 +373,17 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                
+
                                 <StackLayout>
                                     <Grid ColumnSpacing="10">
-                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnGoBackToPage1_Clicked" x:Name="btnGoBackToPage1" Text="Back" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="0" StyleClass="btn-nav" Clicked="BtnGoBackToPage2_Clicked" x:Name="btnGoBackToPage2" Text="Back" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAdd" Text="Add" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAddOutlet" Text="Add" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

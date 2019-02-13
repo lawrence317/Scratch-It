@@ -94,10 +94,10 @@ namespace TBSMobile.View
             }
 
             var username = Preferences.Get("username", String.Empty, "private_prefs");
-            //var password = Preferences.Get("password", String.Empty, "private_prefs");
+            var password = Preferences.Get("password", String.Empty, "private_prefs");
 
             entUser.Text = username;
-            //entPassword.Text = password;
+            entPassword.Text = password;
 
             entUser.Completed += (s, e) => entPassword.Focus();
             entPassword.Completed += (s, e) => Login();
@@ -351,6 +351,10 @@ namespace TBSMobile.View
                                         var contactID = result[0].Message;
 
                                         Preferences.Set("username", userName, "private_prefs");
+                                        Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                                        Preferences.Set("host", hostName, "private_prefs");
+                                        Preferences.Set("database", database, "private_prefs");
+                                        Preferences.Set("password", password, "private_prefs");
 
                                         await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
                                     }
@@ -516,6 +520,9 @@ namespace TBSMobile.View
                                     {
                                         Preferences.Set("username", userName, "private_prefs");
                                         Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                                        Preferences.Set("host", hostName, "private_prefs");
+                                        Preferences.Set("database", database, "private_prefs");
+                                        Preferences.Set("password", password, "private_prefs");
 
                                         await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
                                     }

@@ -280,7 +280,7 @@
                                     </Label.FontFamily>
                                 </Label>
                                 <Frame StyleClass="fieldFrame" x:Name="RemarksFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
-                                    <local:CustomEntry StyleClass="fieldForm" x:Name="entRemarks">
+                                    <local:CustomEntry Unfocused="EntRemarks_Unfocused" StyleClass="fieldForm" x:Name="entRemarks">
                                         <local:CustomEntry.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

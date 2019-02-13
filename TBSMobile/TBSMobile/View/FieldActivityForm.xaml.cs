@@ -1254,7 +1254,7 @@ namespace TBSMobile.View
                         {
                             if (confirm == true)
                             {
-                                btnGoBacktoPage4.IsEnabled = false;
+                                btnGoBacktoPage6.IsEnabled = false;
                                 btnSend.IsEnabled = false;
                                 
                                 if (CrossConnectivity.Current.IsConnected)

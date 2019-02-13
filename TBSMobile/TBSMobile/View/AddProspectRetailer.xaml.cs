@@ -1199,8 +1199,8 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        acPage3.IsVisible = true;
-                        acPage4.IsVisible = false;
+                        acPage4.IsVisible = true;
+                        acPage3.IsVisible = false;
                     }
                     else
                     {
@@ -1244,6 +1244,20 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
                 }
+            }
+        }
+
+        private void EntRemarks_Unfocused(object sender, FocusEventArgs e)
+        {
+            if (string.IsNullOrEmpty(entRemarks.Text))
+            {
+                remarksvalidator.IsVisible = true;
+                RemarksFrame.BorderColor = Color.FromHex("#e74c3c");
+            }
+            else
+            {
+                remarksvalidator.IsVisible = false;
+                RemarksFrame.BorderColor = Color.FromHex("#e8eaed");
             }
         }
     }
