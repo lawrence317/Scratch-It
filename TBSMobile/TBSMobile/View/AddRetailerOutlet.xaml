@@ -383,7 +383,7 @@
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAddOutlet" Text="Add" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAdd_Clicked" x:Name="btnAddOutlet" Text="Submit" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

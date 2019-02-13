@@ -168,13 +168,13 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(TimeSpan.FromSeconds(20), null, true);
+                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(5), null, true);
                     entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
                 }
             }
             catch (Exception ex)
             {
-                await DisplayAlert("GPS Error", "Unable to get location " + ex, "Ok");
+                Crashes.TrackError(ex);
             }
         }
 
@@ -196,7 +196,7 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(TimeSpan.FromSeconds(20), null, true);
+                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(5), null, true);
                     entLocation.Text = position.Latitude + "," + position.Longitude;
                 }
             }
@@ -524,12 +524,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto1Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto1Url.Text))
                 {
-                    btnCamera1.IsEnabled = false;
-                    btnCamera1.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera1.IsVisible = false;
+                    photo1thumb.IsVisible = true;
+                    photo1thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -563,12 +572,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto2Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto2Url.Text))
                 {
-                    btnCamera2.IsEnabled = false;
-                    btnCamera2.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera2.IsVisible = false;
+                    photo2thumb.IsVisible = true;
+                    photo2thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -602,12 +620,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto3Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto3Url.Text))
                 {
-                    btnCamera3.IsEnabled = false;
-                    btnCamera3.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera3.IsVisible = false;
+                    photo3thumb.IsVisible = true;
+                    photo3thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -642,12 +669,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entVideoUrl.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entVideoUrl.Text))
                 {
-                    btnCamera4.IsEnabled = false;
-                    btnCamera4.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera4.IsVisible = false;
+                    vidthumb.IsVisible = true;
+                    vidthumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                 }
             }
             catch (Exception ex)

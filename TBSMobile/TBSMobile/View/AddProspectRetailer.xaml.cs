@@ -363,7 +363,7 @@ namespace TBSMobile.View
 
                             if (confirm == true)
                             {
-                                btnBackPage2.IsEnabled = false;
+                                btnBackPage3.IsEnabled = false;
                                 btnAddContacts.IsEnabled = false;
                                 
                                 if (CrossConnectivity.Current.IsConnected)
@@ -537,12 +537,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto1Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto1Url.Text))
                 {
-                    btnCamera1.IsEnabled = false;
-                    btnCamera1.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera1.IsVisible = false;
+                    photo1thumb.IsVisible = true;
+                    photo1thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -576,12 +585,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto2Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto2Url.Text))
                 {
-                    btnCamera2.IsEnabled = false;
-                    btnCamera2.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera2.IsVisible = false;
+                    photo2thumb.IsVisible = true;
+                    photo2thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -615,12 +633,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entPhoto3Url.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entPhoto3Url.Text))
                 {
-                    btnCamera3.IsEnabled = false;
-                    btnCamera3.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera3.IsVisible = false;
+                    photo3thumb.IsVisible = true;
+                    photo3thumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                     photovideovalidator.IsVisible = false;
                 }
             }
@@ -655,12 +682,21 @@ namespace TBSMobile.View
                     }
                 );
 
+                if (file == null)
+                    return;
+
                 entVideoUrl.Text = file.Path;
 
                 if (!string.IsNullOrEmpty(entVideoUrl.Text))
                 {
-                    btnCamera4.IsEnabled = false;
-                    btnCamera4.BackgroundColor = Color.FromHex("#219150");
+                    btnCamera4.IsVisible = false;
+                    vidthumb.IsVisible = false;
+                    vidthumb.Source = ImageSource.FromStream(() =>
+                    {
+                        var stream = file.GetStream();
+                        file.Dispose();
+                        return stream;
+                    });
                 }
             }
             catch (Exception ex)
@@ -988,52 +1024,7 @@ namespace TBSMobile.View
                                                                                     PresProvince = province,
                                                                                     PresCountry = country,
                                                                                     Landmark = landmark,
-                                                                                    Telephone1 = telephone1,
-                                                                                    Telephone2 = telephone2,
-                                                                                    Mobile = mobile,
-                                                                                    Email = email,
-                                                                                    Photo1 = photo1url,
-                                                                                    Photo2 = photo2url,
-                                                                                    Photo3 = photo3url,
-                                                                                    Video = videourl,
-                                                                                    MobilePhoto1 = photo1url,
-                                                                                    MobilePhoto2 = photo2url,
-                                                                                    MobilePhoto3 = photo3url,
-                                                                                    MobileVideo = videourl,
-                                                                                    Employee = employee,
-                                                                                    Customer = customer,
-                                                                                    Supervisor = contact,
-                                                                                    Deleted = deleted,
-                                                                                    LastSync = DateTime.Parse(current_datetime),
-                                                                                    LastUpdated = DateTime.Parse(current_datetime)
-                                                                                };
-
-                                                                                await conn.InsertAsync(retailer);
-
-                                                                                Analytics.TrackEvent("Sent Prospect Retailer");
-                                                                                await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
-                                                                                await Application.Current.MainPage.Navigation.PopModalAsync();
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                var db = DependencyService.Get<ISQLiteDB>();
-                                                                                var conn = db.GetConnection();
-
-                                                                                var retailer = new ContactsTable
-                                                                                {
-                                                                                    ContactID = id,
-                                                                                    FileAs = firstName + " " + lastName + " " + middleName,
-                                                                                    FirstName = firstName,
-                                                                                    MiddleName = middleName,
-                                                                                    LastName = lastName,
-                                                                                    RetailerType = retailerType,
-                                                                                    PresStreet = street,
-                                                                                    PresBarangay = barangay,
-                                                                                    PresDistrict = district,
-                                                                                    PresTown = town,
-                                                                                    PresProvince = province,
-                                                                                    PresCountry = country,
-                                                                                    Landmark = landmark,
+                                                                                    CustomerRemarks = remarks,
                                                                                     Telephone1 = telephone1,
                                                                                     Telephone2 = telephone2,
                                                                                     Mobile = mobile,
@@ -1066,6 +1057,53 @@ namespace TBSMobile.View
                                                                     {
                                                                         Send_offline();
                                                                     }
+                                                                }
+                                                                else
+                                                                {
+                                                                    var db = DependencyService.Get<ISQLiteDB>();
+                                                                    var conn = db.GetConnection();
+
+                                                                    var retailer = new ContactsTable
+                                                                    {
+                                                                        ContactID = id,
+                                                                        FileAs = firstName + " " + lastName + " " + middleName,
+                                                                        FirstName = firstName,
+                                                                        MiddleName = middleName,
+                                                                        LastName = lastName,
+                                                                        RetailerType = retailerType,
+                                                                        PresStreet = street,
+                                                                        PresBarangay = barangay,
+                                                                        PresDistrict = district,
+                                                                        PresTown = town,
+                                                                        PresProvince = province,
+                                                                        PresCountry = country,
+                                                                        Landmark = landmark,
+                                                                        CustomerRemarks = remarks,
+                                                                        Telephone1 = telephone1,
+                                                                        Telephone2 = telephone2,
+                                                                        Mobile = mobile,
+                                                                        Email = email,
+                                                                        Photo1 = photo1url,
+                                                                        Photo2 = photo2url,
+                                                                        Photo3 = photo3url,
+                                                                        Video = videourl,
+                                                                        MobilePhoto1 = photo1url,
+                                                                        MobilePhoto2 = photo2url,
+                                                                        MobilePhoto3 = photo3url,
+                                                                        MobileVideo = videourl,
+                                                                        Employee = employee,
+                                                                        Customer = customer,
+                                                                        Supervisor = contact,
+                                                                        Deleted = deleted,
+                                                                        LastSync = DateTime.Parse(current_datetime),
+                                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                                    };
+
+                                                                    await conn.InsertAsync(retailer);
+
+                                                                    Analytics.TrackEvent("Sent Prospect Retailer");
+                                                                    await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
+                                                                    await Application.Current.MainPage.Navigation.PopModalAsync();
                                                                 }
                                                             }
                                                         }
@@ -1231,8 +1269,8 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        acPage4.IsVisible = true;
-                        acPage3.IsVisible = false;
+                        acPage3.IsVisible = true;
+                        acPage4.IsVisible = false;
                     }
                     else
                     {

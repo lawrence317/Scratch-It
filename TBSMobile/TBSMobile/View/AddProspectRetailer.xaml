@@ -429,6 +429,7 @@
                                             </OnPlatform>
                                         </Button.FontFamily>
                                     </Button>
+                                    <Image StyleClass="thumbnail" x:Name="photo1thumb" Grid.Row="1" Grid.Column="0" IsVisible="False"/>
                                     <Button StyleClass="btnphoto" Grid.Row="1" Grid.Column="1" Image="camera.png" x:Name="btnCamera2" Clicked="btnCamera2_Clicked" BorderRadius="6">
                                         <Button.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -436,6 +437,7 @@
                                             </OnPlatform>
                                         </Button.FontFamily>
                                     </Button>
+                                    <Image StyleClass="thumbnail" x:Name="photo2thumb" Grid.Row="1" Grid.Column="1" IsVisible="False"/>
                                     <Label Text="Capture Photo #3" Grid.Row="2" Grid.Column="0" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -457,6 +459,7 @@
                                             </OnPlatform>
                                         </Button.FontFamily>
                                     </Button>
+                                    <Image StyleClass="thumbnail" x:Name="photo3thumb" Grid.Row="3" Grid.Column="0" IsVisible="False"/>
                                     <Button StyleClass="btnphoto" Grid.Row="3" Grid.Column="1" Image="camera.png" x:Name="btnCamera4" Clicked="btnCamera4_Clicked" BorderRadius="6">
                                         <Button.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -464,6 +467,7 @@
                                             </OnPlatform>
                                         </Button.FontFamily>
                                     </Button>
+                                    <Image StyleClass="thumbnail" x:Name="vidthumb" Grid.Row="3" Grid.Column="1" IsVisible="False"/>
                                 </Grid>
 
                                 <Label Text="Please capture a photo" x:Name="photovideovalidator" StyleClass="validation" IsVisible="False">
@@ -487,7 +491,7 @@
                                                 </OnPlatform>
                                             </Button.FontFamily>
                                         </Button>
-                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAddContacts_Clicked" x:Name="btnAddContacts" Text="Send" BorderRadius="6">
+                                        <Button Grid.Row="0" Grid.Column="1" StyleClass="btn-nav" Clicked="btnAddContacts_Clicked" x:Name="btnAddContacts" Text="Submit" BorderRadius="6">
                                             <Button.FontFamily>
                                                 <OnPlatform x:TypeArguments="x:String">
                                                     <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

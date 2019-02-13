@@ -46,7 +46,6 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         btnLogin.IsEnabled = true;
-                        AutoLogin();
                     }
                     else
                     {
@@ -131,24 +130,6 @@ namespace TBSMobile.View
                     {
                         Console.Write("Creating table error " + ex.Message);
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-            }
-        }
-
-        public void AutoLogin()
-        {
-            try
-            {
-                var username = Preferences.Get("username", String.Empty, "private_prefs");
-                var password = Preferences.Get("password", String.Empty, "private_prefs");
-
-                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
-                {
-                    Login();
                 }
             }
             catch (Exception ex)
