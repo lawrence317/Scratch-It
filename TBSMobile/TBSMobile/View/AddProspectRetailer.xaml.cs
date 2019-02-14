@@ -902,15 +902,28 @@ namespace TBSMobile.View
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            byte[] Photo1Data = File.ReadAllBytes(photo1url);
-
                             var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
                             string ph1contentType = "application/json";
-                            JObject ph1json = new JObject
+
+                            JObject ph1json;
+                            bool ph1doesExist = File.Exists(photo1url);
+
+                            if (!ph1doesExist || string.IsNullOrEmpty(photo1url))
                             {
-                                { "ContactID", id },
-                                { "Photo1", Photo1Data }
-                            };
+                                ph1json = new JObject
+                                {
+                                    {"ContactID",id},
+                                    { "Photo1",""}
+                                };
+                            }
+                            else
+                            {
+                                ph1json = new JObject
+                                {
+                                    {"ContactID",id},
+                                    {"Photo1",File.ReadAllBytes(photo1url)}
+                                };
+                            }
 
                             HttpClient ph1client = new HttpClient();
                             var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
@@ -927,15 +940,28 @@ namespace TBSMobile.View
 
                                     if (ph1message.Equals("Inserted"))
                                     {
-                                        byte[] Photo2Data = File.ReadAllBytes(photo2url);
-
                                         var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
                                         string ph2contentType = "application/json";
-                                        JObject ph2json = new JObject
+
+                                        JObject ph2json;
+                                        bool ph2doesExist = File.Exists(photo2url);
+
+                                        if (!ph2doesExist || string.IsNullOrEmpty(photo2url))
                                         {
-                                            { "ContactID", id },
-                                            { "Photo2", Photo2Data }
-                                        };
+                                            ph2json = new JObject
+                                            {
+                                                {"ContactID",id},
+                                                { "Photo2",""}
+                                            };
+                                        }
+                                        else
+                                        {
+                                            ph2json = new JObject
+                                            {
+                                                {"ContactID",id},
+                                                {"Photo2",File.ReadAllBytes(photo2url)}
+                                            };
+                                        }
 
                                         HttpClient ph2client = new HttpClient();
                                         var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
@@ -956,11 +982,26 @@ namespace TBSMobile.View
 
                                                     var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
                                                     string ph3contentType = "application/json";
-                                                    JObject ph3json = new JObject
+
+                                                    JObject ph3json;
+                                                    bool ph3doesExist = File.Exists(photo3url);
+
+                                                    if (!ph3doesExist || string.IsNullOrEmpty(photo3url))
                                                     {
-                                                        { "ContactID", id },
-                                                        { "Photo3", Photo3Data }
-                                                    };
+                                                        ph3json = new JObject
+                                                        {
+                                                            {"ContactID",id},
+                                                            { "Photo3",""}
+                                                        };
+                                                    }
+                                                    else
+                                                    {
+                                                        ph3json = new JObject
+                                                        {
+                                                            {"ContactID",id},
+                                                            {"Photo3",File.ReadAllBytes(photo3url)}
+                                                        };
+                                                    }
 
                                                     HttpClient ph3client = new HttpClient();
                                                     var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
@@ -979,17 +1020,28 @@ namespace TBSMobile.View
                                                             {
                                                                 if (!string.IsNullOrEmpty(videourl))
                                                                 {
-                                                                    byte[] VideoData;
-
-                                                                    VideoData = File.ReadAllBytes(videourl);
-
                                                                     var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
                                                                     string vidcontentType = "application/json";
-                                                                    JObject vidjson = new JObject
+
+                                                                    JObject vidjson;
+                                                                    bool viddoesExist = File.Exists(videourl);
+
+                                                                    if (viddoesExist)
                                                                     {
-                                                                       { "ContactID", id },
-                                                                       { "Video", VideoData }
-                                                                    };
+                                                                        vidjson = new JObject
+                                                                        {
+                                                                            { "ContactID", id },
+                                                                            { "Video", File.ReadAllBytes(videourl) }
+                                                                        };
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        vidjson = new JObject
+                                                                        {
+                                                                            { "ContactID", id },
+                                                                            { "Video", "" }
+                                                                        };
+                                                                    }
 
                                                                     HttpClient vidclient = new HttpClient();
                                                                     var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
