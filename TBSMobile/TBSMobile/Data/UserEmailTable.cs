@@ -12,6 +12,8 @@ namespace TBSMobile.Data
         public string ContactID { get; set; }
         [MaxLength(1000)]
         public string Email { get; set; }
+        [MaxLength(100)]
+        public string RecordLog { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
         public int Deleted { get; set; }

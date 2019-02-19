@@ -68,6 +68,7 @@ namespace TBSMobile.View
             public string UsrPassword { get; set; }
             public string UserTypeID { get; set; }
             public string UserStatus { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -107,6 +108,7 @@ namespace TBSMobile.View
             public int Employee { get; set; }
             public int Customer { get; set; }
             public string Supervisor { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -131,6 +133,7 @@ namespace TBSMobile.View
             public string Landmark { get; set; }
             public string GPSCoordinates { get; set; }
             public string Supervisor { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -155,6 +158,7 @@ namespace TBSMobile.View
             public string Remarks { get; set; }
             public string OtherConcern { get; set; }
             public string GPSCoordinates { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -165,6 +169,7 @@ namespace TBSMobile.View
             public string CAFNo { get; set; }
             public string ContactID { get; set; }
             public string ActivityID { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -188,6 +193,7 @@ namespace TBSMobile.View
             public string ContactID { get; set; }
             public string Email { get; set; }
             public DateTime LastSync { get; set; }
+            public string RecordLog { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
         }
@@ -254,6 +260,7 @@ namespace TBSMobile.View
                                     var cruserPassword = result.UsrPassword;
                                     var cruserStatus = result.UserStatus;
                                     var cruserType = result.UserTypeID;
+                                    var crrecordLog = result.RecordLog;
                                     var crdeleted = result.Deleted;
                                     var crlastUpdated = result.LastUpdated;
 
@@ -266,6 +273,7 @@ namespace TBSMobile.View
                                         { "UsrPassword", cruserPassword },
                                         { "UserStatus", cruserStatus },
                                         { "UserTypeID", cruserType },
+                                        { "RecordLog", crrecordLog },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -348,6 +356,7 @@ namespace TBSMobile.View
                                         var userPassword = item.UsrPassword;
                                         var userType = item.UserTypeID;
                                         var userStatus = item.UserStatus;
+                                        var recordLog = item.RecordLog;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -359,6 +368,7 @@ namespace TBSMobile.View
                                             UsrPassword = userPassword,
                                             UserTypeID = userType,
                                             UserStatus = userStatus,
+                                            RecordLog = recordLog,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -452,6 +462,7 @@ namespace TBSMobile.View
                                 var chuserPassword = item.UsrPassword;
                                 var chuserType = item.UserTypeID;
                                 var chuserStatus = item.UserStatus;
+                                var chrecordLog = item.RecordLog;
                                 var chlastSync = DateTime.Parse(current_datetime);
                                 var chlastUpdated = item.LastUpdated;
                                 var chdltd = item.Deleted;
@@ -471,6 +482,7 @@ namespace TBSMobile.View
                                             UsrPassword = chuserPassword,
                                             UserTypeID = chuserType,
                                             UserStatus = chuserStatus,
+                                            RecordLog = chrecordLog,
                                             LastSync = chlastSync,
                                             LastUpdated = chlastUpdated,
                                             Deleted = chdltd
@@ -490,6 +502,7 @@ namespace TBSMobile.View
                                         UsrPassword = chuserPassword,
                                         UserTypeID = chuserType,
                                         UserStatus = chuserStatus,
+                                        RecordLog = chrecordLog,
                                         LastSync = chlastSync,
                                         LastUpdated = chlastUpdated,
                                         Deleted = chdltd
@@ -598,6 +611,7 @@ namespace TBSMobile.View
                                     var crmobileVideo = crresult.MobileVideo;
                                     var cremployee = crresult.Employee;
                                     var crcustomer = crresult.Customer;
+                                    var crrecordLog = crresult.RecordLog;
                                     var crsupervisor = crresult.Supervisor;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
@@ -633,6 +647,7 @@ namespace TBSMobile.View
                                         { "MobileVideo", crmobileVideo },
                                         { "Employee", cremployee },
                                         { "Customer", crcustomer },
+                                        { "RecordLog", crrecordLog },
                                         { "Supervisor", crsupervisor },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
@@ -653,8 +668,6 @@ namespace TBSMobile.View
 
                                             if (datamessage.Equals("Inserted"))
                                             {
-                                                byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
                                                 var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
                                                 string ph1contentType = "application/json";
 
@@ -693,8 +706,6 @@ namespace TBSMobile.View
 
                                                         if (ph1message.Equals("Inserted"))
                                                         {
-                                                            byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                             var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
                                                             string ph2contentType = "application/json";
 
@@ -734,8 +745,6 @@ namespace TBSMobile.View
 
                                                                     if (ph2message.Equals("Inserted"))
                                                                     {
-                                                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                         var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
                                                                         string ph3contentType = "application/json";
 
@@ -933,6 +942,7 @@ namespace TBSMobile.View
                                         var email = item.Email;
                                         var employee = item.Employee;
                                         var customer = item.Customer;
+                                        var recordLog = item.RecordLog;
                                         var Supervisor = item.Supervisor;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
@@ -972,6 +982,7 @@ namespace TBSMobile.View
                                             Employee = employee,
                                             Customer = customer,
                                             Supervisor = Supervisor,
+                                            RecordLog = recordLog,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -1096,6 +1107,7 @@ namespace TBSMobile.View
                                     var chemployee = chitem.Employee;
                                     var chcustomer = chitem.Customer;
                                     var chSupervisor = chitem.Supervisor;
+                                    var chRecordLog = chitem.RecordLog;
                                     var chlastSync = DateTime.Parse(current_datetime);
                                     var chlastUpdated = chitem.LastUpdated;
                                     var chdeleted = chitem.Deleted;
@@ -1141,6 +1153,7 @@ namespace TBSMobile.View
                                                 Employee = chemployee,
                                                 Customer = chcustomer,
                                                 Supervisor = chSupervisor,
+                                                RecordLog = chRecordLog,
                                                 LastSync = chlastSync,
                                                 Deleted = chdeleted,
                                                 LastUpdated = chlastUpdated
@@ -1187,6 +1200,7 @@ namespace TBSMobile.View
                                             Employee = chemployee,
                                             Customer = chcustomer,
                                             Supervisor = chSupervisor,
+                                            RecordLog = chRecordLog,
                                             LastSync = chlastSync,
                                             Deleted = chdeleted,
                                             LastUpdated = chlastUpdated
@@ -1281,6 +1295,7 @@ namespace TBSMobile.View
                                 var crlandmark = crresult.Landmark;
                                 var crgpsCoordinates = crresult.GPSCoordinates;
                                 var crsupervisor = crresult.Supervisor;
+                                var crrecordLog = crresult.RecordLog;
                                 var crdeleted = crresult.Deleted;
                                 var crlastUpdated = crresult.LastUpdated;
 
@@ -1303,6 +1318,7 @@ namespace TBSMobile.View
                                     { "Landmark", crlandmark },
                                     { "GPSCoordinates", crgpsCoordinates },
                                     { "Supervisor", crsupervisor },
+                                    { "RecordLog", crrecordLog },
                                     { "Deleted", crdeleted },
                                     { "LastUpdated", crlastUpdated }
                                 };
@@ -1382,6 +1398,7 @@ namespace TBSMobile.View
                                         var landmark = item.Landmark;
                                         var gpsCoordinates = item.GPSCoordinates;
                                         var Supervisor = item.Supervisor;
+                                        var RecordLog = item.RecordLog;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -1403,6 +1420,7 @@ namespace TBSMobile.View
                                             Landmark = landmark,
                                             GPSCoordinates = gpsCoordinates,
                                             Supervisor = Supervisor,
+                                            RecordLog = RecordLog,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -1506,6 +1524,7 @@ namespace TBSMobile.View
                                 var chlandmark = chitem.Landmark;
                                 var chgpsCoordinates = chitem.GPSCoordinates;
                                 var chSupervisor = chitem.Supervisor;
+                                var chRecordLog = chitem.RecordLog;
                                 var chlastSync = DateTime.Parse(current_datetime);
                                 var chlastUpdated = chitem.LastUpdated;
                                 var chdeleted = chitem.Deleted;
@@ -1534,6 +1553,7 @@ namespace TBSMobile.View
                                             Landmark = chlandmark,
                                             GPSCoordinates = chgpsCoordinates,
                                             Supervisor = chSupervisor,
+                                            RecordLog = chRecordLog,
                                             LastSync = chlastSync,
                                             Deleted = chdeleted,
                                             LastUpdated = chlastUpdated
@@ -1563,6 +1583,7 @@ namespace TBSMobile.View
                                         Landmark = chlandmark,
                                         GPSCoordinates = chgpsCoordinates,
                                         Supervisor = chSupervisor,
+                                        RecordLog = chRecordLog,
                                         LastSync = chlastSync,
                                         Deleted = chdeleted,
                                         LastUpdated = chlastUpdated
@@ -1658,6 +1679,7 @@ namespace TBSMobile.View
                                     var crgpsLocation = crresult.GPSCoordinates;
                                     var crremarks = crresult.Remarks;
                                     var crotherConcern = crresult.OtherConcern;
+                                    var crrecordLog = crresult.RecordLog;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -1678,6 +1700,7 @@ namespace TBSMobile.View
                                         { "GPSCoordinates", crgpsLocation },
                                         { "Remarks", crremarks },
                                         { "OtherConcern", crotherConcern },
+                                        { "RecordLog", crrecordLog },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -1697,8 +1720,6 @@ namespace TBSMobile.View
 
                                             if (datamessage.Equals("Inserted"))
                                             {
-                                                byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
                                                 var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                                                 string ph1contentType = "application/json";
 
@@ -1738,8 +1759,6 @@ namespace TBSMobile.View
 
                                                         if (ph1message.Equals("Inserted"))
                                                         {
-                                                            byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                             var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                                             string ph2contentType = "application/json";
 
@@ -1779,8 +1798,6 @@ namespace TBSMobile.View
 
                                                                     if (ph2message.Equals("Inserted"))
                                                                     {
-                                                                        byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                         var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
                                                                         string ph3contentType = "application/json";
 
@@ -1968,6 +1985,7 @@ namespace TBSMobile.View
                                         var gpsCoordinates = item.GPSCoordinates;
                                         var remarks = item.Remarks;
                                         var otherConcern = item.OtherConcern;
+                                        var recordLog = item.RecordLog;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -1991,6 +2009,7 @@ namespace TBSMobile.View
                                             GPSCoordinates = gpsCoordinates,
                                             Remarks = remarks,
                                             OtherConcern = otherConcern,
+                                            RecordLog = recordLog,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -2072,6 +2091,7 @@ namespace TBSMobile.View
                                     var crcafNo = crresult.CAFNo;
                                     var crcontactId = crresult.ContactID;
                                     var cractivityid = crresult.ActivityID;
+                                    var crrecordLog = crresult.RecordLog;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -2082,6 +2102,7 @@ namespace TBSMobile.View
                                         { "CAFNo", crcafNo },
                                         { "ContactID", crcontactId },
                                         { "ActivityID", cractivityid },
+                                        { "RecordLog", crrecordLog },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -2154,6 +2175,7 @@ namespace TBSMobile.View
                                         var cafNo = item.CAFNo;
                                         var contactId = item.ContactID;
                                         var activityid = item.ActivityID;
+                                        var recordlog = item.RecordLog;
                                         var lastSync = DateTime.Parse(current_datetime);
                                         var lastUpdated = item.LastUpdated;
                                         var deleted = item.Deleted;
@@ -2163,6 +2185,7 @@ namespace TBSMobile.View
                                             CAFNo = cafNo,
                                             ContactID = contactId,
                                             ActivityID = activityid,
+                                            RecordLog = recordlog,
                                             LastSync = lastSync,
                                             Deleted = deleted,
                                             LastUpdated = lastUpdated
@@ -2636,6 +2659,7 @@ namespace TBSMobile.View
                                     var crresult = getEmailChanges.Result[i];
                                     var crcontactID = crresult.ContactID;
                                     var cremail = crresult.Email;
+                                    var crrecordLog = crresult.RecordLog;
                                     var crdeleted = crresult.Deleted;
                                     var crlastUpdated = crresult.LastUpdated;
 
@@ -2645,6 +2669,7 @@ namespace TBSMobile.View
                                     {
                                         { "ContactID", crcontactID },
                                         { "Email", cremail },
+                                        { "RecordLog", crrecordLog },
                                         { "Deleted", crdeleted },
                                         { "LastUpdated", crlastUpdated }
                                     };
@@ -2710,6 +2735,7 @@ namespace TBSMobile.View
                                         var chitem = chemailresult[i];
                                         var chcontactID = chitem.ContactID;
                                         var chemail = chitem.Email;
+                                        var chrecordLog = chitem.RecordLog;
                                         var chlastSync = DateTime.Parse(current_datetime);
                                         var chlastUpdated = chitem.LastUpdated;
                                         var chdeleted = chitem.Deleted;
@@ -2718,6 +2744,7 @@ namespace TBSMobile.View
                                         {
                                             ContactID = chcontactID,
                                             Email = chemail,
+                                            RecordLog = chrecordLog,
                                             LastSync = chlastSync,
                                             Deleted = chdeleted,
                                             LastUpdated = chlastUpdated
@@ -2802,6 +2829,7 @@ namespace TBSMobile.View
                             var chitem = chemailresult[i];
                             var chcontactID = chitem.ContactID;
                             var chemail = chitem.Email;
+                            var chrecordLog = chitem.RecordLog;
                             var chlastSync = DateTime.Parse(current_datetime);
                             var chlastUpdated = chitem.LastUpdated;
                             var chdeleted = chitem.Deleted;
@@ -2817,6 +2845,7 @@ namespace TBSMobile.View
                                     {
                                         ContactID = chcontactID,
                                         Email = chemail,
+                                        RecordLog = chrecordLog,
                                         LastSync = chlastSync,
                                         Deleted = chdeleted,
                                         LastUpdated = chlastUpdated
@@ -2833,6 +2862,7 @@ namespace TBSMobile.View
                                 {
                                     ContactID = chcontactID,
                                     Email = chemail,
+                                    RecordLog = chrecordLog,
                                     LastSync = chlastSync,
                                     Deleted = chdeleted,
                                     LastUpdated = chlastUpdated

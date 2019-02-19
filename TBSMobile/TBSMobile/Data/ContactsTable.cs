@@ -62,6 +62,8 @@ namespace TBSMobile.Data
         public int Employee { get; set; }
         [MaxLength(2)]
         public int Customer { get; set; }
+        [MaxLength(100)]
+        public string RecordLog { get; set; }
         [MaxLength(50)]
         public string Supervisor { get; set; }
         public DateTime LastSync { get; set; }

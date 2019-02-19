@@ -89,7 +89,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 50000;
+                                    var optimalSpeed = 5000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
                                     var speeds = CrossConnectivity.Current.Bandwidths;
 
@@ -381,7 +381,7 @@ namespace TBSMobile.View
 
                                 if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
                                 {
-                                    var optimalSpeed = 50000;
+                                    var optimalSpeed = 5000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                     if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -538,6 +538,19 @@ namespace TBSMobile.View
             }
         }
 
+        public class UserData
+        {
+            public string ContactID { get; set; }
+            public string UserID { get; set; }
+            public string UsrPassword { get; set; }
+            public string UserTypeID { get; set; }
+            public string UserStatus { get; set; }
+            public string RecordLog { get; set; }
+            public DateTime LastSync { get; set; }
+            public int Deleted { get; set; }
+            public DateTime LastUpdated { get; set; }
+        }
+
         public class ContactsData
         {
             public string ContactID { get; set; }
@@ -572,6 +585,7 @@ namespace TBSMobile.View
             public int Employee { get; set; }
             public int Customer { get; set; }
             public string Supervisor { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -596,6 +610,7 @@ namespace TBSMobile.View
             public string Landmark { get; set; }
             public string GPSCoordinates { get; set; }
             public string Supervisor { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -617,9 +632,10 @@ namespace TBSMobile.View
             public string MobilePhoto2 { get; set; }
             public string MobilePhoto3 { get; set; }
             public string MobileVideo { get; set; }
-            public string GPSCoordinates { get; set; }
             public string Remarks { get; set; }
             public string OtherConcern { get; set; }
+            public string GPSCoordinates { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -630,6 +646,7 @@ namespace TBSMobile.View
             public string CAFNo { get; set; }
             public string ContactID { get; set; }
             public string ActivityID { get; set; }
+            public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
@@ -640,6 +657,7 @@ namespace TBSMobile.View
             public string ContactID { get; set; }
             public string Email { get; set; }
             public DateTime LastSync { get; set; }
+            public string RecordLog { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
         }
@@ -715,6 +733,7 @@ namespace TBSMobile.View
                             var cremployee = crresult.Employee;
                             var crcustomer = crresult.Customer;
                             var crsupervisor = crresult.Supervisor;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -750,6 +769,7 @@ namespace TBSMobile.View
                                 { "Employee", cremployee },
                                 { "Customer", crcustomer },
                                 { "Supervisor", crsupervisor },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -769,8 +789,6 @@ namespace TBSMobile.View
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
                                         var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
                                         string ph1contentType = "application/json";
 
@@ -809,8 +827,6 @@ namespace TBSMobile.View
 
                                                 if (ph1message.Equals("Inserted"))
                                                 {
-                                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
                                                     string ph2contentType = "application/json";
 
@@ -849,8 +865,6 @@ namespace TBSMobile.View
 
                                                             if (ph2message.Equals("Inserted"))
                                                             {
-                                                                byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                 var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
                                                                 string ph3contentType = "application/json";
 
@@ -987,14 +1001,15 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayAlert("Sync Error", "Retailer send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else {
-                        OnSyncComplete();
+                    else if (seedata == "Retry")
+                    {
+                        SyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -1054,6 +1069,7 @@ namespace TBSMobile.View
                             var crlandmark = crresult.Landmark;
                             var crgpsCoordinates = crresult.GPSCoordinates;
                             var crsupervisor = crresult.Supervisor;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1076,6 +1092,7 @@ namespace TBSMobile.View
                                 { "Landmark", crlandmark },
                                 { "GPSCoordinates", crgpsCoordinates },
                                 { "Supervisor", crsupervisor },
+                                { "RecordLog", crsupervisor },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -1121,15 +1138,15 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayAlert("Sync Error", "Retailer outlet send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        SyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -1197,6 +1214,7 @@ namespace TBSMobile.View
                             var crgpsCoordinates = crresult.GPSCoordinates;
                             var crremarks = crresult.Remarks;
                             var crotherConcern = crresult.OtherConcern;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1217,6 +1235,7 @@ namespace TBSMobile.View
                                 { "GPSCoordinates", crgpsCoordinates },
                                 { "Remarks", crremarks },
                                 { "OtherConcern", crotherConcern },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -1236,8 +1255,6 @@ namespace TBSMobile.View
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        byte[] crPhoto1Data = File.ReadAllBytes(crphoto1);
-
                                         var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                                         string ph1contentType = "application/json";
 
@@ -1278,8 +1295,6 @@ namespace TBSMobile.View
 
                                                 if (ph1message.Equals("Inserted"))
                                                 {
-                                                    byte[] crPhoto2Data = File.ReadAllBytes(crphoto2);
-
                                                     var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                                     string ph2contentType = "application/json";
 
@@ -1320,8 +1335,6 @@ namespace TBSMobile.View
 
                                                             if (ph2message.Equals("Inserted"))
                                                             {
-                                                                byte[] crPhoto3Data = File.ReadAllBytes(crphoto3);
-
                                                                 var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
                                                                 string ph3contentType = "application/json";
 
@@ -1493,15 +1506,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        SyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -1554,6 +1567,7 @@ namespace TBSMobile.View
                             var crcafNo = crresult.CAFNo;
                             var crcontactId = crresult.ContactID;
                             var cractivityID = crresult.ActivityID;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1564,6 +1578,7 @@ namespace TBSMobile.View
                                 { "CAFNo", crcafNo },
                                 { "ContactID", crcontactId },
                                 { "ActivityID", cractivityID },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -1610,15 +1625,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        SyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -1670,6 +1685,7 @@ namespace TBSMobile.View
                             var crresult = getEmailChanges.Result[i];
                             var crcontactID = crresult.ContactID;
                             var cremail = crresult.Email;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1679,6 +1695,7 @@ namespace TBSMobile.View
                             {
                                 { "ContactID", crcontactID },
                                 { "Email", cremail },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -1713,15 +1730,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Sync Error", "Email queue send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        SyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -1762,7 +1779,7 @@ namespace TBSMobile.View
 
                     int count = 1;
 
-                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ?  AND RetailerType = 'RT00004' AND Deleted != '1'", contact);
+                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getContactsChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -1804,6 +1821,7 @@ namespace TBSMobile.View
                             var cremployee = crresult.Employee;
                             var crcustomer = crresult.Customer;
                             var crsupervisor = crresult.Supervisor;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -1839,6 +1857,7 @@ namespace TBSMobile.View
                                 { "Employee", cremployee },
                                 { "Customer", crcustomer },
                                 { "Supervisor", crsupervisor },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -2070,15 +2089,15 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayAlert("Re-sync Error", "Retailer send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        ReSyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -2113,7 +2132,7 @@ namespace TBSMobile.View
 
                     int count = 1;
 
-                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND Deleted != '1'", contact);
+                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getOutletChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -2138,6 +2157,7 @@ namespace TBSMobile.View
                             var crlandmark = crresult.Landmark;
                             var crgpsCoordinates = crresult.GPSCoordinates;
                             var crsupervisor = crresult.Supervisor;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -2160,6 +2180,7 @@ namespace TBSMobile.View
                                 { "Landmark", crlandmark },
                                 { "GPSCoordinates", crgpsCoordinates },
                                 { "Supervisor", crsupervisor },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -2199,15 +2220,15 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayAlert("Re-sync Error", "Retailer outlet send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        ReSyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -2239,7 +2260,7 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    var getCAFChanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND Deleted != '1'", contact);
+                    var getCAFChanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getCAFChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -2269,6 +2290,7 @@ namespace TBSMobile.View
                             var crgpsCoordinates = crresult.GPSCoordinates;
                             var crremarks = crresult.Remarks;
                             var crotherConcern = crresult.OtherConcern;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -2289,6 +2311,7 @@ namespace TBSMobile.View
                                 { "GPSCoordinates", crgpsCoordinates },
                                 { "Remarks", crremarks },
                                 { "OtherConcern", crotherConcern },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -2529,15 +2552,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Re-sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        ReSyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -2569,7 +2592,7 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    var getActivityChanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND Deleted != '1'", contact);
+                    var getActivityChanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getActivityChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -2584,6 +2607,7 @@ namespace TBSMobile.View
                             var crcafNo = crresult.CAFNo;
                             var crcontactId = crresult.ContactID;
                             var cractivityID = crresult.ActivityID;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -2594,6 +2618,7 @@ namespace TBSMobile.View
                                 { "CAFNo", crcafNo },
                                 { "ContactID", crcontactId },
                                 { "ActivityID", cractivityID },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -2634,15 +2659,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Sync Error", "Activity send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        ReSyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -2674,7 +2699,7 @@ namespace TBSMobile.View
                     var conn = db.GetConnection();
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    var getEmailChanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND Deleted != '1'", contact);
+                    var getEmailChanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = getEmailChanges.Result.Count;
 
                     if (changesresultCount > 0)
@@ -2688,6 +2713,7 @@ namespace TBSMobile.View
                             var crresult = getEmailChanges.Result[i];
                             var crcontactID = crresult.ContactID;
                             var cremail = crresult.Email;
+                            var crrecordlog = crresult.RecordLog;
                             var crdeleted = crresult.Deleted;
                             var crlastUpdated = crresult.LastUpdated;
 
@@ -2697,6 +2723,7 @@ namespace TBSMobile.View
                             {
                                 { "ContactID", crcontactID },
                                 { "Email", cremail },
+                                { "RecordLog", crrecordlog },
                                 { "Deleted", crdeleted },
                                 { "LastUpdated", crlastUpdated }
                             };
@@ -2725,15 +2752,15 @@ namespace TBSMobile.View
                 {
                     Crashes.TrackError(ex);
 
-                    var seedata = await DisplayAlert("Sync Error", "Email queue send failed, unstable connection to server", "See unsynced data", "Cancel");
-                    if (seedata == true)
+                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
+                    if (seedata == "See unsynced data")
                     {
                         await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
                         OnSyncComplete();
                     }
-                    else
+                    else if (seedata == "Retry")
                     {
-                        OnSyncComplete();
+                        ReSyncRetailer(host, database, contact, ipaddress);
                     }
                 }
             }
@@ -2788,7 +2815,7 @@ namespace TBSMobile.View
 
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    var optimalSpeed = 50000;
+                    var optimalSpeed = 5000;
                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
                     var speeds = CrossConnectivity.Current.Bandwidths;
 
@@ -2800,7 +2827,19 @@ namespace TBSMobile.View
                         var confirm = await DisplayAlert("Re-sync Connection Warning", "Slow connection detected. Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
                         if (confirm == true)
                         {
+                            var db = DependencyService.Get<ISQLiteDB>();
+                            var conn = db.GetConnection();
+
+                            var default_datetime = "0001-01-01 00:00:00";
+
+                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+
                             ReSyncRetailer(host, database, contact, ipaddress);
+
                             btnFAF.IsEnabled = false;
                             btnAH.IsEnabled = false;
                             btnLogout.IsEnabled = false;
@@ -2815,7 +2854,19 @@ namespace TBSMobile.View
                         var resync = await DisplayAlert("Re-sync Warning", "Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
                         if (resync == true)
                         {
+                            var db = DependencyService.Get<ISQLiteDB>();
+                            var conn = db.GetConnection();
+
+                            var default_datetime = "0001-01-01 00:00:00";
+
+                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+
                             ReSyncRetailer(host, database, contact, ipaddress);
+
                             btnFAF.IsEnabled = false;
                             btnAH.IsEnabled = false;
                             btnLogout.IsEnabled = false;

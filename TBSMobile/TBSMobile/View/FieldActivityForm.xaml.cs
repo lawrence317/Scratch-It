@@ -1685,6 +1685,9 @@ namespace TBSMobile.View
 
         public async void Send_online()
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -1721,6 +1724,12 @@ namespace TBSMobile.View
             string tradecheck;
             string others;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+            var crresult = getUsername.Result[0];
+            var username = crresult.UserID;
+            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+            var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
 
             if (swRekorida.IsToggled == true)
             {
@@ -1793,6 +1802,7 @@ namespace TBSMobile.View
                     { "Others", others },
                     { "OtherConcern", otherconcern },
                     { "Remarks", remarks },
+                    { "RecordLog", recordlog },
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
 
@@ -1980,10 +1990,7 @@ namespace TBSMobile.View
 
                                                                             if (vidmessage.Equals("Inserted"))
                                                                             {
-                                                                                var db = DependencyService.Get<ISQLiteDB>();
-                                                                                var conn = db.GetConnection();
-
-                                                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
+                                                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                                                 var caf_insert = new CAFTable
                                                                                 {
@@ -2004,6 +2011,7 @@ namespace TBSMobile.View
                                                                                     GPSCoordinates = actlocation,
                                                                                     Remarks = remarks,
                                                                                     OtherConcern = otherconcern,
+                                                                                    RecordLog = recordlog,
                                                                                     LastSync = DateTime.Parse(current_datetime),
                                                                                     LastUpdated = DateTime.Parse(current_datetime)
                                                                                 };
@@ -2017,6 +2025,7 @@ namespace TBSMobile.View
                                                                                         CAFNo = caf,
                                                                                         ContactID = employeeNumber,
                                                                                         ActivityID = "ACT00001",
+                                                                                        RecordLog = recordlog,
                                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                                     };
@@ -2031,6 +2040,7 @@ namespace TBSMobile.View
                                                                                         CAFNo = caf,
                                                                                         ContactID = employeeNumber,
                                                                                         ActivityID = "ACT00002",
+                                                                                        RecordLog = recordlog,
                                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                                     };
@@ -2045,6 +2055,7 @@ namespace TBSMobile.View
                                                                                         CAFNo = caf,
                                                                                         ContactID = employeeNumber,
                                                                                         ActivityID = "ACT00003",
+                                                                                        RecordLog = recordlog,
                                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                                     };
@@ -2059,6 +2070,7 @@ namespace TBSMobile.View
                                                                                         CAFNo = caf,
                                                                                         ContactID = employeeNumber,
                                                                                         ActivityID = "ACT00004",
+                                                                                        RecordLog = recordlog,
                                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                                     };
@@ -2079,10 +2091,7 @@ namespace TBSMobile.View
                                                                 }
                                                                 else
                                                                 {
-                                                                    var db = DependencyService.Get<ISQLiteDB>();
-                                                                    var conn = db.GetConnection();
-
-                                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
+                                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                                     var caf_insert = new CAFTable
                                                                     {
@@ -2103,6 +2112,7 @@ namespace TBSMobile.View
                                                                         GPSCoordinates = actlocation,
                                                                         Remarks = remarks,
                                                                         OtherConcern = otherconcern,
+                                                                        RecordLog = recordlog,
                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                     };
@@ -2116,6 +2126,7 @@ namespace TBSMobile.View
                                                                             CAFNo = caf,
                                                                             ContactID = employeeNumber,
                                                                             ActivityID = "ACT00001",
+                                                                            RecordLog = recordlog,
                                                                             LastSync = DateTime.Parse(current_datetime),
                                                                             LastUpdated = DateTime.Parse(current_datetime)
                                                                         };
@@ -2130,6 +2141,7 @@ namespace TBSMobile.View
                                                                             CAFNo = caf,
                                                                             ContactID = employeeNumber,
                                                                             ActivityID = "ACT00002",
+                                                                            RecordLog = recordlog,
                                                                             LastSync = DateTime.Parse(current_datetime),
                                                                             LastUpdated = DateTime.Parse(current_datetime)
                                                                         };
@@ -2144,6 +2156,7 @@ namespace TBSMobile.View
                                                                             CAFNo = caf,
                                                                             ContactID = employeeNumber,
                                                                             ActivityID = "ACT00003",
+                                                                            RecordLog = recordlog,
                                                                             LastSync = DateTime.Parse(current_datetime),
                                                                             LastUpdated = DateTime.Parse(current_datetime)
                                                                         };
@@ -2158,6 +2171,7 @@ namespace TBSMobile.View
                                                                             CAFNo = caf,
                                                                             ContactID = employeeNumber,
                                                                             ActivityID = "ACT00004",
+                                                                            RecordLog = recordlog,
                                                                             LastSync = DateTime.Parse(current_datetime),
                                                                             LastUpdated = DateTime.Parse(current_datetime)
                                                                         };
@@ -2206,6 +2220,9 @@ namespace TBSMobile.View
 
         public async void Send_offline()
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var caf = entCafNo.Text;
             var retailerCode = entRetailerCode.Text;
             var employeeNumber = entEmployeeNumber.Text;
@@ -2233,11 +2250,13 @@ namespace TBSMobile.View
             var remarks = entRemarks.Text;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+            var crresult = getUsername.Result[0];
+            var username = crresult.UserID;
+            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+            var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, DateTime.Parse(current_datetime), retailerCode);
+            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), retailerCode);
 
             var caf_insert = new CAFTable
             {
@@ -2258,6 +2277,7 @@ namespace TBSMobile.View
                 GPSCoordinates = actlocation,
                 Remarks = remarks,
                 OtherConcern = otherconcern,
+                RecordLog = recordlog,
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
@@ -2270,6 +2290,7 @@ namespace TBSMobile.View
                     CAFNo = caf,
                     ContactID = employeeNumber,
                     ActivityID = "ACT00001",
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
@@ -2283,6 +2304,7 @@ namespace TBSMobile.View
                     CAFNo = caf,
                     ContactID = employeeNumber,
                     ActivityID = "ACT00002",
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
@@ -2296,6 +2318,7 @@ namespace TBSMobile.View
                     CAFNo = caf,
                     ContactID = employeeNumber,
                     ActivityID = "ACT00003",
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
@@ -2309,6 +2332,7 @@ namespace TBSMobile.View
                     CAFNo = caf,
                     ContactID = employeeNumber,
                     ActivityID = "ACT00004",
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 

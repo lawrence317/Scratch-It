@@ -141,7 +141,7 @@ namespace TBSMobile.View
                                 PingReply pingresult = ping.Send(ipaddress);
                                 if (pingresult.Status.ToString() == "Success")
                                 {
-                                    var optimalSpeed = 50000;
+                                    var optimalSpeed = 5000;
                                     var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                     if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -513,6 +513,9 @@ namespace TBSMobile.View
 
         public async void Send_online()
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -535,6 +538,12 @@ namespace TBSMobile.View
             var location = entLocation.Text;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+            var crresult = getUsername.Result[0];
+            var username = crresult.UserID;
+            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+            var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
+
             try
             {
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
@@ -556,6 +565,7 @@ namespace TBSMobile.View
                     { "Email", email },
                     { "GPSCoordinates", location },
                     { "Supervisor", contact },
+                    { "RecordLog", contact },
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
 
@@ -574,9 +584,6 @@ namespace TBSMobile.View
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            var db = DependencyService.Get<ISQLiteDB>();
-                            var conn = db.GetConnection();
-
                             var retailer_group_insert = new RetailerGroupTable
                             {
                                 ContactID = id,
@@ -594,6 +601,7 @@ namespace TBSMobile.View
                                 Email = email,
                                 GPSCoordinates = location,
                                 Supervisor = contact,
+                                RecordLog = recordlog,
                                 LastSync = DateTime.Parse(current_datetime),
                                 LastUpdated = DateTime.Parse(current_datetime)
                             };
@@ -622,6 +630,9 @@ namespace TBSMobile.View
         {
             try
             {
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
                 var id = entContact.Text;
                 var retailerCode = entRetailerCode.Text;
                 var street = entStreet.Text;
@@ -638,8 +649,11 @@ namespace TBSMobile.View
                 var location = entLocation.Text;
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
+                var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+                var crresult = getUsername.Result[0];
+                var username = crresult.UserID;
+                var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+                var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
 
                 var retailer_group_insert = new RetailerGroupTable
                 {
@@ -658,6 +672,7 @@ namespace TBSMobile.View
                     Email = email,
                     GPSCoordinates = location,
                     Supervisor = contact,
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 

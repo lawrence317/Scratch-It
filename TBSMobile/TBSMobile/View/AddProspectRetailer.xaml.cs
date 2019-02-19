@@ -372,7 +372,7 @@ namespace TBSMobile.View
                                     PingReply pingresult = ping.Send(ipaddress);
                                     if (pingresult.Status.ToString() == "Success")
                                     {
-                                        var optimalSpeed = 50000;
+                                        var optimalSpeed = 5000;
                                         var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
 
                                         if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
@@ -818,6 +818,9 @@ namespace TBSMobile.View
 
         public async void Send_online()
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -851,6 +854,12 @@ namespace TBSMobile.View
             int deleted = 0;
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+            var crresult = getUsername.Result[0];
+            var username = crresult.UserID;
+            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+            var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
+
             try
             {
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=9Fcq8C";
@@ -882,6 +891,7 @@ namespace TBSMobile.View
                     { "Employee", employee },
                     { "Customer", customer },
                     { "Supervisor", contact },
+                    { "RecordLog", recordlog },
                     { "Deleted", deleted },
                     { "LastSync", current_datetime },
                     { "LastUpdated", current_datetime }
@@ -1058,9 +1068,6 @@ namespace TBSMobile.View
 
                                                                             if (vidmessage.Equals("Inserted"))
                                                                             {
-                                                                                var db = DependencyService.Get<ISQLiteDB>();
-                                                                                var conn = db.GetConnection();
-
                                                                                 var retailer = new ContactsTable
                                                                                 {
                                                                                     ContactID = id,
@@ -1092,6 +1099,7 @@ namespace TBSMobile.View
                                                                                     Employee = employee,
                                                                                     Customer = customer,
                                                                                     Supervisor = contact,
+                                                                                    RecordLog = recordlog,
                                                                                     Deleted = deleted,
                                                                                     LastSync = DateTime.Parse(current_datetime),
                                                                                     LastUpdated = DateTime.Parse(current_datetime)
@@ -1112,9 +1120,6 @@ namespace TBSMobile.View
                                                                 }
                                                                 else
                                                                 {
-                                                                    var db = DependencyService.Get<ISQLiteDB>();
-                                                                    var conn = db.GetConnection();
-
                                                                     var retailer = new ContactsTable
                                                                     {
                                                                         ContactID = id,
@@ -1146,6 +1151,7 @@ namespace TBSMobile.View
                                                                         Employee = employee,
                                                                         Customer = customer,
                                                                         Supervisor = contact,
+                                                                        RecordLog = recordlog,
                                                                         Deleted = deleted,
                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                         LastUpdated = DateTime.Parse(current_datetime)
@@ -1198,6 +1204,9 @@ namespace TBSMobile.View
         {
             try
             {
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
                 var id = entTempID.Text;
                 var firstName = entFirstName.Text;
                 var middleName = entMiddleName.Text;
@@ -1224,8 +1233,11 @@ namespace TBSMobile.View
                 int customer = 1;
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
+                var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+                var crresult = getUsername.Result[0];
+                var username = crresult.UserID;
+                var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+                var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
 
                 var prospect_insert = new ContactsTable
                 {
@@ -1258,6 +1270,7 @@ namespace TBSMobile.View
                     Employee = employee,
                     Customer = customer,
                     Supervisor = contact,
+                    RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
