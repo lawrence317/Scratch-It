@@ -35,6 +35,7 @@ namespace TBSMobile.Data
         public string RecordLog { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }
+        public int Checked { get; set; }
         public int Deleted { get; set; }
         public string ActNumber
         {

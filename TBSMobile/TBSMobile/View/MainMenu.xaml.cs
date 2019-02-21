@@ -1757,6 +1757,9 @@ namespace TBSMobile.View
 
         public async void ReSyncRetailer(string host, string database, string contact, string ipaddress)
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -1765,6 +1768,7 @@ namespace TBSMobile.View
 
             Ping ping = new Ping();
             PingReply pingresult = ping.Send(ipaddress);
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1772,344 +1776,94 @@ namespace TBSMobile.View
 
                 try
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
+                    lblStatus.Text = "Getting retailer data from server";
 
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    int count = 1;
-
-                    var getContactsChanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = getContactsChanges.Result.Count;
-
-                    if (changesresultCount > 0)
+                    var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=9DpndD";
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        for (int i = 0; i < changesresultCount; i++)
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var default_datetime = "0001-01-01 00:00:00";
+
+                        int count = 1;
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Re-sending retailer changes to server " + count + " out of " + changesresultCount;
+                            var contactsresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
 
-                            var crresult = getContactsChanges.Result[i];
-                            var crcontactID = crresult.ContactID;
-                            var crfileAs = crresult.FileAs;
-                            var crfirstName = crresult.FirstName;
-                            var crmiddleName = crresult.MiddleName;
-                            var crlastName = crresult.LastName;
-                            var crposition = crresult.Position;
-                            var crcompany = crresult.Company;
-                            var crcompanyID = crresult.CompanyID;
-                            var crretailerType = crresult.RetailerType;
-                            var crpresStreet = crresult.PresStreet;
-                            var crpresBarangay = crresult.PresBarangay;
-                            var crpresDistrict = crresult.PresDistrict;
-                            var crpresTown = crresult.PresTown;
-                            var crpresProvince = crresult.PresProvince;
-                            var crpresCountry = crresult.PresCountry;
-                            var crlandmark = crresult.Landmark;
-                            var crremarks = crresult.CustomerRemarks;
-                            var crtelephone1 = crresult.Telephone1;
-                            var crtelephone2 = crresult.Telephone2;
-                            var crmobile = crresult.Mobile;
-                            var cremail = crresult.Email;
-                            var crphoto1 = crresult.Photo1;
-                            var crphoto2 = crresult.Photo2;
-                            var crphoto3 = crresult.Photo3;
-                            var crvideo = crresult.Video;
-                            var crmobilePhoto1 = crresult.MobilePhoto1;
-                            var crmobilePhoto2 = crresult.MobilePhoto2;
-                            var crmobilePhoto3 = crresult.MobilePhoto3;
-                            var crmobileVideo = crresult.MobileVideo;
-                            var cremployee = crresult.Employee;
-                            var crcustomer = crresult.Customer;
-                            var crsupervisor = crresult.Supervisor;
-                            var crrecordlog = crresult.RecordLog;
-                            var crdeleted = crresult.Deleted;
-                            var crlastUpdated = crresult.LastUpdated;
-
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=GC2Tb2";
-                            string crcontentType = "application/json";
-                            JObject crjson = new JObject
+                            for (int i = 0; i < contactsresult.Count; i++)
                             {
-                                { "ContactID", crcontactID },
-                                { "FileAs", crfileAs },
-                                { "FirstName", crfirstName },
-                                { "MiddleName", crmiddleName },
-                                { "LastName", crlastName },
-                                { "Position", crposition },
-                                { "Company", crcompany },
-                                { "CompanyID", crcompanyID },
-                                { "RetailerType", crretailerType },
-                                { "PresStreet", crpresStreet },
-                                { "PresBarangay", crpresBarangay },
-                                { "PresDistrict", crpresDistrict },
-                                { "PresTown", crpresTown },
-                                { "PresProvince", crpresProvince },
-                                { "PresCountry", crpresCountry },
-                                { "Landmark", crlandmark },
-                                { "Remarks", crremarks },
-                                { "Telephone1", crtelephone1 },
-                                { "Telephone2", crtelephone2 },
-                                { "Mobile", crmobile },
-                                { "Email", cremail },
-                                { "MobilePhoto1", crmobilePhoto1 },
-                                { "MobilePhoto2", crmobilePhoto2 },
-                                { "MobilePhoto3", crmobilePhoto3 },
-                                { "MobileVideo", crmobileVideo },
-                                { "Employee", cremployee },
-                                { "Customer", crcustomer },
-                                { "Supervisor", crsupervisor },
-                                { "RecordLog", crrecordlog },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
-                            };
+                                var item = contactsresult[i];
+                                var contactID = item.ContactID;
 
-                            HttpClient crclient = new HttpClient();
-                            var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                lblStatus.Text = "Checking retailer " + count + " out of " + contactsresult.Count;
 
-                            if (crresponse.IsSuccessStatusCode)
-                            {
-                                var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(crcontent))
-                                {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
+                                var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID = ?", contactID);
+                                var resultCount = getContacts.Result.Count;
 
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
-                                    {                                        
-                                        var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=tWyd43";
-                                        string ph1contentType = "application/json";
-
-                                        JObject ph1json;
-                                        bool ph1doesExist = File.Exists(crmobilePhoto1);
-
-                                        if (!ph1doesExist || string.IsNullOrEmpty(crmobilePhoto1))
-                                        {
-                                            ph1json = new JObject
-                                            {
-                                                {"ContactID",crcontactID},
-                                                { "Photo1",""}
-                                            };
-                                        }
-                                        else
-                                        {
-                                            ph1json = new JObject
-                                            {
-                                                {"ContactID",crcontactID},
-                                                {"Photo1",File.ReadAllBytes(crmobilePhoto1)}
-                                            };
-                                        }
-
-                                        HttpClient ph1client = new HttpClient();
-                                        var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
-
-                                        if (ph1response.IsSuccessStatusCode)
-                                        {
-                                            var ph1content = await ph1response.Content.ReadAsStringAsync();
-                                            if (!string.IsNullOrEmpty(ph1content))
-                                            {
-                                                var ph1result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph1content, settings);
-
-                                                var ph1item = ph1result[0];
-                                                var ph1message = ph1item.Message;
-
-                                                if (ph1message.Equals("Inserted"))
-                                                {
-                                                    var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qAWS26";
-                                                    string ph2contentType = "application/json";
-
-                                                    JObject ph2json;
-                                                    bool ph2doesExist = File.Exists(crmobilePhoto2);
-
-                                                    if (!ph2doesExist || string.IsNullOrEmpty(crmobilePhoto2))
-                                                    {
-                                                        ph2json = new JObject
-                                                        {
-                                                            {"ContactID",crcontactID},
-                                                            { "Photo2",""}
-                                                        };
-                                                    }
-                                                    else
-                                                    {
-                                                        ph2json = new JObject
-                                                        {
-                                                            {"ContactID",crcontactID},
-                                                            {"Photo2",File.ReadAllBytes(crmobilePhoto2)}
-                                                        };
-                                                    }
-
-                                                    HttpClient ph2client = new HttpClient();
-                                                    var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
-
-                                                    if (ph2response.IsSuccessStatusCode)
-                                                    {
-                                                        var ph2content = await ph2response.Content.ReadAsStringAsync();
-                                                        if (!string.IsNullOrEmpty(ph2content))
-                                                        {
-                                                            var ph2result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph2content, settings);
-
-                                                            var ph2item = ph2result[0];
-                                                            var ph2message = ph2item.Message;
-
-                                                            if (ph2message.Equals("Inserted"))
-                                                            {
-                                                                var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=XuY4RN";
-                                                                string ph3contentType = "application/json";
-
-                                                                JObject ph3json;
-                                                                bool ph3doesExist = File.Exists(crmobilePhoto3);
-
-                                                                if (!ph3doesExist || string.IsNullOrEmpty(crmobilePhoto3))
-                                                                {
-                                                                    ph3json = new JObject
-                                                                    {
-                                                                        {"ContactID",crcontactID},
-                                                                        { "Photo3",""}
-                                                                    };
-                                                                }
-                                                                else
-                                                                {
-                                                                    ph3json = new JObject
-                                                                    {
-                                                                        {"ContactID",crcontactID},
-                                                                        {"Photo3",File.ReadAllBytes(crmobilePhoto3)}
-                                                                    };
-                                                                }
-
-                                                                HttpClient ph3client = new HttpClient();
-                                                                var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
-
-                                                                if (ph3response.IsSuccessStatusCode)
-                                                                {
-                                                                    var ph3content = await ph3response.Content.ReadAsStringAsync();
-                                                                    if (!string.IsNullOrEmpty(ph3content))
-                                                                    {
-                                                                        var ph3result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph3content, settings);
-
-                                                                        var ph3item = ph3result[0];
-                                                                        var ph3message = ph3item.Message;
-
-                                                                        if (ph3message.Equals("Inserted"))
-                                                                        {
-                                                                            if (!string.IsNullOrEmpty(crmobileVideo))
-                                                                            {
-                                                                                var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=PsxQ7v";
-                                                                                string vidcontentType = "application/json";
-
-                                                                                JObject vidjson;
-                                                                                bool viddoesExist = File.Exists(crmobileVideo);
-
-                                                                                if (viddoesExist)
-                                                                                {
-                                                                                    vidjson = new JObject
-                                                                                    {
-                                                                                       { "ContactID", crcontactID },
-                                                                                       { "Video", File.ReadAllBytes(crmobileVideo) }
-                                                                                    };
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    vidjson = new JObject
-                                                                                    {
-                                                                                       { "ContactID", crcontactID },
-                                                                                       { "Video", "" }
-                                                                                    };
-                                                                                }
-
-                                                                                HttpClient vidclient = new HttpClient();
-                                                                                var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
-
-                                                                                if (vidresponse.IsSuccessStatusCode)
-                                                                                {
-                                                                                    var vidcontent = await vidresponse.Content.ReadAsStringAsync();
-                                                                                    if (!string.IsNullOrEmpty(vidcontent))
-                                                                                    {
-                                                                                        var vidresult = JsonConvert.DeserializeObject<List<ServerMessage>>(vidcontent, settings);
-
-                                                                                        var viditem = vidresult[0];
-                                                                                        var vidmessage = viditem.Message;
-
-                                                                                        if (vidmessage.Equals("Inserted"))
-                                                                                        {
-                                                                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
-                                                                                            count++;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                                                    OnSyncComplete();
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), crcontactID);
-                                                                                count++;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                                    OnSyncComplete();
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                                        OnSyncComplete();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                            OnSyncComplete();
-                                        }
-                                    }
+                                if(resultCount == 1) {
+                                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
                                 }
-                            }
-                            else
-                            {
-                                lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                                OnSyncComplete();
+
+                                count++;
                             }
                         }
+                        else
+                        {
+                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                        }
+
+                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+
+                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
                     }
-
-                    synccount += "Total re-synced retailer: " + (count - 1) + " out of " + changesresultCount + "\n";
-
-                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                    else
+                    {
+                        var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            ReSyncRetailer(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
-                    if (seedata == "See unsynced data")
-                    {
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
-                        OnSyncComplete();
-                    }
-                    else if (seedata == "Retry")
+                    var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                    if (seedata == true)
                     {
                         ReSyncRetailer(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing retailer failed. Server is unreachable.";
-                OnSyncComplete();
+                OnSyncFailed();
             }
         }
 
         public async void ReSyncRetailerOutlet(string host, string database, string contact, string ipaddress)
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -2118,129 +1872,102 @@ namespace TBSMobile.View
 
             Ping ping = new Ping();
             PingReply pingresult = ping.Send(ipaddress);
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (pingresult.Status.ToString() == "Success")
             {
-                lblStatus.Text = "Initializing retailer re-sync";
+                lblStatus.Text = "Initializing retailer outlet re-sync";
 
                 try
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
+                    lblStatus.Text = "Getting retailer outlet data from server";
 
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    int count = 1;
-
-                    var getOutletChanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = getOutletChanges.Result.Count;
-
-                    if (changesresultCount > 0)
+                    var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Vf6HfC";
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        for (int i = 0; i < changesresultCount; i++)
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var default_datetime = "0001-01-01 00:00:00";
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Re-sending retailer outlet changes to server " + count + " out of " + changesresultCount;
+                            int count = 1;
 
-                            var crresult = getOutletChanges.Result[i];
-                            var crretailerCode = crresult.RetailerCode;
-                            var crcontactID = crresult.ContactID;
-                            var crpresStreet = crresult.PresStreet;
-                            var crpresBarangay = crresult.PresBarangay;
-                            var crpresDistrict = crresult.PresDistrict;
-                            var crpresTown = crresult.PresTown;
-                            var crpresProvince = crresult.PresProvince;
-                            var crpresCountry = crresult.PresCountry;
-                            var crtelephone1 = crresult.Telephone1;
-                            var crtelephone2 = crresult.Telephone2;
-                            var crmobile = crresult.Mobile;
-                            var cremail = crresult.Email;
-                            var crlandmark = crresult.Landmark;
-                            var crgpsCoordinates = crresult.GPSCoordinates;
-                            var crsupervisor = crresult.Supervisor;
-                            var crrecordlog = crresult.RecordLog;
-                            var crdeleted = crresult.Deleted;
-                            var crlastUpdated = crresult.LastUpdated;
-
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=xCPM3T";
-                            string crcontentType = "application/json";
-                            JObject crjson = new JObject
+                            var contactsresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
+                            for (int i = 0; i < contactsresult.Count; i++)
                             {
-                                { "RetailerCode", crretailerCode },
-                                { "ContactID", crcontactID },
-                                { "PresStreet", crpresStreet },
-                                { "PresBarangay", crpresBarangay },
-                                { "PresDistrict", crpresDistrict },
-                                { "PresTown", crpresTown },
-                                { "PresProvince", crpresProvince },
-                                { "PresCountry", crpresCountry },
-                                { "Telephone1", crtelephone1 },
-                                { "Telephone2", crtelephone2 },
-                                { "Mobile", crmobile },
-                                { "Email", cremail },
-                                { "Landmark", crlandmark },
-                                { "GPSCoordinates", crgpsCoordinates },
-                                { "Supervisor", crsupervisor },
-                                { "RecordLog", crrecordlog },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
-                            };
+                                var item = contactsresult[i];
+                                var retailerCode = item.RetailerCode;
 
-                            HttpClient crclient = new HttpClient();
-                            var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                lblStatus.Text = "Checking retailer outlet" + count + " out of " + contactsresult.Count;
 
-                            if (crresponse.IsSuccessStatusCode)
-                            {
-                                var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(crcontent))
+                                var getContacts = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode = ?", retailerCode);
+                                var resultCount = getContacts.Result.Count;
+
+                                if (resultCount == 1)
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
-                                    {
-                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), crretailerCode);
-                                        count++;
-                                    }
+                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
                                 }
-                            }
-                            else
-                            {
-                                lblStatus.Text = "Re-syncing retailer outlet failed. Server is unreachable.";
-                                OnSyncComplete();
+
+                                count++;
                             }
                         }
+                        else
+                        {
+                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
+                        }
+
+                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+
+                        ReSyncCaf(host, database, contact, ipaddress);
                     }
-
-                    synccount += "Total re-synced retailer outlet changes: " + (count - 1) + " out of " + changesresultCount + "\n";
-
-                    ReSyncCaf(host, database, contact, ipaddress);
+                    else
+                    {
+                        var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            ReSyncRetailer(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
-                    if (seedata == "See unsynced data")
-                    {
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
-                        OnSyncComplete();
-                    }
-                    else if (seedata == "Retry")
+                    var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                    if (seedata == true)
                     {
                         ReSyncRetailer(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing retailer outlet failed. Server is unreachable.";
-                OnSyncComplete();
+                OnSyncFailed();
             }
         }
 
         public async void ReSyncCaf(string host, string database, string contact, string ipaddress)
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -2249,6 +1976,7 @@ namespace TBSMobile.View
 
             Ping ping = new Ping();
             PingReply pingresult = ping.Send(ipaddress);
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2256,323 +1984,94 @@ namespace TBSMobile.View
 
                 try
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    lblStatus.Text = "Getting field activity data from server";
 
-                    var getCAFChanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = getCAFChanges.Result.Count;
-
-                    if (changesresultCount > 0)
+                    var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=fqV2Vb";
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int count = 1;
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var default_datetime = "0001-01-01 00:00:00";
+
+                        if (!string.IsNullOrEmpty(content))
                         {
+                            int count = 1;
 
-                            lblStatus.Text = "Re-sending Supervisor activity changes to server " + count + " out of " + changesresultCount;
-
-                            var crresult = getCAFChanges.Result[i];
-                            var crcafNo = crresult.CAFNo;
-                            var cremployeeID = crresult.EmployeeID;
-                            var crcafDate = crresult.CAFDate;
-                            var crcustomerID = crresult.CustomerID;
-                            var crstartTime = crresult.StartTime;
-                            var crendTime = crresult.EndTime;
-                            var crphoto1 = crresult.Photo1;
-                            var crphoto2 = crresult.Photo2;
-                            var crphoto3 = crresult.Photo3;
-                            var crvideo = crresult.Video;
-                            var crmobilePhoto1 = crresult.MobilePhoto1;
-                            var crmobilePhoto2 = crresult.MobilePhoto2;
-                            var crmobilePhoto3 = crresult.MobilePhoto3;
-                            var crmobileVideo = crresult.MobileVideo;
-                            var crgpsCoordinates = crresult.GPSCoordinates;
-                            var crremarks = crresult.Remarks;
-                            var crotherConcern = crresult.OtherConcern;
-                            var crrecordlog = crresult.RecordLog;
-                            var crdeleted = crresult.Deleted;
-                            var crlastUpdated = crresult.LastUpdated;
-
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=k5N7PE";
-                            string crcontentType = "application/json";
-                            JObject crjson = new JObject
+                            var cafresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
+                            for (int i = 0; i < cafresult.Count; i++)
                             {
-                                { "CAFNo", crcafNo },
-                                { "EmployeeID", cremployeeID },
-                                { "CAFDate", crcafDate },
-                                { "CustomerID", crcustomerID },
-                                { "StartTime", crstartTime },
-                                { "EndTime", crendTime },
-                                { "MobilePhoto1", crmobilePhoto1 },
-                                { "MobilePhoto2", crmobilePhoto2 },
-                                { "MobilePhoto3", crmobilePhoto3 },
-                                { "MobileVideo", crmobileVideo },
-                                { "GPSCoordinates", crgpsCoordinates },
-                                { "Remarks", crremarks },
-                                { "OtherConcern", crotherConcern },
-                                { "RecordLog", crrecordlog },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
-                            };
+                                var item = cafresult[i];
+                                var cafNo = item.CAFNo;
 
-                            HttpClient crclient = new HttpClient();
-                            var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                lblStatus.Text = "Checking field activity " + count + " out of " + cafresult.Count;
 
-                            if (crresponse.IsSuccessStatusCode)
-                            {
-                                var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(crcontent))
+                                var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblCaf WHERE CAFNo = ?", cafNo);
+                                var resultCount = getContacts.Result.Count;
+
+                                if (resultCount == 1)
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
-                                    {
-                                        var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
-                                        string ph1contentType = "application/json";
-
-                                        JObject ph1json;
-                                        bool ph1doesExist = File.Exists(crmobilePhoto1);
-
-                                        if (!ph1doesExist || string.IsNullOrEmpty(crmobilePhoto1))
-                                        {
-                                            ph1json = new JObject
-                                            {
-                                                { "CAFNo", crcafNo },
-                                                { "CAFDate", crcafDate },
-                                                { "Photo1", ""}
-                                            };
-                                        }
-                                        else
-                                        {
-                                            ph1json = new JObject
-                                            {
-                                                { "CAFNo", crcafNo },
-                                                { "CAFDate", crcafDate },
-                                                { "Photo1", File.ReadAllBytes(crmobilePhoto1)}
-                                            };
-                                        }
-
-                                        HttpClient ph1client = new HttpClient();
-                                        var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
-
-                                        if (ph1response.IsSuccessStatusCode)
-                                        {
-                                            var ph1content = await ph1response.Content.ReadAsStringAsync();
-                                            if (!string.IsNullOrEmpty(ph1content))
-                                            {
-                                                var ph1result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph1content, settings);
-
-                                                var ph1item = ph1result[0];
-                                                var ph1message = ph1item.Message;
-
-                                                if (ph1message.Equals("Inserted"))
-                                                {
-                                                    var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
-                                                    string ph2contentType = "application/json";
-
-                                                    JObject ph2json;
-                                                    bool ph2doesExist = File.Exists(crmobilePhoto2);
-
-                                                    if (!ph2doesExist || string.IsNullOrEmpty(crmobilePhoto2))
-                                                    {
-                                                        ph2json = new JObject
-                                                        {
-                                                            { "CAFNo", crcafNo },
-                                                            { "CAFDate", crcafDate },
-                                                            { "Photo2", ""}
-                                                        };
-                                                    }
-                                                    else
-                                                    {
-                                                        ph2json = new JObject
-                                                        {
-                                                            { "CAFNo", crcafNo },
-                                                            { "CAFDate", crcafDate },
-                                                            { "Photo2", File.ReadAllBytes(crmobilePhoto2)}
-                                                        };
-                                                    }
-
-                                                    HttpClient ph2client = new HttpClient();
-                                                    var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
-
-                                                    if (ph2response.IsSuccessStatusCode)
-                                                    {
-                                                        var ph2content = await ph2response.Content.ReadAsStringAsync();
-                                                        if (!string.IsNullOrEmpty(ph2content))
-                                                        {
-                                                            var ph2result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph2content, settings);
-
-                                                            var ph2item = ph2result[0];
-                                                            var ph2message = ph2item.Message;
-
-                                                            if (ph2message.Equals("Inserted"))
-                                                            {
-                                                                var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
-                                                                string ph3contentType = "application/json";
-
-                                                                JObject ph3json;
-                                                                bool ph3doesExist = File.Exists(crmobilePhoto3);
-
-                                                                if (!ph3doesExist || string.IsNullOrEmpty(crmobilePhoto3))
-                                                                {
-                                                                    ph3json = new JObject
-                                                                    {
-                                                                        { "CAFNo", crcafNo },
-                                                                        { "CAFDate", crcafDate },
-                                                                        { "Photo3", ""}
-                                                                    };
-                                                                }
-                                                                else
-                                                                {
-                                                                    ph3json = new JObject
-                                                                    {
-                                                                        { "CAFNo", crcafNo },
-                                                                        { "CAFDate", crcafDate },
-                                                                        { "Photo3", File.ReadAllBytes(crmobilePhoto3)}
-                                                                    };
-                                                                }
-
-                                                                HttpClient ph3client = new HttpClient();
-                                                                var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
-
-                                                                if (ph3response.IsSuccessStatusCode)
-                                                                {
-                                                                    var ph3content = await ph3response.Content.ReadAsStringAsync();
-                                                                    if (!string.IsNullOrEmpty(ph3content))
-                                                                    {
-                                                                        var ph3result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph3content, settings);
-
-                                                                        var ph3item = ph3result[0];
-                                                                        var ph3message = ph3item.Message;
-
-                                                                        if (ph3message.Equals("Inserted"))
-                                                                        {
-                                                                            if (!string.IsNullOrEmpty(crmobileVideo))
-                                                                            {
-                                                                                var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
-                                                                                string vidcontentType = "application/json";
-
-                                                                                JObject vidjson;
-                                                                                bool viddoesExist = File.Exists(crmobileVideo);
-
-                                                                                if (viddoesExist)
-                                                                                {
-                                                                                    vidjson = new JObject
-                                                                                    {
-                                                                                       { "CAFNo", crcafNo },
-                                                                                       { "CAFDate", crcafDate },
-                                                                                       { "Video", File.ReadAllBytes(crmobileVideo) }
-                                                                                    };
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    vidjson = new JObject
-                                                                                    {
-                                                                                       { "CAFNo", crcafNo },
-                                                                                       { "CAFDate", crcafDate },   
-                                                                                       { "Video", "" }
-                                                                                    };
-                                                                                }
-
-                                                                                HttpClient vidclient = new HttpClient();
-                                                                                var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
-
-                                                                                if (vidresponse.IsSuccessStatusCode)
-                                                                                {
-                                                                                    var vidcontent = await vidresponse.Content.ReadAsStringAsync();
-                                                                                    if (!string.IsNullOrEmpty(vidcontent))
-                                                                                    {
-                                                                                        var vidresult = JsonConvert.DeserializeObject<List<ServerMessage>>(vidcontent, settings);
-
-                                                                                        var viditem = vidresult[0];
-                                                                                        var vidmessage = viditem.Message;
-
-                                                                                        if (vidmessage.Equals("Inserted"))
-                                                                                        {
-                                                                                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                                                                            count++;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                                                    OnSyncComplete();
-                                                                                }
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                                                                count++;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                                    OnSyncComplete();
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                                        OnSyncComplete();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                            OnSyncComplete();
-                                        }
-                                    }
+                                    await conn.QueryAsync<ContactsTable>("UPDATE tblCaf SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
                                 }
-                            }
-                            else
-                            {
-                                lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                                OnSyncComplete();
+
+                                count++;
                             }
                         }
+                        else
+                        {
+                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact, 1);
+                        }
 
-                        synccount += "Total re-synced field activity: " + (count - 1) + " out of " + changesresultCount + "\n";
+                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+
+                        ReSyncActivities(host, database, contact, ipaddress);
                     }
-
-                    ReSyncActivities(host, database, contact, ipaddress);
+                    else
+                    {
+                        var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            ReSyncCaf(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-
-                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
-                    if (seedata == "See unsynced data")
+                    var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                    if (seedata == true)
                     {
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
-                        OnSyncComplete();
+                        ReSyncCaf(host, database, contact, ipaddress);
                     }
-                    else if (seedata == "Retry")
+                    else
                     {
-                        ReSyncRetailer(host, database, contact, ipaddress);
+                        OnSyncFailed();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing field activity failed. Server is unreachable.";
-                OnSyncComplete();
+                OnSyncFailed();
             }
         }
 
         public async void ReSyncActivities(string host, string database, string contact, string ipaddress)
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -2581,6 +2080,7 @@ namespace TBSMobile.View
 
             Ping ping = new Ping();
             PingReply pingresult = ping.Send(ipaddress);
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2588,98 +2088,96 @@ namespace TBSMobile.View
 
                 try
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    lblStatus.Text = "Getting activity data from server";
 
-                    var getActivityChanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = getActivityChanges.Result.Count;
-
-                    if (changesresultCount > 0)
+                    var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=M2T3w2";
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int count = 1;
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var default_datetime = "0001-01-01 00:00:00";
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Re-sending activity changes to server " + count + " out of " + changesresultCount;
+                            int count = 1;
 
-                            var crresult = getActivityChanges.Result[i];
-                            var crcafNo = crresult.CAFNo;
-                            var crcontactId = crresult.ContactID;
-                            var cractivityID = crresult.ActivityID;
-                            var crrecordlog = crresult.RecordLog;
-                            var crdeleted = crresult.Deleted;
-                            var crlastUpdated = crresult.LastUpdated;
-
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=b7Q9XU";
-                            string crcontentType = "application/json";
-                            JObject crjson = new JObject
+                            var actresult = JsonConvert.DeserializeObject<List<ActivityData>>(content, settings);
+                            for (int i = 0; i < actresult.Count; i++)
                             {
-                                { "CAFNo", crcafNo },
-                                { "ContactID", crcontactId },
-                                { "ActivityID", cractivityID },
-                                { "RecordLog", crrecordlog },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
-                            };
+                                lblStatus.Text = "Checking activity " + count + " out of " + actresult.Count;
 
-                            HttpClient crclient = new HttpClient();
-                            var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                var item = actresult[i];
+                                var cafNo = item.CAFNo;
+                                var contactId = item.ContactID;
+                                var activityid = item.ActivityID;
 
-                            if (crresponse.IsSuccessStatusCode)
-                            {
-                                var crcontent = await crresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(crcontent))
+                                var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblCaf WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", cafNo, contactId, activityid);
+                                var resultCount = getContacts.Result.Count;
+
+                                if (resultCount == 1)
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
-                                    {
-                                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), crcafNo);
-                                        count++;
-                                    }
+                                    await conn.QueryAsync<ContactsTable>("UPDATE tblCaf SET Checked = ? WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", 1, cafNo, contactId, activityid);
                                 }
-                            }
-                            else
-                            {
-                                lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                                OnSyncComplete();
+
+                                count++;
                             }
                         }
+                        else
+                        {
+                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+                        }
 
-                        synccount += "Total re-synced activity: " + (count - 1) + " out of " + changesresultCount + "\n";
+                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+
+                        ReSyncEmail(host, database, contact, ipaddress);
                     }
-
-                    ReSyncEmail(host, database, contact, ipaddress);
+                    else
+                    {
+                        var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            ReSyncActivities(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-
-                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
-                    if (seedata == "See unsynced data")
+                    var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                    if (seedata == true)
                     {
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
-                        OnSyncComplete();
+                        ReSyncActivities(host, database, contact, ipaddress);
                     }
-                    else if (seedata == "Retry")
+                    else
                     {
-                        ReSyncRetailer(host, database, contact, ipaddress);
+                        OnSyncFailed();
                     }
                 }
             }
             else
             {
                 lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                OnSyncComplete();
+                OnSyncFailed();
             }
         }
 
         public async void ReSyncEmail(string host, string database, string contact, string ipaddress)
         {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
             var settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -2688,6 +2186,7 @@ namespace TBSMobile.View
 
             Ping ping = new Ping();
             PingReply pingresult = ping.Send(ipaddress);
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2695,79 +2194,86 @@ namespace TBSMobile.View
 
                 try
                 {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    lblStatus.Text = "Getting email recipient data from server";
 
-                    var getEmailChanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = getEmailChanges.Result.Count;
-
-                    if (changesresultCount > 0)
+                    var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=3sEW7W";
+                    string chcontentType = "application/json";
+                    JObject chjson = new JObject
                     {
-                        int count = 1;
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient chclient = new HttpClient();
+                    var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
+
+                    if (chresponse.IsSuccessStatusCode)
+                    {
+                        var chcontent = await chresponse.Content.ReadAsStringAsync();
+                        var default_datetime = "0001-01-01 00:00:00";
+
+                        if (!string.IsNullOrEmpty(chcontent))
                         {
-                            lblStatus.Text = "Re-sending email changes to server " + count + " out of " + changesresultCount;
+                            int count = 1;
 
-                            var crresult = getEmailChanges.Result[i];
-                            var crcontactID = crresult.ContactID;
-                            var cremail = crresult.Email;
-                            var crrecordlog = crresult.RecordLog;
-                            var crdeleted = crresult.Deleted;
-                            var crlastUpdated = crresult.LastUpdated;
-
-                            var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=kcZw9g";
-                            string crcontentType = "application/json";
-                            JObject crjson = new JObject
+                            var chemailresult = JsonConvert.DeserializeObject<List<EmailData>>(chcontent, settings);
+                            for (int i = 0; i < chemailresult.Count; i++)
                             {
-                                { "ContactID", crcontactID },
-                                { "Email", cremail },
-                                { "RecordLog", crrecordlog },
-                                { "Deleted", crdeleted },
-                                { "LastUpdated", crlastUpdated }
-                            };
+                                lblStatus.Text = "Checking email recipient " + count + " out of " + chemailresult.Count;
 
-                            HttpClient crclient = new HttpClient();
-                            var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+                                var chitem = chemailresult[i];
+                                var contactID = chitem.ContactID;
 
-                            if (crresponse.IsSuccessStatusCode)
-                            {
-                                await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
+                                var getContacts = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ?", contactID);
+                                var resultCount = getContacts.Result.Count;
+
+                                if (resultCount == 1)
+                                {
+                                    await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactID);
+                                }
+
                                 count++;
                             }
-                            else
-                            {
-                                lblStatus.Text = "Re-syncing activity failed. Server is unreachable.";
-                                OnSyncComplete();
-                            }
+                        }
+                        else
+                        {
+                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
                         }
 
-                        synccount += "Total re-synced email recipient changes: " + (count - 1) + " out of " + changesresultCount + "\n";
-                    }
+                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
 
-                    OnSyncComplete();
+                        SyncRetailer(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            ReSyncActivities(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-
-                    var seedata = await DisplayActionSheet("Sync data failed", "Cancel", "", "See unsynced data", "Retry");
-                    if (seedata == "See unsynced data")
+                    var seedata = await DisplayAlert("Resync data failed", "Data resync failed", "Retry", "Cancel");
+                    if (seedata == true)
                     {
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
-                        OnSyncComplete();
+                        ReSyncActivities(host, database, contact, ipaddress);
                     }
-                    else if (seedata == "Retry")
+                    else
                     {
-                        ReSyncRetailer(host, database, contact, ipaddress);
+                        OnSyncFailed();
                     }
                 }
             }
             else
             {
-                lblStatus.Text = "Re-syncing email failed. Server is unreachable.";
-                OnSyncComplete();
+                lblStatus.Text = "Re-syncing email recipient failed. Server is unreachable.";
+                OnSyncFailed();
             }
         }
 
@@ -2782,6 +2288,39 @@ namespace TBSMobile.View
                 {
                     DisplayAlert("Sync Completed", "Sync Summary: \n\n" + synccount , "Got it");
                     synccount = "";
+                    lblStatus.Text = "Online - Connected to server";
+                    lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
+                }
+                else
+                {
+                    lblStatus.Text = "Online - Server unreachable. Connect to VPN";
+                    lblStatus.BackgroundColor = Color.FromHex("#e67e22");
+                }
+            }
+            else
+            {
+                lblStatus.Text = "Offline - Connect to internet";
+                lblStatus.BackgroundColor = Color.FromHex("#e74c3c");
+            }
+
+            btnFAF.IsEnabled = true;
+            btnAH.IsEnabled = true;
+            btnLogout.IsEnabled = true;
+            btnUI.IsEnabled = true;
+            btnPR.IsEnabled = true;
+            btnRetailer.IsEnabled = true;
+            btnResend.IsEnabled = true;
+        }
+
+        public void OnSyncFailed()
+        {
+            Ping ping = new Ping();
+            PingReply pingresult = ping.Send(ipaddress);
+
+            if (CrossConnectivity.Current.IsConnected)
+            {
+                if (pingresult.Status.ToString() == "Success")
+                {
                     lblStatus.Text = "Online - Connected to server";
                     lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
                 }
@@ -2827,17 +2366,6 @@ namespace TBSMobile.View
                         var confirm = await DisplayAlert("Re-sync Connection Warning", "Slow connection detected. Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
                         if (confirm == true)
                         {
-                            var db = DependencyService.Get<ISQLiteDB>();
-                            var conn = db.GetConnection();
-
-                            var default_datetime = "0001-01-01 00:00:00";
-
-                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-
                             ReSyncRetailer(host, database, contact, ipaddress);
 
                             btnFAF.IsEnabled = false;
@@ -2854,17 +2382,6 @@ namespace TBSMobile.View
                         var resync = await DisplayAlert("Re-sync Warning", "Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
                         if (resync == true)
                         {
-                            var db = DependencyService.Get<ISQLiteDB>();
-                            var conn = db.GetConnection();
-
-                            var default_datetime = "0001-01-01 00:00:00";
-
-                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-
                             ReSyncRetailer(host, database, contact, ipaddress);
 
                             btnFAF.IsEnabled = false;
