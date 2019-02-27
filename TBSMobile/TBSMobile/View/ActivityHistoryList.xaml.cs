@@ -41,7 +41,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? ORDER BY CAFDate DESC, StartTime DESC LIMIT 50", contact);
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 100", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
@@ -122,7 +122,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? ORDER BY CAFDate DESC, StartTime DESC LIMIT 50", contact);
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 100", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
