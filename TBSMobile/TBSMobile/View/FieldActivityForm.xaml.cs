@@ -49,7 +49,6 @@ namespace TBSMobile.View
             SetCAFNo();
             getRecipients();
             GetGPS();
-            GetGPSLocation();
             entEmployeeNumber.Text = contact;
             dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#3498db");
@@ -150,34 +149,6 @@ namespace TBSMobile.View
             entCafNo.Text = finalString;
         }
 
-        public async void GetGPSLocation()
-        {
-            Position position = null;
-            try
-            {
-                var locator = CrossGeolocator.Current;
-                locator.DesiredAccuracy = 30;
-
-                if (!locator.IsGeolocationAvailable)
-                {
-                    await DisplayAlert("GPS Error", "GPS location not available", "Ok");
-                }
-                else if (!locator.IsGeolocationEnabled)
-                {
-                    await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
-                }
-                else
-                {
-                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(5), null, true);
-                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-            }
-        }
-
         public async void GetGPS()
         {
             Position position = null;
@@ -196,8 +167,9 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(5), null, true);
-                    entLocation.Text = position.Latitude + "," + position.Longitude;
+                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(10), null, true);
+                    
+                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
                 }
             }
             catch (Exception ex)
@@ -440,16 +412,30 @@ namespace TBSMobile.View
                         {
                             if (string.IsNullOrEmpty(result.GPSCoordinates))
                             {
-                                GetGPS();
+                                if (String.IsNullOrEmpty(entOnsiteLocation.Text))
+                                {
+                                    GetGPS();
+                                }
+                                else
+                                {
+                                    entLocation.Text = entOnsiteLocation.Text;
+                                }
                             }
                             else
                             {
-                                entLocation.Text = result.GPSCoordinates;
+                                if (String.IsNullOrEmpty(entOnsiteLocation.Text))
+                                {
+                                    GetGPS();
+                                }
+                                else
+                                {
+                                    entLocation.Text = entOnsiteLocation.Text;
+                                }
                             }
                         }
                         else
                         {
-                            GetGPS();
+                            entLocation.Text = entOnsiteLocation.Text;
                         }
 
                         if (string.IsNullOrEmpty(result.PresCountry))
