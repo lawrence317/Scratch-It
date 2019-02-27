@@ -217,6 +217,18 @@ namespace TBSMobile.View
             public DateTime LastUpdated { get; set; }
         }
 
+        public class UserLogsData
+        {
+            public string ContactID { get; set; }
+            public string LogType { get; set; }
+            public string Log { get; set; }
+            public DateTime LogDate { get; set; }
+            public string DatabaseName { get; set; }
+            public DateTime LastSync { get; set; }
+            public DateTime LastUpdated { get; set; }
+            public int Deleted { get; set; }
+        }
+
         public class ServerMessage
         {
             public string Message { get; set; }
@@ -3292,6 +3304,106 @@ namespace TBSMobile.View
                             Crashes.TrackError(ex);
                         }
                     }
+                    
+                    SyncLogs(host, database, contact, ipaddress);
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+            else
+            {
+                syncStatus.Text = "Syncing town failed. Server is unreachable.";
+                btnBack.IsVisible = true;
+            }
+        }
+
+        public async void SyncLogs(string host, string database, string contact, string ipaddress){
+            var settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+
+            Ping ping = new Ping();
+            PingReply pingresult = ping.Send(ipaddress);
+
+            if (pingresult.Status.ToString() == "Success")
+            {
+                try
+                {
+                    syncStatus.Text = "Initializing user logs sync";
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var getUserLogsChanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                    var changesresultCount = getUserLogsChanges.Result.Count;
+                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    if (changesresultCount > 0)
+                    {
+                        int clientupdate = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
+                        {
+                            try
+                            {
+                                syncStatus.Text = "Sending user logs to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = getUserLogsChanges.Result[i];
+                                var crcontactID = result.ContactID;
+                                var crlogType = result.LogType;
+                                var crlog = result.Log;
+                                var crlogDate = result.LogDate;
+                                var crdatabaseName = result.DatabaseName;
+                                var crdeleted = result.Deleted;
+                                var crlastUpdated = result.LastUpdated;
+
+                                var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=pQ412v";
+                                string crcontentType = "application/json";
+                                JObject crjson = new JObject
+                                {
+                                    { "ContactID", contact },
+                                    { "LogType", crlogType },
+                                    { "Log", crlog },
+                                    { "LogDate", crlogDate },
+                                    { "DatabaseName", crdatabaseName },
+                                    { "Deleted", crdeleted },
+                                    { "LastUpdated", crlastUpdated }
+                                };
+
+                                HttpClient crclient = new HttpClient();
+                                var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                if (crresponse.IsSuccessStatusCode)
+                                {
+                                    var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(crcontent))
+                                    {
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ?", DateTime.Parse(current_datetime), contact, crlogType, crlog);
+
+                                            clientupdate++;
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Crashes.TrackError(ex);
+                            }
+                        }
+
+                        synccount += "Total synced user logs: " + (clientupdate - 1) + " out of " + changesresultCount + "\n";
+                    }
 
                     OnSyncComplete();
                 }
@@ -3302,7 +3414,7 @@ namespace TBSMobile.View
             }
             else
             {
-                syncStatus.Text = "Syncing town failed. Server is unreachable.";
+                syncStatus.Text = "Syncing user logs failed. Server is unreachable.";
                 btnBack.IsVisible = true;
             }
         }

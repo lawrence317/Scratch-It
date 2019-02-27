@@ -2079,8 +2079,58 @@ namespace TBSMobile.View
                                                                                 }
 
                                                                                 Analytics.TrackEvent("Sent Field Activity Form");
-                                                                                await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-                                                                                await Application.Current.MainPage.Navigation.PopAsync();
+
+                                                                                var logtype = "Mobile Log";
+                                                                                var log = "Added field activity(" + caf + ")";
+                                                                                var deleted = "0";
+
+                                                                                string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
+                                                                                string logscontentType = "application/json";
+                                                                                JObject logsjson = new JObject
+                                                                                {
+                                                                                    { "ContactID", contact },
+                                                                                    { "LogType", logtype },
+                                                                                    { "Log", log },
+                                                                                    { "LogDate", DateTime.Parse(current_datetime) },
+                                                                                    { "DatabaseName", database },
+                                                                                    { "Deleted", deleted },
+                                                                                    { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                                                };
+
+                                                                                HttpClient logsclient = new HttpClient();
+                                                                                var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
+
+                                                                                if (logsresponse.IsSuccessStatusCode)
+                                                                                {
+                                                                                    var logscontent = await logsresponse.Content.ReadAsStringAsync();
+                                                                                    if (!string.IsNullOrEmpty(logscontent))
+                                                                                    {
+                                                                                        var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
+
+                                                                                        var logsdataitem = logsdataresult[0];
+                                                                                        var logsdatamessage = logsdataitem.Message;
+
+                                                                                        if (logsdatamessage.Equals("Inserted"))
+                                                                                        {
+                                                                                            var logs_insert = new UserLogsTable
+                                                                                            {
+                                                                                                ContactID = contact,
+                                                                                                LogType = logtype,
+                                                                                                Log = log,
+                                                                                                LogDate = DateTime.Parse(current_datetime),
+                                                                                                DatabaseName = database,
+                                                                                                Deleted = Int32.Parse(deleted),
+                                                                                                LastUpdated = DateTime.Parse(current_datetime),
+                                                                                                LastSync = DateTime.Parse(current_datetime),
+                                                                                            };
+
+                                                                                            await conn.InsertOrReplaceAsync(logs_insert);
+
+                                                                                            await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                                            await Application.Current.MainPage.Navigation.PopAsync();
+                                                                                        }
+                                                                                    }
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -2180,8 +2230,62 @@ namespace TBSMobile.View
                                                                     }
 
                                                                     Analytics.TrackEvent("Sent Field Activity Form");
-                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-                                                                    await Application.Current.MainPage.Navigation.PopAsync();
+
+                                                                    var logtype = "Mobile Log";
+                                                                    var log = "Added field activity(" + caf + ")";
+                                                                    var deleted = "0";
+
+                                                                    string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
+                                                                    string logscontentType = "application/json";
+                                                                    JObject logsjson = new JObject
+                                                                    {
+                                                                        { "ContactID", contact },
+                                                                        { "LogType", logtype },
+                                                                        { "Log", log },
+                                                                        { "LogDate", DateTime.Parse(current_datetime) },
+                                                                        { "DatabaseName", database },
+                                                                        { "Deleted", deleted },
+                                                                        { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                                    };
+
+                                                                    HttpClient logsclient = new HttpClient();
+                                                                    var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
+
+                                                                    if (logsresponse.IsSuccessStatusCode)
+                                                                    {
+                                                                        var logscontent = await logsresponse.Content.ReadAsStringAsync();
+                                                                        if (!string.IsNullOrEmpty(logscontent))
+                                                                        {
+                                                                            var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
+
+                                                                            var logsdataitem = logsdataresult[0];
+                                                                            var logsdatamessage = logsdataitem.Message;
+
+                                                                            if (logsdatamessage.Equals("Inserted"))
+                                                                            {
+                                                                                var logs_insert = new UserLogsTable
+                                                                                {
+                                                                                    ContactID = contact,
+                                                                                    LogType = logtype,
+                                                                                    Log = log,
+                                                                                    LogDate = DateTime.Parse(current_datetime),
+                                                                                    DatabaseName = database,
+                                                                                    Deleted = Int32.Parse(deleted),
+                                                                                    LastUpdated = DateTime.Parse(current_datetime),
+                                                                                    LastSync = DateTime.Parse(current_datetime)
+                                                                                };
+
+                                                                                await conn.InsertOrReplaceAsync(logs_insert);
+
+                                                                                await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                                await Application.Current.MainPage.Navigation.PopAsync();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        Send_offline();
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -2338,6 +2442,23 @@ namespace TBSMobile.View
 
                 await conn.InsertAsync(others_insert);
             }
+
+            var logtype = "Mobile Log";
+            var log = "Added field activity(" + caf + ")";
+            int deleted = 0;
+
+            var logs_insert = new UserLogsTable
+            {
+                ContactID = contact,
+                LogType = logtype,
+                Log = log,
+                LogDate = DateTime.Parse(current_datetime),
+                DatabaseName = database,
+                Deleted = deleted,
+                LastUpdated = DateTime.Parse(current_datetime)
+            };
+
+            await conn.InsertOrReplaceAsync(logs_insert);
 
             Analytics.TrackEvent("Sent Field Activity Form");
             await DisplayAlert("Offline Save", "Your activity has been saved offline. Connect to the server to send your activity", "Got it");

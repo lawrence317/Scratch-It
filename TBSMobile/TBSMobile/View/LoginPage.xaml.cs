@@ -337,7 +337,57 @@ namespace TBSMobile.View
                                         Preferences.Set("database", database, "private_prefs");
                                         Preferences.Set("password", password, "private_prefs");
 
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                                        var logtype = "Mobile Log";
+                                        var log = "Logged in (" + userName + ")";
+                                        var deleted = "0";
+                                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                                        string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + hostName + "&Database=" + database + "&Request=pQ412v";
+                                        string logscontentType = "application/json";
+                                        JObject logsjson = new JObject
+                                        {
+                                            { "ContactID", contactID },
+                                            { "LogType", logtype },
+                                            { "Log", log },
+                                            { "LogDate", DateTime.Parse(current_datetime) },
+                                            { "DatabaseName", database },
+                                            { "Deleted", deleted },
+                                            { "LastUpdated", DateTime.Parse(current_datetime) }
+                                        };
+
+                                        HttpClient logsclient = new HttpClient();
+                                        var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
+
+                                        if (logsresponse.IsSuccessStatusCode)
+                                        {
+                                            var logscontent = await logsresponse.Content.ReadAsStringAsync();
+                                            if (!string.IsNullOrEmpty(logscontent))
+                                            {
+                                                var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
+
+                                                var logsdataitem = logsdataresult[0];
+                                                var logsdatamessage = logsdataitem.Message;
+
+                                                if (logsdatamessage.Equals("Inserted"))
+                                                {
+                                                    var logs_insert = new UserLogsTable
+                                                    {
+                                                        ContactID = contactID,
+                                                        LogType = logtype,
+                                                        Log = log,
+                                                        LogDate = DateTime.Parse(current_datetime),
+                                                        DatabaseName = database,
+                                                        Deleted = Int32.Parse(deleted),
+                                                        LastUpdated = DateTime.Parse(current_datetime),
+                                                        LastSync = DateTime.Parse(current_datetime)
+                                                    };
+
+                                                    await conn.InsertOrReplaceAsync(logs_insert);
+
+                                                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                                                }
+                                            }
+                                        }                                        
                                     }
                                 }
                             }
@@ -505,6 +555,23 @@ namespace TBSMobile.View
                                         Preferences.Set("database", database, "private_prefs");
                                         Preferences.Set("password", password, "private_prefs");
 
+                                        var logtype = "Mobile Log";
+                                        var log = "Logged in (" + userName + ")";
+                                        int deleted = 0;
+
+                                        var logs_insert = new UserLogsTable
+                                        {
+                                            ContactID = contactID,
+                                            LogType = logtype,
+                                            Log = log,
+                                            LogDate = DateTime.Parse(current_datetime),
+                                            DatabaseName = database,
+                                            Deleted = deleted,
+                                            LastUpdated = DateTime.Parse(current_datetime)
+                                        };
+
+                                        await conn.InsertOrReplaceAsync(logs_insert);
+
                                         await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
                                     }
                                 }
@@ -670,7 +737,28 @@ namespace TBSMobile.View
                                 }
                                 else
                                 {
+                                    var logtype = "Mobile Log";
+                                    var log = "Logged in (" + userName + ")";
+                                    int deleted = 0;
+
+                                    var logs_insert = new UserLogsTable
+                                    {
+                                        ContactID = contactID,
+                                        LogType = logtype,
+                                        Log = log,
+                                        LogDate = DateTime.Parse(current_datetime),
+                                        DatabaseName = database,
+                                        Deleted = deleted,
+                                        LastUpdated = DateTime.Parse(current_datetime)
+                                    };
+
+                                    await conn.InsertOrReplaceAsync(logs_insert);
+
                                     Preferences.Set("username", userName, "private_prefs");
+                                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                                    Preferences.Set("host", hostName, "private_prefs");
+                                    Preferences.Set("database", database, "private_prefs");
+                                    Preferences.Set("password", password, "private_prefs");
 
                                     await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
                                 }

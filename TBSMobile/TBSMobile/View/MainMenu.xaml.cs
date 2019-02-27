@@ -318,6 +318,7 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
                         Analytics.TrackEvent("Logged Out");
+
                         await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                     else
@@ -660,6 +661,18 @@ namespace TBSMobile.View
             public string RecordLog { get; set; }
             public int Deleted { get; set; }
             public DateTime LastUpdated { get; set; }
+        }
+
+        public class UserLogsData
+        {
+            public string ContactID { get; set; }
+            public string LogType { get; set; }
+            public string Log { get; set; }
+            public DateTime LogDate { get; set; }
+            public string DatabaseName { get; set; }
+            public DateTime LastSync { get; set; }
+            public DateTime LastUpdated { get; set; }
+            public int Deleted { get; set; }
         }
 
         public class ServerMessage
@@ -1770,7 +1783,7 @@ namespace TBSMobile.View
                             synccount += "Total synced email recipient changes: " + (count - 1) + " out of " + changesresultCount + "\n";
                         }
 
-                        OnSyncComplete();
+                        SyncLogs(host, database, contact, ipaddress);
                     }
                     catch (Exception ex)
                     {
@@ -1815,6 +1828,142 @@ namespace TBSMobile.View
             else
             {
                 await DisplayAlert("Email recipient data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                OnSyncFailed();
+            }
+        }
+
+        public async void SyncLogs(string host, string database, string contact, string ipaddress)
+        {
+            if (CrossConnectivity.Current.IsConnected)
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
+
+                Ping ping = new Ping();
+                PingReply pingresult = ping.Send(ipaddress);
+
+                if (pingresult.Status.ToString() == "Success")
+                {
+                    try
+                    {
+                        lblStatus.Text = "Initializing user logs sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var getUserLogsChanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = getUserLogsChanges.Result.Count;
+                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                lblStatus.Text = "Sending user logs to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = getUserLogsChanges.Result[i];
+                                var crcontactID = result.ContactID;
+                                var crlogType = result.LogType;
+                                var crlog = result.Log;
+                                var crlogDate = result.LogDate;
+                                var crdatabaseName = result.DatabaseName;
+                                var crdeleted = result.Deleted;
+                                var crlastUpdated = result.LastUpdated;
+
+                                var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=pQ412v";
+                                string crcontentType = "application/json";
+                                JObject crjson = new JObject
+                                    {
+                                        { "ContactID", contact },
+                                        { "LogType", crlogType },
+                                        { "Log", crlog },
+                                        { "LogDate", crlogDate },
+                                        { "DatabaseName", crdatabaseName },
+                                        { "Deleted", crdeleted },
+                                        { "LastUpdated", crlastUpdated }
+                                    };
+
+                                HttpClient crclient = new HttpClient();
+                                var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                if (crresponse.IsSuccessStatusCode)
+                                {
+                                    var crcontent = await crresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(crcontent))
+                                    {
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(crcontent, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ?", DateTime.Parse(current_datetime), contact, crlogType, crlog);
+
+                                            clientupdate++;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("User logs recipient data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                                    OnSyncFailed();
+                                }
+                            }
+
+                            synccount += "Total synced user logs: " + (clientupdate - 1) + " out of " + changesresultCount + "\n";
+                        }
+
+                        OnSyncComplete();
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+
+                        var seedata = await DisplayAlert("User logs data failed", "Data syncing failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            if (CrossConnectivity.Current.IsConnected)
+                            {
+                                Ping ping_retry = new Ping();
+                                PingReply pingretry_result = ping_retry.Send(ipaddress);
+
+                                if (pingretry_result.Status.ToString() == "Success")
+                                {
+                                    SyncLogs(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Email recipient data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                                    OnSyncFailed();
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Email recipient data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                                OnSyncFailed();
+                            }
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("User logs data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                    OnSyncFailed();
+                }
+            }
+            else
+            {
+                await DisplayAlert("User logs data failed", "No connection detected, please connect to the internet to retry", "Got it");
                 OnSyncFailed();
             }
         }
@@ -2020,7 +2169,7 @@ namespace TBSMobile.View
                                     var item = contactsresult[i];
                                     var retailerCode = item.RetailerCode;
 
-                                    lblStatus.Text = "Checking retailer outlet" + count + " out of " + contactsresult.Count;
+                                    lblStatus.Text = "Checking retailer outlet " + count + " out of " + contactsresult.Count;
 
                                     var getContacts = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode = ?", retailerCode);
                                     var resultCount = getContacts.Result.Count;
@@ -2148,9 +2297,9 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=fqV2Vb";
                         string contentType = "application/json";
                         JObject json = new JObject
-                    {
-                        { "ContactID", contact }
-                    };
+                        {
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2204,7 +2353,7 @@ namespace TBSMobile.View
 
                                     if (pingretry_result.Status.ToString() == "Success")
                                     {
-                                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                        ReSyncCaf(host, database, contact, ipaddress);
                                     }
                                     else
                                     {
@@ -2237,7 +2386,7 @@ namespace TBSMobile.View
 
                                 if (pingretry_result.Status.ToString() == "Success")
                                 {
-                                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                    ReSyncCaf(host, database, contact, ipaddress);
                                 }
                                 else
                                 {
@@ -2356,7 +2505,7 @@ namespace TBSMobile.View
 
                                     if (pingretry_result.Status.ToString() == "Success")
                                     {
-                                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                        ReSyncActivities(host, database, contact, ipaddress);
                                     }
                                     else
                                     {
@@ -2389,7 +2538,7 @@ namespace TBSMobile.View
 
                                 if (pingretry_result.Status.ToString() == "Success")
                                 {
-                                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                    ReSyncActivities(host, database, contact, ipaddress);
                                 }
                                 else
                                 {
@@ -2450,9 +2599,9 @@ namespace TBSMobile.View
                         var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=3sEW7W";
                         string chcontentType = "application/json";
                         JObject chjson = new JObject
-                    {
-                        { "ContactID", contact }
-                    };
+                        {
+                            { "ContactID", contact }
+                        };
 
                         HttpClient chclient = new HttpClient();
                         var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
@@ -2492,7 +2641,7 @@ namespace TBSMobile.View
 
                             await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
 
-                            SyncRetailer(host, database, contact, ipaddress);
+                            ReSyncLogs(host, database, contact, ipaddress);
                         }
                         else
                         {
@@ -2506,7 +2655,7 @@ namespace TBSMobile.View
 
                                     if (pingretry_result.Status.ToString() == "Success")
                                     {
-                                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                        ReSyncEmail(host, database, contact, ipaddress);
                                     }
                                     else
                                     {
@@ -2539,7 +2688,7 @@ namespace TBSMobile.View
 
                                 if (pingretry_result.Status.ToString() == "Success")
                                 {
-                                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                    ReSyncEmail(host, database, contact, ipaddress);
                                 }
                                 else
                                 {
@@ -2568,6 +2717,160 @@ namespace TBSMobile.View
             else
             {
                 await DisplayAlert("Email recipient data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                OnSyncFailed();
+            }
+        }
+
+        public async void ReSyncLogs(string host, string database, string contact, string ipaddress)
+        {
+            if (CrossConnectivity.Current.IsConnected)
+            {
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
+
+                Ping ping = new Ping();
+                PingReply pingresult = ping.Send(ipaddress);
+                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                if (pingresult.Status.ToString() == "Success")
+                {
+                    lblStatus.Text = "Initializing user logs re-sync";
+
+                    try
+                    {
+                        lblStatus.Text = "Getting user logs data from server";
+
+                        var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=F23lba";
+                        string chcontentType = "application/json";
+                        JObject chjson = new JObject
+                        {
+                            { "ContactID", contact }
+                        };
+
+                        HttpClient chclient = new HttpClient();
+                        var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
+
+                        if (chresponse.IsSuccessStatusCode)
+                        {
+                            var chcontent = await chresponse.Content.ReadAsStringAsync();
+                            var default_datetime = "0001-01-01 00:00:00";
+
+                            if (!string.IsNullOrEmpty(chcontent))
+                            {
+                                int count = 1;
+
+                                var chlogsresult = JsonConvert.DeserializeObject<List<UserLogsData>>(chcontent, settings);
+                                for (int i = 0; i < chlogsresult.Count; i++)
+                                {
+                                    lblStatus.Text = "Checking user logs " + count + " out of " + chlogsresult.Count;
+
+                                    var chitem = chlogsresult[i];
+                                    var contactID = chitem.ContactID;
+                                    var logtype = chitem.LogType;
+                                    var log = chitem.Log;
+                                    var logdate = chitem.LogDate;
+                                    var databasename = chitem.DatabaseName;
+
+                                    var getContacts = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", contactID, logtype, log, logdate, databasename);
+                                    var resultCount = getContacts.Result.Count;
+
+                                    if (resultCount == 1)
+                                    {
+                                        await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET Checked = ? WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", 1, contactID, logtype, log, logdate, databasename);
+                                    }
+
+                                    count++;
+                                }
+                            }
+                            else
+                            {
+                                await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
+                            }
+
+                            await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+
+                            SyncRetailer(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            var seedata = await DisplayAlert("User logs data failed", "Data resyncing failed", "Retry", "Cancel");
+                            if (seedata == true)
+                            {
+                                if (CrossConnectivity.Current.IsConnected)
+                                {
+                                    Ping ping_retry = new Ping();
+                                    PingReply pingretry_result = ping_retry.Send(ipaddress);
+
+                                    if (pingretry_result.Status.ToString() == "Success")
+                                    {
+                                        ReSyncLogs(host, database, contact, ipaddress);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("User logs data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                                        OnSyncFailed();
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("User logs data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                                    OnSyncFailed();
+                                }
+                            }
+                            else
+                            {
+                                OnSyncFailed();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                        var seedata = await DisplayAlert("User logs data failed", "Data resyncing failed", "Retry", "Cancel");
+                        if (seedata == true)
+                        {
+                            if (CrossConnectivity.Current.IsConnected)
+                            {
+                                Ping ping_retry = new Ping();
+                                PingReply pingretry_result = ping_retry.Send(ipaddress);
+
+                                if (pingretry_result.Status.ToString() == "Success")
+                                {
+                                    ReSyncLogs(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("User logs data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                                    OnSyncFailed();
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("User logs data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                                OnSyncFailed();
+                            }
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("User logs data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
+                    OnSyncFailed();
+                }
+            }
+            else
+            {
+                await DisplayAlert("User logs data failed", "No connection detected, please connect to the internet to retry", "Got it");
                 OnSyncFailed();
             }
         }

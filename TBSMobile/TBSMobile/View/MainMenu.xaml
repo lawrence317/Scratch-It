@@ -23,7 +23,7 @@
                     </OnPlatform>
                 </Label.FontFamily>
             </Label>
-            <Button StyleClass="btnFAF" ContentLayout="Top, 0" Image="fieldactivity.png" Text="Field Activity"  Grid.Row="1" Grid.ColumnSpan="2" x:Name="btnFAF" Clicked="btnFAF_Clicked" BorderRadius="0">
+            <Button StyleClass="btnFAF" ContentLayout="Top, 0" Image="fieldactivity.png" Text="Field Activity" Grid.Row="1" Grid.ColumnSpan="2" x:Name="btnFAF" Clicked="btnFAF_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
@@ -58,7 +58,7 @@
                     </OnPlatform>
                 </Button.FontFamily>
             </Button>
-            <Button StyleClass="btnResend" ContentLayout="Top, 0" Image="resend.png" Text="Resend Data" Grid.Row="4" Grid.Column="0" x:Name="btnResend" Clicked="BtnResend_Clicked" BorderRadius="0">
+            <Button StyleClass="btnResend" ContentLayout="Top, 0" Image="resend.png" Text="Sync Data" Grid.Row="4" Grid.Column="0" x:Name="btnResend" Clicked="BtnResend_Clicked" BorderRadius="0">
                 <Button.FontFamily>
                     <OnPlatform x:TypeArguments="x:String">
                         <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

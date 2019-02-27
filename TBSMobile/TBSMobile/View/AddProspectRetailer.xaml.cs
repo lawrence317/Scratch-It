@@ -1108,8 +1108,46 @@ namespace TBSMobile.View
                                                                                 await conn.InsertAsync(retailer);
 
                                                                                 Analytics.TrackEvent("Sent Prospect Retailer");
-                                                                                await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
-                                                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                                                var logtype = "Mobile Log";
+                                                                                var log = "Added prospect retailer(" + fileas + ")";
+
+                                                                                string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
+                                                                                string logscontentType = "application/json";
+                                                                                JObject logsjson = new JObject
+                                                                                {
+                                                                                    { "ContactID", contact },
+                                                                                    { "LogType", logtype },
+                                                                                    { "Log", log },
+                                                                                    { "LogDate", DateTime.Parse(current_datetime) },
+                                                                                    { "DatabaseName", database },
+                                                                                    { "Deleted", contact },
+                                                                                    { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                                                };
+
+                                                                                HttpClient logsclient = new HttpClient();
+                                                                                var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
+
+                                                                                if (logsresponse.IsSuccessStatusCode)
+                                                                                {
+                                                                                    var logscontent = await logsresponse.Content.ReadAsStringAsync();
+                                                                                    if (!string.IsNullOrEmpty(logscontent))
+                                                                                    {
+                                                                                        var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
+
+                                                                                        var logsdataitem = logsdataresult[0];
+                                                                                        var logsdatamessage = logsdataitem.Message;
+
+                                                                                        if (logsdatamessage.Equals("Inserted"))
+                                                                                        {
+                                                                                            await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
+                                                                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    Send_offline();
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -1160,8 +1198,61 @@ namespace TBSMobile.View
                                                                     await conn.InsertAsync(retailer);
 
                                                                     Analytics.TrackEvent("Sent Prospect Retailer");
-                                                                    await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
-                                                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+
+                                                                    var logtype = "Mobile Log";
+                                                                    var log = "Added prospect retailer(" + fileas + ")";
+
+                                                                    string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
+                                                                    string logscontentType = "application/json";
+                                                                    JObject logsjson = new JObject
+                                                                    {
+                                                                        { "ContactID", contact },
+                                                                        { "LogType", logtype },
+                                                                        { "Log", log },
+                                                                        { "LogDate", DateTime.Parse(current_datetime) },
+                                                                        { "DatabaseName", database },
+                                                                        { "Deleted", deleted },
+                                                                        { "LastUpdated", DateTime.Parse(current_datetime) }
+                                                                    };
+
+                                                                    HttpClient logsclient = new HttpClient();
+                                                                    var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
+
+                                                                    if (logsresponse.IsSuccessStatusCode)
+                                                                    {
+                                                                        var logscontent = await logsresponse.Content.ReadAsStringAsync();
+                                                                        if (!string.IsNullOrEmpty(logscontent))
+                                                                        {
+                                                                            var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
+
+                                                                            var logsdataitem = logsdataresult[0];
+                                                                            var logsdatamessage = logsdataitem.Message;
+
+                                                                            if (logsdatamessage.Equals("Inserted"))
+                                                                            {
+                                                                                var logs_insert = new UserLogsTable
+                                                                                {
+                                                                                    ContactID = contact,
+                                                                                    LogType = logtype,
+                                                                                    Log = log,
+                                                                                    LogDate = DateTime.Parse(current_datetime),
+                                                                                    DatabaseName = database,
+                                                                                    Deleted = deleted,
+                                                                                    LastUpdated = DateTime.Parse(current_datetime),
+                                                                                    LastSync = DateTime.Parse(current_datetime)
+                                                                                };
+
+                                                                                await conn.InsertOrReplaceAsync(logs_insert);
+
+                                                                                await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
+                                                                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        Send_offline();
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -1275,6 +1366,23 @@ namespace TBSMobile.View
                 };
 
                 await conn.InsertAsync(prospect_insert);
+
+                var logtype = "Mobile Log";
+                var log = "Added prospect retailer(" + fileas + ")";
+                int deleted = 0;
+
+                var logs_insert = new UserLogsTable
+                {
+                    ContactID = contact,
+                    LogType = logtype,
+                    Log = log,
+                    LogDate = DateTime.Parse(current_datetime),
+                    DatabaseName = database,
+                    Deleted = deleted,
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
+
+                await conn.InsertOrReplaceAsync(logs_insert);
             }
             catch (Exception ex)
             {
