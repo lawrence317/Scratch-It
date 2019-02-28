@@ -44,7 +44,7 @@ namespace TBSMobile.View
             if (CrossConnectivity.Current.IsConnected)
             {
                 Ping ping = new Ping();
-               PingReply pingresult = ping.Send(ipaddress);
+                PingReply pingresult = ping.Send(ipaddress, 100);
                 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -237,7 +237,7 @@ namespace TBSMobile.View
         public async void SyncUser(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -423,7 +423,7 @@ namespace TBSMobile.View
         public async void SyncUserUpdate(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -561,7 +561,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1043,7 +1043,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1264,7 +1264,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success") {
                 syncStatus.Text = "Initializing retailer outlet sync";
@@ -1481,7 +1481,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1642,7 +1642,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2069,7 +2069,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2240,7 +2240,7 @@ namespace TBSMobile.View
         public async void SyncSubscription(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2638,7 +2638,7 @@ namespace TBSMobile.View
         public async void SyncEmail(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2909,7 +2909,7 @@ namespace TBSMobile.View
         public async void SyncProvince(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -3113,7 +3113,7 @@ namespace TBSMobile.View
         public async void SyncTown(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -3327,7 +3327,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress);
+             PingReply pingresult = ping.Send(ipaddress, 100);
 
             if (pingresult.Status.ToString() == "Success")
             {

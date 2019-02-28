@@ -133,33 +133,20 @@ namespace TBSMobile.View
                             districtvalidator.IsVisible = false;
                             countryvalidator.IsVisible = false;
 
-                            btnAddOutlet.IsEnabled = false;
+                            fafPage3.IsVisible = false;
+                            sendstatusform.IsVisible = true;
+
+                            sendStatus.Text = "Checking internet connection";
 
                             if (CrossConnectivity.Current.IsConnected)
                             {
+                                sendStatus.Text = "Checking connection to server";
+
                                 Ping ping = new Ping();
-                                PingReply pingresult = ping.Send(ipaddress);
+                                PingReply pingresult = ping.Send(ipaddress, 100);
                                 if (pingresult.Status.ToString() == "Success")
                                 {
-                                    var optimalSpeed = 5000;
-                                    var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
-
-                                    if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
-                                    {
-                                        var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
-                                        if (sendconfirm == true)
-                                        {
-                                            Send_online();
-                                        }
-                                        else
-                                        {
-                                            Send_offline();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Send_online();
-                                    }
+                                    Send_online();
                                 }
                                 else
                                 {
@@ -546,6 +533,8 @@ namespace TBSMobile.View
 
             try
             {
+                sendStatus.Text = "Sending retailer outlet to server";
+
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
                 string contentType = "application/json";
                 JObject json = new JObject
@@ -584,6 +573,8 @@ namespace TBSMobile.View
 
                         if (datamessage.Equals("Inserted"))
                         {
+                            sendStatus.Text = "Saving retailer outlet to the device";
+
                             var retailer_group_insert = new RetailerGroupTable
                             {
                                 ContactID = id,
@@ -609,6 +600,8 @@ namespace TBSMobile.View
                             await conn.InsertAsync(retailer_group_insert);
 
                             Analytics.TrackEvent("Sent Retailer Outlet");
+
+                            sendStatus.Text = "Sending user logs to server";
 
                             var logtype = "Mobile Log";
                             var log = "Added retailer outlet(" + retailerCode + ")";
@@ -642,6 +635,8 @@ namespace TBSMobile.View
 
                                     if (logsdatamessage.Equals("Inserted"))
                                     {
+                                        sendStatus.Text = "Saving user logs to the device";
+
                                         var logs_insert = new UserLogsTable
                                         {
                                             ContactID = contact,
@@ -709,6 +704,8 @@ namespace TBSMobile.View
                 var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
                 var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
 
+                sendStatus.Text = "Saving retailer outlet to the device";
+
                 var retailer_group_insert = new RetailerGroupTable
                 {
                     ContactID = id,
@@ -735,6 +732,8 @@ namespace TBSMobile.View
                 var logtype = "Mobile Log";
                 var log = "Added retailer outlet(" + retailerCode + ")";
                 int deleted = 0;
+
+                sendStatus.Text = "Saving user logs to the device";
 
                 var logs_insert = new UserLogsTable
                 {

@@ -134,7 +134,7 @@ namespace TBSMobile.View
 
             for (int i = 0; i < 2; i++)
             {
-                stringChars[i] = chars[random.Next(chars.Length)];
+                stringChars[i] = chars[random.Next(numbers.Length)];
             }
             for (int i = 2; i < 6; i++)
             {
@@ -142,11 +142,11 @@ namespace TBSMobile.View
             }
             for (int i = 6; i < 10; i++)
             {
-                stringChars[i] = chars[random.Next(chars.Length)];
+                stringChars[i] = chars[random.Next(numbers.Length)];
             }
 
             var finalString = new String(stringChars);
-            entCafNo.Text = finalString;
+            entCafNo.Text = "AF" + finalString;
         }
 
         public async void GetGPS()
@@ -159,17 +159,19 @@ namespace TBSMobile.View
 
                 if (!locator.IsGeolocationAvailable)
                 {
-                    await DisplayAlert("GPS Error", "GPS location not available", "Ok");
+                    await DisplayAlert("GPS Error", "GPS location not available", "Got it");
                 }
                 else if (!locator.IsGeolocationEnabled)
                 {
-                    await DisplayAlert("GPS Error", "GPS location was not enabled", "Ok");
+                    await DisplayAlert("GPS Error", "GPS location is not enabled", "Got it");
                 }
                 else
                 {
                     position = await locator.GetPositionAsync(TimeSpan.FromMinutes(10), null, true);
                     
-                    entOnsiteLocation.Text = position.Latitude + "," + position.Longitude;
+                    string location = position.Latitude + "," + position.Longitude;
+                    entOnsiteLocation.Text = location;
+                    entLocation.Text = location;
                 }
             }
             catch (Exception ex)
@@ -410,32 +412,18 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(result.GPSCoordinates))
                         {
-                            if (string.IsNullOrEmpty(result.GPSCoordinates))
-                            {
-                                if (String.IsNullOrEmpty(entOnsiteLocation.Text))
-                                {
-                                    GetGPS();
-                                }
-                                else
-                                {
-                                    entLocation.Text = entOnsiteLocation.Text;
-                                }
-                            }
-                            else
-                            {
-                                if (String.IsNullOrEmpty(entOnsiteLocation.Text))
-                                {
-                                    GetGPS();
-                                }
-                                else
-                                {
-                                    entLocation.Text = entOnsiteLocation.Text;
-                                }
-                            }
+                            entLocation.Text = result.GPSCoordinates;
                         }
                         else
                         {
-                            entLocation.Text = entOnsiteLocation.Text;
+                            if (String.IsNullOrEmpty(entOnsiteLocation.Text))
+                            {
+                                GetGPS();
+                            }
+                            else
+                            {
+                                entLocation.Text = entOnsiteLocation.Text;
+                            }
                         }
 
                         if (string.IsNullOrEmpty(result.PresCountry))
@@ -1276,36 +1264,21 @@ namespace TBSMobile.View
                         {
                             if (confirm == true)
                             {
-                                btnGoBacktoPage6.IsEnabled = false;
-                                btnSend.IsEnabled = false;
-                                
+                                fafPage7.IsVisible = false;
+                                sendstatusform.IsVisible = true;
+
+                                sendStatus.Text = "Checking internet connection";
+
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
-                                    Ping ping = new Ping();
-                                    PingReply pingresult = ping.Send(ipaddress);
+                                     sendStatus.Text = "Checking connection to server";
+
+                                     Ping ping = new Ping();
+                                     PingReply pingresult = ping.Send(ipaddress, 100);
 
                                     if (pingresult.Status.ToString() == "Success")
                                     {
-                                        var optimalSpeed = 5000;
-                                        var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
-
-                                        if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
-                                        {
-                                            var sendconfirm = await DisplayAlert("Slow Connection Connection Warning", "Slow connection detected. Do you want to send the data?", "Send to server", "Save offline");
-
-                                            if (sendconfirm == true)
-                                            {
-                                                Send_online();
-                                            }
-                                            else
-                                            {
-                                                Send_offline();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Send_online();
-                                        }
+                                        Send_online();
                                     }
                                     else
                                     {
@@ -1755,6 +1728,8 @@ namespace TBSMobile.View
 
             try
             {
+                sendStatus.Text = "Sending field activity to server";
+
                 string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
                 string contentType = "application/json";
                 JObject json = new JObject
@@ -1808,6 +1783,8 @@ namespace TBSMobile.View
 
                         if (datamessage.Equals("Inserted"))
                         {
+                            sendStatus.Text = "Sending field activity photo 1 to server";
+
                             var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
                             string ph1contentType = "application/json";
 
@@ -1849,6 +1826,8 @@ namespace TBSMobile.View
 
                                     if (ph1message.Equals("Inserted"))
                                     {
+                                        sendStatus.Text = "Sending field activity photo 2 to server";
+
                                         var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
                                         string ph2contentType = "application/json";
 
@@ -1890,6 +1869,8 @@ namespace TBSMobile.View
 
                                                 if (ph2message.Equals("Inserted"))
                                                 {
+                                                    sendStatus.Text = "Sending field activity photo 3 to server";
+
                                                     byte[] Photo3Data = File.ReadAllBytes(photo3url);
 
                                                     var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
@@ -1935,6 +1916,8 @@ namespace TBSMobile.View
                                                             {
                                                                 if (!string.IsNullOrEmpty(videourl))
                                                                 {
+                                                                    sendStatus.Text = "Sending field activity video to server";
+
                                                                     var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
                                                                     string vidcontentType = "application/json";
 
@@ -1976,6 +1959,8 @@ namespace TBSMobile.View
 
                                                                             if (vidmessage.Equals("Inserted"))
                                                                             {
+                                                                                sendStatus.Text = "Saving field activity to the device";
+
                                                                                 await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                                                 var caf_insert = new CAFTable
@@ -2064,7 +2049,7 @@ namespace TBSMobile.View
                                                                                     await conn.InsertAsync(others_insert);
                                                                                 }
 
-                                                                                Analytics.TrackEvent("Sent Field Activity Form");
+                                                                                sendStatus.Text = "Sending user logs to server";
 
                                                                                 var logtype = "Mobile Log";
                                                                                 var log = "Added field activity(" + caf + ")";
@@ -2098,6 +2083,8 @@ namespace TBSMobile.View
 
                                                                                         if (logsdatamessage.Equals("Inserted"))
                                                                                         {
+                                                                                            sendStatus.Text = "Saving user logs to the device";
+
                                                                                             var logs_insert = new UserLogsTable
                                                                                             {
                                                                                                 ContactID = contact,
@@ -2112,7 +2099,10 @@ namespace TBSMobile.View
 
                                                                                             await conn.InsertOrReplaceAsync(logs_insert);
 
+                                                                                            Analytics.TrackEvent("Sent Field Activity Form");
+
                                                                                             await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+
                                                                                             await Application.Current.MainPage.Navigation.PopAsync();
                                                                                         }
                                                                                     }
@@ -2127,6 +2117,8 @@ namespace TBSMobile.View
                                                                 }
                                                                 else
                                                                 {
+                                                                    sendStatus.Text = "Saving field activity to the device";
+
                                                                     await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
 
                                                                     var caf_insert = new CAFTable
@@ -2216,6 +2208,7 @@ namespace TBSMobile.View
                                                                     }
 
                                                                     Analytics.TrackEvent("Sent Field Activity Form");
+                                                                    sendStatus.Text = "Sending user logs to server";
 
                                                                     var logtype = "Mobile Log";
                                                                     var log = "Added field activity(" + caf + ")";
@@ -2249,6 +2242,8 @@ namespace TBSMobile.View
 
                                                                             if (logsdatamessage.Equals("Inserted"))
                                                                             {
+                                                                                sendStatus.Text = "Saving user logs to the device";
+
                                                                                 var logs_insert = new UserLogsTable
                                                                                 {
                                                                                     ContactID = contact,
@@ -2348,6 +2343,8 @@ namespace TBSMobile.View
 
             await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), retailerCode);
 
+            sendStatus.Text = "Saving field activity to the device";
+
             var caf_insert = new CAFTable
             {
                 CAFNo = caf,
@@ -2433,6 +2430,8 @@ namespace TBSMobile.View
             var log = "Added field activity(" + caf + ")";
             int deleted = 0;
 
+            sendStatus.Text = "Saving user logs to the device";
+
             var logs_insert = new UserLogsTable
             {
                 ContactID = contact,
@@ -2447,7 +2446,8 @@ namespace TBSMobile.View
             await conn.InsertOrReplaceAsync(logs_insert);
 
             Analytics.TrackEvent("Sent Field Activity Form");
-            await DisplayAlert("Offline Save", "Your activity has been saved offline. Connect to the server to send your activity", "Got it");
+
+            await DisplayAlert("Offline Send", "Your activity has been saved offline. Connect to the server to sync your activity", "Got it");
             await Application.Current.MainPage.Navigation.PopAsync();
         }
 

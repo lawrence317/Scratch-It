@@ -80,10 +80,11 @@
 .btn-connect {
     background-color: #e67e22;
 }
+
 .lblSync {
-    color: #415365;
-    font-size: 20;
-    margin-top: 50;
+    color: #353535;
+    font-size: 18;
+    margin-top: 30;
     text-align: center;
 }
 
@@ -205,7 +206,7 @@
     text-align: center;
     color: #feffff;
     font-size: 15;
-    padding: 10;
+    padding: 5;
 }
 
 .lblunsyncedtitle {
@@ -218,4 +219,9 @@
 
 .thumbnail {
     height: 150;
+}
+
+.sendstatusform {
+    background-color: #fff;
+    opacity: 0.4;
 }

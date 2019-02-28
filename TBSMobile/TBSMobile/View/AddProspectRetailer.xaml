@@ -16,6 +16,17 @@
                 <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand">
                     <ScrollView>
                         <StackLayout Orientation="Vertical">
+                            <StackLayout StyleClass="sendstatusform" x:Name="sendstatusform" IsVisible="False">
+                                <ActivityIndicator x:Name="sendindicator" HeightRequest="80" Color="#3498db" IsRunning="True"/>
+                                <Label StyleClass="lblSync" x:Name="sendStatus">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                            </StackLayout>
+                            
                             <StackLayout x:Name="acPage1">
                                 <Entry x:Name="entTempID" IsVisible="False" StyleClass="fieldForm"/>
 
