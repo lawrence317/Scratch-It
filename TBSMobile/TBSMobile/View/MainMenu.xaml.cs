@@ -60,7 +60,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             Ping ping = new Ping();
-                             PingReply pingresult = ping.Send(ipaddress, 100);
+                             PingReply pingresult = ping.Send(ipaddress, 800);
 
                             if (pingresult.Status.ToString() == "Success")
                             {
@@ -353,7 +353,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             Ping ping = new Ping();
-                             PingReply pingresult = ping.Send(ipaddress, 100);
+                             PingReply pingresult = ping.Send(ipaddress, 800);
 
                             if (pingresult.Status.ToString() == "Success")
                             {
@@ -691,7 +691,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1070,7 +1070,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1227,7 +1227,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1591,7 +1591,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1724,7 +1724,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1843,7 +1843,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -1982,7 +1982,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2133,7 +2133,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2283,7 +2283,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2433,7 +2433,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2585,7 +2585,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2735,7 +2735,7 @@ namespace TBSMobile.View
                 };
 
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 if (pingresult.Status.ToString() == "Success")
@@ -2878,7 +2878,7 @@ namespace TBSMobile.View
         public void OnSyncComplete()
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 100);
+             PingReply pingresult = ping.Send(ipaddress, 800);
 
             if (CrossConnectivity.Current.IsConnected)
             {
@@ -2913,7 +2913,7 @@ namespace TBSMobile.View
         public void OnSyncFailed()
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 100);
+             PingReply pingresult = ping.Send(ipaddress, 800);
 
             if (CrossConnectivity.Current.IsConnected)
             {
@@ -2948,7 +2948,7 @@ namespace TBSMobile.View
             if (CrossConnectivity.Current.IsConnected)
             {
                 Ping ping = new Ping();
-                 PingReply pingresult = ping.Send(ipaddress, 100);
+                 PingReply pingresult = ping.Send(ipaddress, 800);
 
                 if (pingresult.Status.ToString() == "Success")
                 {

@@ -186,7 +186,7 @@ namespace TBSMobile.View
                     try
                     {
                        Ping ping = new Ping();
-                        PingReply pingresult = ping.Send(ipaddress, 100);
+                        PingReply pingresult = ping.Send(ipaddress, 800);
 
                         if (pingresult.Status.ToString() == "Success")
                         {
@@ -864,7 +864,7 @@ namespace TBSMobile.View
                     try
                     {
                        Ping ping = new Ping();
-                        PingReply pingresult = ping.Send(ipaddress, 100);
+                        PingReply pingresult = ping.Send(ipaddress, 800);
 
                         if (pingresult.Status.ToString() == "Success")
                         {
