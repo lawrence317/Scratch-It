@@ -185,8 +185,8 @@ namespace TBSMobile.View
                 {
                     try
                     {
-                       Ping ping = new Ping();
-                        PingReply pingresult = ping.Send(ipaddress, 800);
+                        Ping ping = new Ping();
+                        PingReply pingresult = ping.Send(ipaddress, 200);
 
                         if (pingresult.Status.ToString() == "Success")
                         {
@@ -277,7 +277,8 @@ namespace TBSMobile.View
                                             {
                                                 { "Serial", Constants.deviceID },
                                                 { "Date",  DateTime.Parse(current_date)},
-                                                { "ContactID",  userName}
+                                                { "ContactID",  userName},
+                                                { "Version", Constants.appversion }
                                             };
 
                                             HttpClient trialclient = new HttpClient();
@@ -338,7 +339,7 @@ namespace TBSMobile.View
                                         Preferences.Set("password", password, "private_prefs");
 
                                         var logtype = "Mobile Log";
-                                        var log = "Logged in (" + userName + ")";
+                                        var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                                         var deleted = "0";
                                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -551,7 +552,7 @@ namespace TBSMobile.View
                                         else
                                         {
                                             var logtype = "Mobile Log";
-                                            var log = "Logged in (" + userName + ")";
+                                            var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                                             int deleted = 0;
 
                                             var logs_insert = new UserLogsTable
@@ -744,7 +745,7 @@ namespace TBSMobile.View
                                 else
                                 {
                                     var logtype = "Mobile Log";
-                                    var log = "Logged in (" + userName + ")";
+                                    var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                                     int deleted = 0;
 
                                     var logs_insert = new UserLogsTable
@@ -864,7 +865,7 @@ namespace TBSMobile.View
                     try
                     {
                        Ping ping = new Ping();
-                        PingReply pingresult = ping.Send(ipaddress, 800);
+                        PingReply pingresult = ping.Send(ipaddress, 200);
 
                         if (pingresult.Status.ToString() == "Success")
                         {

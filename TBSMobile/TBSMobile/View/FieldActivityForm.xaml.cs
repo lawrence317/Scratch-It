@@ -3,6 +3,7 @@ using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
+using Plugin.DeviceInfo;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
 using Plugin.Media;
@@ -1274,7 +1275,7 @@ namespace TBSMobile.View
                                      sendStatus.Text = "Checking connection to server";
 
                                      Ping ping = new Ping();
-                                     PingReply pingresult = ping.Send(ipaddress, 800);
+                                     PingReply pingresult = ping.Send(ipaddress, 200);
 
                                     if (pingresult.Status.ToString() == "Success")
                                     {
@@ -2052,7 +2053,7 @@ namespace TBSMobile.View
                                                                                 sendStatus.Text = "Sending user logs to server";
 
                                                                                 var logtype = "Mobile Log";
-                                                                                var log = "Added field activity(" + caf + ")";
+                                                                                var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                                                                                 var deleted = "0";
 
                                                                                 string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
@@ -2211,7 +2212,7 @@ namespace TBSMobile.View
                                                                     sendStatus.Text = "Sending user logs to server";
 
                                                                     var logtype = "Mobile Log";
-                                                                    var log = "Added field activity(" + caf + ")";
+                                                                    var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                                                                     var deleted = "0";
 
                                                                     string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
@@ -2427,7 +2428,7 @@ namespace TBSMobile.View
             }
 
             var logtype = "Mobile Log";
-            var log = "Added field activity(" + caf + ")";
+            var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
             int deleted = 0;
 
             sendStatus.Text = "Saving user logs to the device";

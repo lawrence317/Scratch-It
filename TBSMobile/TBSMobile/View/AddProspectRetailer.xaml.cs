@@ -3,6 +3,7 @@ using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
+using Plugin.DeviceInfo;
 using Plugin.Media;
 using Plugin.Media.Abstractions;
 using System;
@@ -373,7 +374,7 @@ namespace TBSMobile.View
                                     sendStatus.Text = "Checking connection to server";
 
                                     Ping ping = new Ping();
-                                    PingReply pingresult = ping.Send(ipaddress, 800);
+                                    PingReply pingresult = ping.Send(ipaddress, 200);
                                     if (pingresult.Status.ToString() == "Success")
                                     {
                                         Send_online();
@@ -1107,7 +1108,7 @@ namespace TBSMobile.View
                                                                                 sendStatus.Text = "Sending user logs to server";
 
                                                                                 var logtype = "Mobile Log";
-                                                                                var log = "Added prospect retailer(" + fileas + ")";
+                                                                                var log = "Added prospect retailer(<b>" + fileas + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
 
                                                                                 string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
                                                                                 string logscontentType = "application/json";
@@ -1217,7 +1218,7 @@ namespace TBSMobile.View
                                                                     sendStatus.Text = "Sending user logs to server";
 
                                                                     var logtype = "Mobile Log";
-                                                                    var log = "Added prospect retailer(" + fileas + ")";
+                                                                    var log = "Added prospect retailer(<b>" + fileas + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
 
                                                                     string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
                                                                     string logscontentType = "application/json";
@@ -1391,7 +1392,7 @@ namespace TBSMobile.View
                 await conn.InsertAsync(prospect_insert);
 
                 var logtype = "Mobile Log";
-                var log = "Added prospect retailer(" + fileas + ")";
+                var log = "Added prospect retailer(<b>" + fileas + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                 int deleted = 0;
 
                 var logs_insert = new UserLogsTable
@@ -1413,7 +1414,7 @@ namespace TBSMobile.View
             }
 
             Analytics.TrackEvent("Sent Prospect Retailer");
-            await DisplayAlert("Offline Save", "Prospect retailer has been saved offline. Connect to the server to send your activity", "Got it");
+            await DisplayAlert("Offline Save", "Prospect retailer has been saved offline. Connect to the server to sync your data", "Got it");
             await Application.Current.MainPage.Navigation.PopModalAsync();
         }
 

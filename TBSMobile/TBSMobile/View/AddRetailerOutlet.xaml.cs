@@ -15,6 +15,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Newtonsoft.Json;
+using Plugin.DeviceInfo;
 
 namespace TBSMobile.View
 {
@@ -143,7 +144,7 @@ namespace TBSMobile.View
                                 sendStatus.Text = "Checking connection to server";
 
                                 Ping ping = new Ping();
-                                PingReply pingresult = ping.Send(ipaddress, 800);
+                                PingReply pingresult = ping.Send(ipaddress, 200);
                                 if (pingresult.Status.ToString() == "Success")
                                 {
                                     Send_online();
@@ -604,7 +605,7 @@ namespace TBSMobile.View
                             sendStatus.Text = "Sending user logs to server";
 
                             var logtype = "Mobile Log";
-                            var log = "Added retailer outlet(" + retailerCode + ")";
+                            var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                             var deleted = "0";
 
                             string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
@@ -730,7 +731,7 @@ namespace TBSMobile.View
                 await conn.InsertOrReplaceAsync(retailer_group_insert);
 
                 var logtype = "Mobile Log";
-                var log = "Added retailer outlet(" + retailerCode + ")";
+                var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                 int deleted = 0;
 
                 sendStatus.Text = "Saving user logs to the device";
@@ -750,7 +751,7 @@ namespace TBSMobile.View
 
                 Analytics.TrackEvent("Sent Prospect Retailer");
 
-                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to send your activity", "Got it");
+                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to sync your data", "Got it");
                 await Application.Current.MainPage.Navigation.PopModalAsync();
             }
             catch (Exception ex)
