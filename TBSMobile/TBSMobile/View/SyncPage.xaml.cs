@@ -44,7 +44,7 @@ namespace TBSMobile.View
             if (CrossConnectivity.Current.IsConnected)
             {
                 Ping ping = new Ping();
-                PingReply pingresult = ping.Send(ipaddress, 200);
+                PingReply pingresult = ping.Send(ipaddress, 5000);
                 
                 if (pingresult.Status.ToString() == "Success")
                 {
@@ -240,7 +240,7 @@ namespace TBSMobile.View
         public async void SyncUser(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-            PingReply pingresult = ping.Send(ipaddress, 200);
+            PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -426,7 +426,7 @@ namespace TBSMobile.View
         public async void SyncUserUpdate(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+            PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -535,7 +535,7 @@ namespace TBSMobile.View
                             synccount += "Total synced new user: " + (newcount - 1) + "\n";
                         }
 
-                        SyncRetailer(host, database, contact, ipaddress);
+                        SyncSubscription(host, database, contact, ipaddress);
                     }
                     else
                     {
@@ -554,7 +554,405 @@ namespace TBSMobile.View
                 btnBack.IsVisible = true;
             }
         }
-        
+
+        public async void SyncSubscription(string host, string database, string contact, string ipaddress)
+        {
+            Ping ping = new Ping();
+            PingReply pingresult = ping.Send(ipaddress, 5000);
+
+            if (pingresult.Status.ToString() == "Success")
+            {
+                syncStatus.Text = "Initializing device registration sync";
+
+                try
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var getSub = conn.QueryAsync<SubscriptionData>("SELECT * FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
+                    var resultCount = getSub.Result.Count;
+                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    if (resultCount > 0)
+                    {
+                        var getSubscriptionChanges = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = getSubscriptionChanges.Result.Count;
+
+                        int count = 1;
+
+                        if (changesresultCount > 0)
+                        {
+                            for (int i = 0; i < resultCount; i++)
+                            {
+                                try
+                                {
+                                    syncStatus.Text = "Sending device registration changes to server " + count + " out of " + changesresultCount;
+
+                                    var crresult = getSubscriptionChanges.Result[i];
+                                    var crserialNumber = crresult.SerialNumber;
+                                    var crcontactID = crresult.ContactID;
+                                    var crdateStart = crresult.DateStart;
+                                    var crnoOfDays = crresult.NoOfDays;
+                                    var crtrials = crresult.Trials;
+                                    var crinputserialnumber = crresult.InputSerialNumber;
+                                    var crdeleted = crresult.Deleted;
+                                    var crlastUpdated = crresult.LastUpdated;
+
+                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=59EkmJ";
+                                    string crcontentType = "application/json";
+                                    JObject crjson = new JObject
+                                    {
+                                        { "ContactID", crcontactID },
+                                        { "SerialNumber", crserialNumber },
+                                        { "DateStart", crdateStart },
+                                        { "Trials", crtrials },
+                                        { "InputSerialNumber", crinputserialnumber },
+                                        { "NoOfDays", crnoOfDays },
+                                        { "Deleted", crdeleted },
+                                        { "LastUpdated", crlastUpdated }
+                                    };
+
+                                    HttpClient crclient = new HttpClient();
+                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
+
+                                    if (crresponse.IsSuccessStatusCode)
+                                    {
+                                        await conn.QueryAsync<SubscriptionTable>("UPDATE tblSubscription SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
+
+                                        count++;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Crashes.TrackError(ex);
+                                }
+                            }
+
+                            synccount += "Total synced device registration changes: " + (count - 1) + " out of " + changesresultCount + "\n";
+
+                            try
+                            {
+                                syncStatus.Text = "Getting device registration updates from server";
+
+                                var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=spw5SD";
+                                string chcontentType = "application/json";
+                                JObject chjson = new JObject
+                                {
+                                    { "ContactID", contact },
+                                    { "DeviceID", Constants.deviceID }
+                                };
+
+                                HttpClient chclient = new HttpClient();
+                                var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
+
+                                if (chresponse.IsSuccessStatusCode)
+                                {
+                                    var chcontent = await chresponse.Content.ReadAsStringAsync();
+
+                                    if (!string.IsNullOrEmpty(chcontent))
+                                    {
+                                        var settings = new JsonSerializerSettings
+                                        {
+                                            NullValueHandling = NullValueHandling.Ignore,
+                                            MissingMemberHandling = MissingMemberHandling.Ignore
+                                        };
+
+                                        var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
+
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
+
+                                        for (int i = 0; i < chsubresult.Count; i++)
+                                        {
+                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
+
+                                            var chitem = chsubresult[i];
+                                            var chSerialNumber = chitem.SerialNumber;
+                                            var chcontactID = chitem.ContactID;
+                                            var chnoOfDays = chitem.NoOfDays;
+                                            var chdateStart = chitem.DateStart;
+                                            var chtrials = chitem.Trials;
+                                            var chinputserialnumber = chitem.InputSerialNumber;
+                                            var chlastSync = DateTime.Parse(current_datetime);
+                                            var chlastUpdated = chitem.LastUpdated;
+                                            var chdeleted = chitem.Deleted;
+
+                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND SerialNumber = ?", chcontactID, chSerialNumber);
+                                            var chresultCount = chgetSubscription.Result.Count;
+
+                                            if (chresultCount > 0)
+                                            {
+                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
+                                                {
+                                                    var chsub = new SubscriptionTable
+                                                    {
+                                                        SerialNumber = chSerialNumber,
+                                                        ContactID = chcontactID,
+                                                        NoOfDays = chnoOfDays,
+                                                        DateStart = chdateStart,
+                                                        Trials = chtrials,
+                                                        InputSerialNumber = chinputserialnumber,
+                                                        LastSync = chlastSync,
+                                                        Deleted = chdeleted,
+                                                        LastUpdated = chlastUpdated
+                                                    };
+
+                                                    await conn.InsertOrReplaceAsync(chsub);
+                                                    syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
+
+                                                    updatecount++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var chesub = new SubscriptionTable
+                                                {
+                                                    SerialNumber = chSerialNumber,
+                                                    ContactID = chcontactID,
+                                                    NoOfDays = chnoOfDays,
+                                                    DateStart = chdateStart,
+                                                    Trials = chtrials,
+                                                    InputSerialNumber = chinputserialnumber,
+                                                    LastSync = chlastSync,
+                                                    Deleted = chdeleted,
+                                                    LastUpdated = chlastUpdated
+                                                };
+
+                                                await conn.InsertOrReplaceAsync(chesub);
+                                                syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
+
+                                                newcount++;
+                                            }
+
+                                            servercount++;
+                                        }
+
+                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
+                                    btnBack.IsVisible = true;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Crashes.TrackError(ex);
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                syncStatus.Text = "Getting device registration updates from server";
+
+                                var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=spw5SD";
+                                string chcontentType = "application/json";
+                                JObject chjson = new JObject
+                                {
+                                    { "ContactID", contact },
+                                    { "DeviceID", Constants.deviceID }
+                                };
+
+                                HttpClient chclient = new HttpClient();
+                                var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
+
+                                if (chresponse.IsSuccessStatusCode)
+                                {
+                                    var chcontent = await chresponse.Content.ReadAsStringAsync();
+
+                                    if (!string.IsNullOrEmpty(chcontent))
+                                    {
+                                        var settings = new JsonSerializerSettings
+                                        {
+                                            NullValueHandling = NullValueHandling.Ignore,
+                                            MissingMemberHandling = MissingMemberHandling.Ignore
+                                        };
+
+                                        var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
+
+                                        int updatecount = 1;
+                                        int newcount = 1;
+                                        int servercount = 1;
+
+                                        for (int i = 0; i < chsubresult.Count; i++)
+                                        {
+                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
+
+                                            var chitem = chsubresult[i];
+                                            var chSerialNumber = chitem.SerialNumber;
+                                            var chcontactID = chitem.ContactID;
+                                            var chnoOfDays = chitem.NoOfDays;
+                                            var chdateStart = chitem.DateStart;
+                                            var chtrials = chitem.Trials;
+                                            var chinputserialnumber = chitem.InputSerialNumber;
+                                            var chlastSync = DateTime.Parse(current_datetime);
+                                            var chlastUpdated = chitem.LastUpdated;
+                                            var chdeleted = chitem.Deleted;
+
+                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND SerialNumber = ?", chcontactID, chSerialNumber);
+                                            var chresultCount = chgetSubscription.Result.Count;
+
+                                            if (chresultCount > 0)
+                                            {
+                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
+                                                {
+                                                    var chsub = new SubscriptionTable
+                                                    {
+                                                        SerialNumber = chSerialNumber,
+                                                        ContactID = chcontactID,
+                                                        NoOfDays = chnoOfDays,
+                                                        DateStart = chdateStart,
+                                                        Trials = chtrials,
+                                                        InputSerialNumber = chinputserialnumber,
+                                                        LastSync = chlastSync,
+                                                        Deleted = chdeleted,
+                                                        LastUpdated = chlastUpdated
+                                                    };
+
+                                                    await conn.InsertOrReplaceAsync(chsub);
+                                                    syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
+
+                                                    updatecount++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var chesub = new SubscriptionTable
+                                                {
+                                                    SerialNumber = chSerialNumber,
+                                                    ContactID = chcontactID,
+                                                    NoOfDays = chnoOfDays,
+                                                    DateStart = chdateStart,
+                                                    Trials = chtrials,
+                                                    InputSerialNumber = chinputserialnumber,
+                                                    LastSync = chlastSync,
+                                                    Deleted = chdeleted,
+                                                    LastUpdated = chlastUpdated
+                                                };
+
+                                                await conn.InsertOrReplaceAsync(chesub);
+                                                syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
+
+                                                newcount++;
+                                            }
+
+                                            servercount++;
+                                        }
+
+                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
+                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
+                                    btnBack.IsVisible = true;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Crashes.TrackError(ex);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            syncStatus.Text = "Getting device registration data from server";
+
+                            var sublink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qtF5Ej";
+                            string subcontentType = "application/json";
+                            JObject subjson = new JObject
+                            {
+                                { "ContactID", contact },
+                                { "DeviceID", Constants.deviceID }
+                            };
+
+                            HttpClient subclient = new HttpClient();
+                            var subresponse = await subclient.PostAsync(sublink, new StringContent(subjson.ToString(), Encoding.UTF8, subcontentType));
+
+                            if (subresponse.IsSuccessStatusCode)
+                            {
+                                var subcontent = await subresponse.Content.ReadAsStringAsync();
+
+                                if (!string.IsNullOrEmpty(subcontent))
+                                {
+                                    int count = 1;
+
+                                    var settings = new JsonSerializerSettings
+                                    {
+                                        NullValueHandling = NullValueHandling.Ignore,
+                                        MissingMemberHandling = MissingMemberHandling.Ignore
+                                    };
+
+                                    var subsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(subcontent, settings);
+                                    for (int i = 0; i < subsubresult.Count; i++)
+                                    {
+                                        syncStatus.Text = "Syncing device registration " + count + " out of " + subsubresult.Count;
+
+                                        var subitem = subsubresult[i];
+                                        var subSerialNumber = subitem.SerialNumber;
+                                        var subContactID = subitem.ContactID;
+                                        var subnoOfDays = subitem.NoOfDays;
+                                        var subdateStart = subitem.DateStart;
+                                        var subtrials = subitem.Trials;
+                                        var subinputserialnumber = subitem.InputSerialNumber;
+                                        var sublastSync = DateTime.Parse(current_datetime);
+                                        var sublastUpdated = subitem.LastUpdated;
+                                        var subdeleted = subitem.Deleted;
+
+                                        var subsub = new SubscriptionTable
+                                        {
+                                            SerialNumber = subSerialNumber,
+                                            ContactID = subContactID,
+                                            NoOfDays = subnoOfDays,
+                                            DateStart = subdateStart,
+                                            Trials = subtrials,
+                                            InputSerialNumber = subinputserialnumber,
+                                            LastSync = sublastSync,
+                                            Deleted = subdeleted,
+                                            LastUpdated = sublastUpdated
+                                        };
+
+                                        await conn.InsertOrReplaceAsync(subsub);
+
+                                        count++;
+                                    }
+
+                                    synccount += "Total synced device registration: " + (count - 1) + " out of " + subsubresult.Count + "\n";
+                                }
+                            }
+                            else
+                            {
+                                syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
+                                btnBack.IsVisible = true;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Crashes.TrackError(ex);
+                        }
+                    }
+
+                    SyncRetailer(host, database, contact, ipaddress);
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
+            }
+            else
+            {
+                syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
+                btnBack.IsVisible = true;
+            }
+        }
+
         public async void SyncRetailer(string host, string database, string contact, string ipaddress)
         {
             var settings = new JsonSerializerSettings
@@ -564,7 +962,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1058,7 +1456,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1288,7 +1686,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success") {
                 syncStatus.Text = "Initializing retailer outlet sync";
@@ -1505,7 +1903,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -1666,7 +2064,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2093,7 +2491,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2247,7 +2645,7 @@ namespace TBSMobile.View
                         }
                     }
 
-                    SyncSubscription(host, database, contact, ipaddress);
+                    SyncEmail(host, database, contact, ipaddress);
                 }
                 catch (Exception ex)
                 {
@@ -2260,409 +2658,11 @@ namespace TBSMobile.View
                 btnBack.IsVisible = true;
             }
         }
-
-        public async void SyncSubscription(string host, string database, string contact, string ipaddress)
-        {
-            Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
-
-            if (pingresult.Status.ToString() == "Success")
-            {
-                syncStatus.Text = "Initializing device registration sync";
-
-                try
-                {
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-                    
-                    var getSub = conn.QueryAsync<SubscriptionData>("SELECT * FROM tblSubscription WHERE SerialNumber = ?", Constants.deviceID);
-                    var resultCount = getSub.Result.Count;
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    
-                    if (resultCount > 0)
-                    {
-                        var getSubscriptionChanges = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                        var changesresultCount = getSubscriptionChanges.Result.Count;
-
-                        int count = 1;
-
-                        if (changesresultCount > 0)
-                        {
-                            for (int i = 0; i < resultCount; i++)
-                            {
-                                try
-                                {
-                                    syncStatus.Text = "Sending device registration changes to server " + count + " out of " + changesresultCount;
-
-                                    var crresult = getSubscriptionChanges.Result[i];
-                                    var crserialNumber = crresult.SerialNumber;
-                                    var crcontactID = crresult.ContactID;
-                                    var crdateStart = crresult.DateStart;
-                                    var crnoOfDays = crresult.NoOfDays;
-                                    var crtrials = crresult.Trials;
-                                    var crinputserialnumber = crresult.InputSerialNumber;
-                                    var crdeleted = crresult.Deleted;
-                                    var crlastUpdated = crresult.LastUpdated;
-
-                                    var crlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=59EkmJ";
-                                    string crcontentType = "application/json";
-                                    JObject crjson = new JObject
-                                    {
-                                        { "ContactID", crcontactID },
-                                        { "SerialNumber", crserialNumber },
-                                        { "DateStart", crdateStart },
-                                        { "Trials", crtrials },
-                                        { "InputSerialNumber", crinputserialnumber },
-                                        { "NoOfDays", crnoOfDays },
-                                        { "Deleted", crdeleted },
-                                        { "LastUpdated", crlastUpdated }
-                                    };
-
-                                    HttpClient crclient = new HttpClient();
-                                    var crresponse = await crclient.PostAsync(crlink, new StringContent(crjson.ToString(), Encoding.UTF8, crcontentType));
-
-                                    if (crresponse.IsSuccessStatusCode)
-                                    {
-                                        await conn.QueryAsync<SubscriptionTable>("UPDATE tblSubscription SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
-
-                                        count++;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Crashes.TrackError(ex);
-                                }
-                            }
-
-                            synccount += "Total synced device registration changes: " + (count - 1) + " out of " + changesresultCount + "\n";
-
-                            try
-                            {
-                                syncStatus.Text = "Getting device registration updates from server";
-
-                                var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=spw5SD";
-                                string chcontentType = "application/json";
-                                JObject chjson = new JObject
-                                {
-                                    { "ContactID", contact },
-                                    { "DeviceID", Constants.deviceID }
-                                };
-
-                                HttpClient chclient = new HttpClient();
-                                var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
-
-                                if (chresponse.IsSuccessStatusCode)
-                                {
-                                    var chcontent = await chresponse.Content.ReadAsStringAsync();
-
-                                    if (!string.IsNullOrEmpty(chcontent))
-                                    {
-                                        var settings = new JsonSerializerSettings
-                                        {
-                                            NullValueHandling = NullValueHandling.Ignore,
-                                            MissingMemberHandling = MissingMemberHandling.Ignore
-                                        };
-
-                                        var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
-
-                                        int updatecount = 1;
-                                        int newcount = 1;
-                                        int servercount = 1;
-
-                                        for (int i = 0; i < chsubresult.Count; i++)
-                                        {
-                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
-
-                                            var chitem = chsubresult[i];
-                                            var chSerialNumber = chitem.SerialNumber;
-                                            var chcontactID = chitem.ContactID;
-                                            var chnoOfDays = chitem.NoOfDays;
-                                            var chdateStart = chitem.DateStart;
-                                            var chtrials = chitem.Trials;
-                                            var chinputserialnumber = chitem.InputSerialNumber;
-                                            var chlastSync = DateTime.Parse(current_datetime);
-                                            var chlastUpdated = chitem.LastUpdated;
-                                            var chdeleted = chitem.Deleted;
-
-                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND SerialNumber = ?", chcontactID, chSerialNumber);
-                                            var chresultCount = chgetSubscription.Result.Count;
-
-                                            if (chresultCount > 0)
-                                            {
-                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
-                                                {
-                                                    var chsub = new SubscriptionTable
-                                                    {
-                                                        SerialNumber = chSerialNumber,
-                                                        ContactID = chcontactID,
-                                                        NoOfDays = chnoOfDays,
-                                                        DateStart = chdateStart,
-                                                        Trials = chtrials,
-                                                        InputSerialNumber = chinputserialnumber,
-                                                        LastSync = chlastSync,
-                                                        Deleted = chdeleted,
-                                                        LastUpdated = chlastUpdated
-                                                    };
-
-                                                    await conn.InsertOrReplaceAsync(chsub);
-                                                    syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
-
-                                                    updatecount++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                var chesub = new SubscriptionTable
-                                                {
-                                                    SerialNumber = chSerialNumber,
-                                                    ContactID = chcontactID,
-                                                    NoOfDays = chnoOfDays,
-                                                    DateStart = chdateStart,
-                                                    Trials = chtrials,
-                                                    InputSerialNumber = chinputserialnumber,
-                                                    LastSync = chlastSync,
-                                                    Deleted = chdeleted,
-                                                    LastUpdated = chlastUpdated
-                                                };
-
-                                                await conn.InsertOrReplaceAsync(chesub);
-                                                syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
-
-                                                newcount++;
-                                            }
-
-                                            servercount++;
-                                        }
-
-                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
-                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
-                                    }
-                                }
-                                else
-                                {
-                                    syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
-                                    btnBack.IsVisible = true;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Crashes.TrackError(ex);
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                syncStatus.Text = "Getting device registration updates from server";
-
-                                var chlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=spw5SD";
-                                string chcontentType = "application/json";
-                                JObject chjson = new JObject
-                                {
-                                    { "ContactID", contact },
-                                    { "DeviceID", Constants.deviceID }
-                                };
-
-                                HttpClient chclient = new HttpClient();
-                                var chresponse = await chclient.PostAsync(chlink, new StringContent(chjson.ToString(), Encoding.UTF8, chcontentType));
-
-                                if (chresponse.IsSuccessStatusCode)
-                                {
-                                    var chcontent = await chresponse.Content.ReadAsStringAsync();
-
-                                    if (!string.IsNullOrEmpty(chcontent))
-                                    {
-                                        var settings = new JsonSerializerSettings
-                                        {
-                                            NullValueHandling = NullValueHandling.Ignore,
-                                            MissingMemberHandling = MissingMemberHandling.Ignore
-                                        };
-
-                                        var chsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(chcontent, settings);
-
-                                        int updatecount = 1;
-                                        int newcount = 1;
-                                        int servercount = 1;
-
-                                        for (int i = 0; i < chsubresult.Count; i++)
-                                        {
-                                            syncStatus.Text = "Checking device registration update " + servercount + " out of " + chsubresult.Count;
-
-                                            var chitem = chsubresult[i];
-                                            var chSerialNumber = chitem.SerialNumber;
-                                            var chcontactID = chitem.ContactID;
-                                            var chnoOfDays = chitem.NoOfDays;
-                                            var chdateStart = chitem.DateStart;
-                                            var chtrials = chitem.Trials;
-                                            var chinputserialnumber = chitem.InputSerialNumber;
-                                            var chlastSync = DateTime.Parse(current_datetime);
-                                            var chlastUpdated = chitem.LastUpdated;
-                                            var chdeleted = chitem.Deleted;
-                                            
-                                            var chgetSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE ContactID = ? AND SerialNumber = ?", chcontactID, chSerialNumber);
-                                            var chresultCount = chgetSubscription.Result.Count;
-
-                                            if (chresultCount > 0)
-                                            {
-                                                if (chlastUpdated > chgetSubscription.Result[0].LastUpdated)
-                                                {
-                                                    var chsub = new SubscriptionTable
-                                                    {
-                                                        SerialNumber = chSerialNumber,
-                                                        ContactID = chcontactID,
-                                                        NoOfDays = chnoOfDays,
-                                                        DateStart = chdateStart,
-                                                        Trials = chtrials,
-                                                        InputSerialNumber = chinputserialnumber,
-                                                        LastSync = chlastSync,
-                                                        Deleted = chdeleted,
-                                                        LastUpdated = chlastUpdated
-                                                    };
-
-                                                    await conn.InsertOrReplaceAsync(chsub);
-                                                    syncStatus.Text = "Syncing subscription updates of " + chSerialNumber;
-
-                                                    updatecount++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                var chesub = new SubscriptionTable
-                                                {
-                                                    SerialNumber = chSerialNumber,
-                                                    ContactID = chcontactID,
-                                                    NoOfDays = chnoOfDays,
-                                                    DateStart = chdateStart,
-                                                    Trials = chtrials,
-                                                    InputSerialNumber = chinputserialnumber,
-                                                    LastSync = chlastSync,
-                                                    Deleted = chdeleted,
-                                                    LastUpdated = chlastUpdated
-                                                };
-
-                                                await conn.InsertOrReplaceAsync(chesub);
-                                                syncStatus.Text = "Syncing new subscription (" + chSerialNumber + ")";
-
-                                                newcount++;
-                                            }
-
-                                            servercount++;
-                                        }
-
-                                        synccount += "Total synced updated device registration: " + (updatecount - 1) + "\n";
-                                        synccount += "Total synced new device registration: " + (newcount - 1) + "\n";
-                                    }
-                                }
-                                else
-                                {
-                                    syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
-                                    btnBack.IsVisible = true;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Crashes.TrackError(ex);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            syncStatus.Text = "Getting device registration data from server";
-
-                            var sublink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=qtF5Ej";
-                            string subcontentType = "application/json";
-                            JObject subjson = new JObject
-                            {
-                                { "ContactID", contact },
-                                { "DeviceID", Constants.deviceID }
-                            };
-
-                            HttpClient subclient = new HttpClient();
-                            var subresponse = await subclient.PostAsync(sublink, new StringContent(subjson.ToString(), Encoding.UTF8, subcontentType));
-
-                            if (subresponse.IsSuccessStatusCode)
-                            {
-                                var subcontent = await subresponse.Content.ReadAsStringAsync();
-
-                                if (!string.IsNullOrEmpty(subcontent))
-                                {
-                                    int count = 1;
-
-                                    var settings = new JsonSerializerSettings
-                                    {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                        MissingMemberHandling = MissingMemberHandling.Ignore
-                                    };
-
-                                    var subsubresult = JsonConvert.DeserializeObject<List<SubscriptionData>>(subcontent, settings);
-                                    for (int i = 0; i < subsubresult.Count; i++)
-                                    {
-                                        syncStatus.Text = "Syncing device registration " + count + " out of " + subsubresult.Count;
-
-                                        var subitem = subsubresult[i];
-                                        var subSerialNumber = subitem.SerialNumber;
-                                        var subContactID = subitem.ContactID;
-                                        var subnoOfDays = subitem.NoOfDays;
-                                        var subdateStart = subitem.DateStart;
-                                        var subtrials = subitem.Trials;
-                                        var subinputserialnumber = subitem.InputSerialNumber;
-                                        var sublastSync = DateTime.Parse(current_datetime);
-                                        var sublastUpdated = subitem.LastUpdated;
-                                        var subdeleted = subitem.Deleted;
-
-                                        var subsub = new SubscriptionTable
-                                        {
-                                            SerialNumber = subSerialNumber,
-                                            ContactID = subContactID,
-                                            NoOfDays = subnoOfDays,
-                                            DateStart = subdateStart,
-                                            Trials = subtrials,
-                                            InputSerialNumber = subinputserialnumber,
-                                            LastSync = sublastSync,
-                                            Deleted = subdeleted,
-                                            LastUpdated = sublastUpdated
-                                        };
-
-                                        await conn.InsertOrReplaceAsync(subsub);
-
-                                        count++;
-                                    }
-
-                                    synccount += "Total synced device registration: " + (count - 1) + " out of " + subsubresult.Count + "\n";
-                                }
-                            }
-                            else
-                            {
-                                syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
-                                btnBack.IsVisible = true;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Crashes.TrackError(ex);
-                        }
-                    }
-
-                    SyncEmail(host, database, contact, ipaddress);
-                }
-                catch (Exception ex)
-                {
-                    Crashes.TrackError(ex);
-                }
-            }
-            else
-            {
-                syncStatus.Text = "Syncing subscription failed. Server is unreachable.";
-                btnBack.IsVisible = true;
-            }
-        }
         
         public async void SyncEmail(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -2933,7 +2933,7 @@ namespace TBSMobile.View
         public async void SyncProvince(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -3137,7 +3137,7 @@ namespace TBSMobile.View
         public async void SyncTown(string host, string database, string contact, string ipaddress)
         {
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
@@ -3351,7 +3351,7 @@ namespace TBSMobile.View
             };
 
             Ping ping = new Ping();
-             PingReply pingresult = ping.Send(ipaddress, 200);
+             PingReply pingresult = ping.Send(ipaddress, 5000);
 
             if (pingresult.Status.ToString() == "Success")
             {
