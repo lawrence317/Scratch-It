@@ -17,6 +17,6 @@ namespace TBSMobile.Data
         public static string appversion = "Version: " + VersionTracking.CurrentVersion;
         public static string email = "lawrenceagulto.317@gmail.com";
 
-        public static string requestUrl = ":7777/TBSApp/mobile-api.php?";
+        public static string requestUrl = ":7777/TBSApp/mobile-api-new.php?";
     }
 }
