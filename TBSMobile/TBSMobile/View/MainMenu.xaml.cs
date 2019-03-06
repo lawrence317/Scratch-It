@@ -60,7 +60,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             Ping ping = new Ping();
-                            PingReply pingresult = ping.Send(ipaddress, 500);
+                            PingReply pingresult = ping.Send(ipaddress, 800);
 
                             if (pingresult.Status.ToString() == "Success")
                             {
@@ -353,7 +353,7 @@ namespace TBSMobile.View
                         if (CrossConnectivity.Current.IsConnected)
                         {
                             Ping ping = new Ping();
-                             PingReply pingresult = ping.Send(ipaddress, 200);
+                             PingReply pingresult = ping.Send(ipaddress, 800);
 
                             if (pingresult.Status.ToString() == "Success")
                             {

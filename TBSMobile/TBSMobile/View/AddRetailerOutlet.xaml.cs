@@ -144,7 +144,7 @@ namespace TBSMobile.View
                                 sendStatus.Text = "Checking connection to server";
 
                                 Ping ping = new Ping();
-                                PingReply pingresult = ping.Send(ipaddress, 200);
+                                PingReply pingresult = ping.Send(ipaddress, 4000);
                                 if (pingresult.Status.ToString() == "Success")
                                 {
                                     Send_online();
