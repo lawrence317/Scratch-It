@@ -93,6 +93,9 @@ namespace TBSMobile.View
             public string PresCountry { get; set; }
             public string Landmark { get; set; }
             public string CustomerRemarks { get; set; }
+            public DateTime RecordDate { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
             public string Telephone1 { get; set; }
             public string Telephone2 { get; set; }
             public string Mobile { get; set; }
@@ -609,6 +612,9 @@ namespace TBSMobile.View
                                     var crpresCountry = crresult.PresCountry;
                                     var crlandmark = crresult.Landmark;
                                     var crremarks = crresult.CustomerRemarks;
+                                    var crrecordDate = crresult.RecordDate;
+                                    var crstartTime = crresult.StartTime;
+                                    var crendTime = crresult.EndTime;
                                     var crtelephone1 = crresult.Telephone1;
                                     var crtelephone2 = crresult.Telephone2;
                                     var crmobile = crresult.Mobile;
@@ -649,6 +655,9 @@ namespace TBSMobile.View
                                         { "PresCountry", crpresCountry },
                                         { "Landmark", crlandmark },
                                         { "Remarks", crremarks },
+                                        { "RecordDate", crrecordDate },
+                                        { "StartTime", crstartTime },
+                                        { "EndTime", crendTime },
                                         { "Telephone1", crtelephone1 },
                                         { "Telephone2", crtelephone2 },
                                         { "Mobile", crmobile },
@@ -940,6 +949,9 @@ namespace TBSMobile.View
                                         var presCountry = item.PresCountry;
                                         var landmark = item.Landmark;
                                         var remarks = item.CustomerRemarks;
+                                        var recordDate = item.RecordDate;
+                                        var startTime = item.StartTime;
+                                        var endTime = item.EndTime;
                                         var telephone1 = item.Telephone1;
                                         var telephone2 = item.Telephone2;
                                         var mobile = item.Mobile;
@@ -979,6 +991,9 @@ namespace TBSMobile.View
                                             PresCountry = presCountry,
                                             Landmark = landmark,
                                             CustomerRemarks = remarks,
+                                            RecordDate = recordDate,
+                                            StartTime = startTime,
+                                            EndTime = endTime,
                                             Telephone1 = telephone1,
                                             Telephone2 = telephone2,
                                             Mobile = mobile,
@@ -1104,6 +1119,9 @@ namespace TBSMobile.View
                                     var chpresCountry = chitem.PresCountry;
                                     var chlandmark = chitem.Landmark;
                                     var chremarks = chitem.CustomerRemarks;
+                                    var chrecordDate = chitem.RecordDate;
+                                    var chstartTime = chitem.StartTime;
+                                    var chendTime = chitem.EndTime;
                                     var chtelephone1 = chitem.Telephone1;
                                     var chtelephone2 = chitem.Telephone2;
                                     var chmobile = chitem.Mobile;
@@ -1149,6 +1167,9 @@ namespace TBSMobile.View
                                                 PresProvince = chpresProvince,
                                                 PresCountry = chpresCountry,
                                                 Landmark = chlandmark,
+                                                RecordDate = chrecordDate,
+                                                StartTime = chstartTime,
+                                                EndTime = chendTime,
                                                 CustomerRemarks = chremarks,
                                                 Telephone1 = chtelephone1,
                                                 Telephone2 = chtelephone2,
@@ -1197,6 +1218,9 @@ namespace TBSMobile.View
                                             PresCountry = chpresCountry,
                                             Landmark = chlandmark,
                                             CustomerRemarks = chremarks,
+                                            RecordDate = chrecordDate,
+                                            StartTime = chstartTime,
+                                            EndTime = chendTime,
                                             Telephone1 = chtelephone1,
                                             Telephone2 = chtelephone2,
                                             Mobile = chmobile,

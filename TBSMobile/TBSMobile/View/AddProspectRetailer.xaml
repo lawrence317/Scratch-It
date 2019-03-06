@@ -325,7 +325,7 @@
                                     </Grid>
                                 </StackLayout>
                             </StackLayout>
-                          
+
                             <StackLayout x:Name="acPage3" IsVisible="False">
                                 <Label Text="Mobile Number" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
@@ -384,6 +384,39 @@
                                 </Label>
                                 <Frame StyleClass="fieldFrame" x:Name="EmailFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
                                     <local:CustomEntry StyleClass="fieldForm" x:Name="entEmail" Keyboard="Email">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+                                <Label Text="Record Date" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="ActDateFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry IsEnabled="false" StyleClass="fieldForm" x:Name="dpDate">
+                                        <local:CustomEntry.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </local:CustomEntry.FontFamily>
+                                    </local:CustomEntry>
+                                </Frame>
+
+                                <Label Text="Start Time" StyleClass="lbl-fieldform">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
+                                <Frame StyleClass="fieldFrame" x:Name="ActStartFrame" CornerRadius="4" BorderColor="#e8eaed" HasShadow="False">
+                                    <local:CustomEntry IsEnabled="false" StyleClass="fieldForm" x:Name="tpTime">
                                         <local:CustomEntry.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

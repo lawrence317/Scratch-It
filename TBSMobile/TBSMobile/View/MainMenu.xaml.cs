@@ -571,6 +571,9 @@ namespace TBSMobile.View
             public string PresCountry { get; set; }
             public string Landmark { get; set; }
             public string CustomerRemarks { get; set; }
+            public DateTime RecordDate { get; set; }
+            public DateTime StartTime { get; set; }
+            public DateTime EndTime { get; set; }
             public string Telephone1 { get; set; }
             public string Telephone2 { get; set; }
             public string Mobile { get; set; }
@@ -733,6 +736,9 @@ namespace TBSMobile.View
                                 var crpresCountry = crresult.PresCountry;
                                 var crlandmark = crresult.Landmark;
                                 var crremarks = crresult.CustomerRemarks;
+                                var crrecordDate = crresult.RecordDate;
+                                var crstartTime = crresult.StartTime;
+                                var crendTime = crresult.EndTime;
                                 var crtelephone1 = crresult.Telephone1;
                                 var crtelephone2 = crresult.Telephone2;
                                 var crmobile = crresult.Mobile;
@@ -773,6 +779,9 @@ namespace TBSMobile.View
                                     { "PresCountry", crpresCountry },
                                     { "Landmark", crlandmark },
                                     { "Remarks", crremarks },
+                                    { "RecordDate", crrecordDate },
+                                    { "StartTime", crstartTime },
+                                    { "EndTime", crendTime },
                                     { "Telephone1", crtelephone1 },
                                     { "Telephone2", crtelephone2 },
                                     { "Mobile", crmobile },

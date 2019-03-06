@@ -98,6 +98,9 @@ namespace TBSMobile.View
                     lblMobile.Text = contactResult.Mobile;
                     lblEmail.Text = contactResult.Email;
                     lblRemarks.Text = contactResult.CustomerRemarks;
+                    lblstarttime.Text = contactResult.StartTime.ToString("hh:mm:ss");
+                    lblendtime.Text = contactResult.EndTime.ToString("hh:mm:ss");
+                    lblRecordDate.Text = contactResult.RecordDate.ToString("MM/dd/yyyy");
                     lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy HH:mm:ss");
                     lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy HH:mm:ss");
                 }

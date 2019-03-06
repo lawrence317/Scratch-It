@@ -38,6 +38,13 @@ namespace TBSMobile.View
             this.ipaddress = ipaddress;
             
             SetTempId();
+            Init();
+        }
+
+        void Init()
+        {
+            dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
+            tpTime.Text = DateTime.Now.ToString("HH:mm:ss");
         }
 
         protected async override void OnAppearing()
@@ -828,6 +835,9 @@ namespace TBSMobile.View
             var country = entCountry.Text;
             var landmark = entLandmark.Text;
             var remarks = entRemarks.Text;
+            var date = dpDate.Text;
+            var startTime = tpTime.Text;
+            var endTime = DateTime.Now.ToString("HH:mm:ss");
             var telephone1 = entTelephone1.Text;
             var telephone2 = entTelephone2.Text;
             var mobile = entMobile.Text;
@@ -869,6 +879,9 @@ namespace TBSMobile.View
                     { "Country", country },
                     { "Landmark", landmark },
                     { "Remarks", remarks },
+                    { "RecordDate", DateTime.Parse(date) },
+                    { "StartTime", DateTime.Parse(startTime) },
+                    { "EndTime", DateTime.Parse(endTime) },
                     { "Telephone1", telephone1 },
                     { "Telephone2", telephone2 },
                     { "Mobile", mobile },
@@ -1081,6 +1094,9 @@ namespace TBSMobile.View
                                                                                     PresCountry = country,
                                                                                     Landmark = landmark,
                                                                                     CustomerRemarks = remarks,
+                                                                                    RecordDate = DateTime.Parse(date),
+                                                                                    StartTime = DateTime.Parse(startTime),
+                                                                                    EndTime = DateTime.Parse(endTime),
                                                                                     Telephone1 = telephone1,
                                                                                     Telephone2 = telephone2,
                                                                                     Mobile = mobile,
@@ -1191,6 +1207,9 @@ namespace TBSMobile.View
                                                                         PresCountry = country,
                                                                         Landmark = landmark,
                                                                         CustomerRemarks = remarks,
+                                                                        RecordDate = DateTime.Parse(date),
+                                                                        StartTime = DateTime.Parse(startTime),
+                                                                        EndTime = DateTime.Parse(endTime),
                                                                         Telephone1 = telephone1,
                                                                         Telephone2 = telephone2,
                                                                         Mobile = mobile,
@@ -1332,6 +1351,9 @@ namespace TBSMobile.View
                 var country = entCountry.Text;
                 var landmark = entLandmark.Text;
                 var remarks = entRemarks.Text;
+                var date = dpDate.Text;
+                var startTime = tpTime.Text;
+                var endTime = DateTime.Now.ToString("HH:mm:ss");
                 var telephone1 = entTelephone1.Text;
                 var telephone2 = entTelephone2.Text;
                 var mobile = entMobile.Text;
@@ -1368,6 +1390,9 @@ namespace TBSMobile.View
                     PresCountry = country,
                     Landmark = landmark,
                     CustomerRemarks = remarks,
+                    RecordDate = DateTime.Parse(date),
+                    StartTime = DateTime.Parse(startTime),
+                    EndTime = DateTime.Parse(endTime),
                     Telephone1 = telephone1,
                     Telephone2 = telephone2,
                     Mobile = mobile,

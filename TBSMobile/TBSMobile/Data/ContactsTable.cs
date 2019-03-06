@@ -42,6 +42,9 @@ namespace TBSMobile.Data
         public string Landmark { get; set; }
         [MaxLength(500)]
         public string CustomerRemarks { get; set; }
+        public DateTime RecordDate { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         [MaxLength(30)]
         public string Telephone1 { get; set; }
         [MaxLength(30)]
