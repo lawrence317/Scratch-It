@@ -524,6 +524,7 @@ namespace TBSMobile.View
             var telephone2 = entTelephone2.Text;
             var email = entEmail.Text;
             var location = entLocation.Text;
+            var deleted = "0";
             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
@@ -536,10 +537,16 @@ namespace TBSMobile.View
             {
                 sendStatus.Text = "Sending retailer outlet to server";
 
-                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Pb3c6A";
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string pathfile = "sync-retailer-outlet-client-update-api.php";
+
+                var url = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {
+                    { "Host", host },
+                    { "Database", database },
                     { "ContactID", id },
                     { "RetailerCode", retailerCode },
                     { "PresStreet", street },
@@ -555,6 +562,7 @@ namespace TBSMobile.View
                     { "Email", email },
                     { "GPSCoordinates", location },
                     { "Supervisor", contact },
+                    { "Deleted", deleted },
                     { "RecordLog", contact },
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
@@ -594,6 +602,7 @@ namespace TBSMobile.View
                                 GPSCoordinates = location,
                                 Supervisor = contact,
                                 RecordLog = recordlog,
+                                Deleted = Convert.ToInt32(deleted),
                                 LastSync = DateTime.Parse(current_datetime),
                                 LastUpdated = DateTime.Parse(current_datetime)
                             };
@@ -602,65 +611,14 @@ namespace TBSMobile.View
 
                             Analytics.TrackEvent("Sent Retailer Outlet");
 
-                            sendStatus.Text = "Sending user logs to server";
+                            var logType = "App Log";
+                            var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
 
-                            var logtype = "Mobile Log";
-                            var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
-                            var deleted = "0";
+                            Save_Logs(contact, logType, log, database, logdeleted);
 
-                            string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
-                            string logscontentType = "application/json";
-                            JObject logsjson = new JObject
-                            {
-                                { "ContactID", id },
-                                { "LogType", logtype },
-                                { "Log", log },
-                                { "LogDate", DateTime.Parse(current_datetime) },
-                                { "DatabaseName", database },
-                                { "Deleted", deleted },
-                                { "LastUpdated", DateTime.Parse(current_datetime) }
-                            };
-
-                            HttpClient logsclient = new HttpClient();
-                            var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
-
-                            if (logsresponse.IsSuccessStatusCode)
-                            {
-                                var logscontent = await logsresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(logscontent))
-                                {
-                                    var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
-
-                                    var logsdataitem = logsdataresult[0];
-                                    var logsdatamessage = logsdataitem.Message;
-
-                                    if (logsdatamessage.Equals("Inserted"))
-                                    {
-                                        sendStatus.Text = "Saving user logs to the device";
-
-                                        var logs_insert = new UserLogsTable
-                                        {
-                                            ContactID = contact,
-                                            LogType = logtype,
-                                            Log = log,
-                                            LogDate = DateTime.Parse(current_datetime),
-                                            DatabaseName = database,
-                                            Deleted = Int32.Parse(deleted),
-                                            LastUpdated = DateTime.Parse(current_datetime),
-                                            LastSync = DateTime.Parse(current_datetime)
-                                        };
-
-                                        await conn.InsertOrReplaceAsync(logs_insert);
-
-                                        await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
-                                        await Application.Current.MainPage.Navigation.PopModalAsync();
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Send_offline();
-                            }
+                            await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
+                            await Application.Current.MainPage.Navigation.PopModalAsync();
                         }
                     }
                 }
@@ -952,6 +910,27 @@ namespace TBSMobile.View
                     Crashes.TrackError(ex);
                 }
             }
+        }
+
+        public async void Save_Logs(string contactID, string logType, string log, string database, int deleted)
+        {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            var logs_insert = new UserLogsTable
+            {
+                ContactID = contactID,
+                LogType = logType,
+                Log = log,
+                LogDate = DateTime.Parse(current_datetime),
+                DatabaseName = database,
+                Deleted = deleted,
+                LastUpdated = DateTime.Parse(current_datetime)
+            };
+
+            await conn.InsertOrReplaceAsync(logs_insert);
         }
     }
 }

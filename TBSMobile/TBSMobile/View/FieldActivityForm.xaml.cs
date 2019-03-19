@@ -1731,10 +1731,16 @@ namespace TBSMobile.View
             {
                 sendStatus.Text = "Sending field activity to server";
 
-                string url = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=Fsq6Tr";
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string pathfile = "sync-caf-directly-api.php";
+
+                var url = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {
+                    { "Host", host },
+                    { "Database", database },
                     { "CAFNo", caf },
                     { "CustomerID", retailerCode },
                     { "EmployeeNumber", employeeNumber },
@@ -1786,33 +1792,37 @@ namespace TBSMobile.View
                         {
                             sendStatus.Text = "Sending field activity photo 1 to server";
 
-                            var ph1link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=N4f5GL";
+                            string path1file = "sync-caf-media-path-1-client-update-api.php";
+
+                            var path1link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path1file;
                             string ph1contentType = "application/json";
 
-                            JObject ph1json;
-                            bool ph1doesExist = File.Exists(photo1url);
+                            JObject path1json;
+                            bool path1doesExist = File.Exists(photo1url);
 
-                            if (!ph1doesExist || string.IsNullOrEmpty(photo1url))
+                            if (!path1doesExist || string.IsNullOrEmpty(photo1url))
                             {
-                                ph1json = new JObject
+                                path1json = new JObject
                                 {
-                                    { "CAFNo", caf },
-                                    { "CAFDate", DateTime.Parse(date) },
-                                    { "Photo1", "" }
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", caf},
+                                    { "Path", ""}
                                 };
                             }
                             else
                             {
-                                ph1json = new JObject
+                                path1json = new JObject
                                 {
-                                    { "CAFNo", caf },
-                                    { "CAFDate", DateTime.Parse(date) },
-                                    { "Photo1", File.ReadAllBytes(photo1url) }
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", caf},
+                                    { "Path", File.ReadAllBytes(photo1url)}
                                 };
                             }
 
                             HttpClient ph1client = new HttpClient();
-                            var ph1response = await ph1client.PostAsync(ph1link, new StringContent(ph1json.ToString(), Encoding.UTF8, ph1contentType));
+                            var ph1response = await ph1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
 
                             if (ph1response.IsSuccessStatusCode)
                             {
@@ -1829,33 +1839,37 @@ namespace TBSMobile.View
                                     {
                                         sendStatus.Text = "Sending field activity photo 2 to server";
 
-                                        var ph2link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=6LqMxW";
+                                        string path2file = "sync-caf-media-path-2-client-update-api.php";
+
+                                        var path2link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path2file;
                                         string ph2contentType = "application/json";
 
-                                        JObject ph2json;
-                                        bool ph2doesExist = File.Exists(photo2url);
+                                        JObject path2json;
+                                        bool path2doesExist = File.Exists(photo2url);
 
-                                        if (!ph2doesExist || string.IsNullOrEmpty(photo2url))
+                                        if (!path2doesExist || string.IsNullOrEmpty(photo2url))
                                         {
-                                            ph2json = new JObject
+                                            path2json = new JObject
                                             {
-                                                { "CAFNo", caf },
-                                                { "CAFDate", DateTime.Parse(date) },
-                                                { "Photo2", "" }
+                                                { "Host", host },
+                                                { "Database", database },
+                                                { "MediaID", caf},
+                                                { "Path", ""}
                                             };
                                         }
                                         else
                                         {
-                                            ph2json = new JObject
+                                            path2json = new JObject
                                             {
-                                                { "CAFNo", caf },
-                                                { "CAFDate", DateTime.Parse(date) },
-                                                { "Photo2", File.ReadAllBytes(photo2url) }
+                                                { "Host", host },
+                                                { "Database", database },
+                                                { "MediaID", caf},
+                                                { "Path", File.ReadAllBytes(photo2url)}
                                             };
                                         }
 
                                         HttpClient ph2client = new HttpClient();
-                                        var ph2response = await ph2client.PostAsync(ph2link, new StringContent(ph2json.ToString(), Encoding.UTF8, ph2contentType));
+                                        var ph2response = await ph2client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
 
                                         if (ph2response.IsSuccessStatusCode)
                                         {
@@ -1872,35 +1886,37 @@ namespace TBSMobile.View
                                                 {
                                                     sendStatus.Text = "Sending field activity photo 3 to server";
 
-                                                    byte[] Photo3Data = File.ReadAllBytes(photo3url);
+                                                    string path3file = "sync-caf-media-path-3-client-update-api.php";
 
-                                                    var ph3link = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Mpt2Y9";
+                                                    var path3link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path3file;
                                                     string ph3contentType = "application/json";
+                                                    
+                                                    JObject path3json;
+                                                    bool path3doesExist = File.Exists(photo3url);
 
-                                                    JObject ph3json;
-                                                    bool ph3doesExist = File.Exists(photo3url);
-
-                                                    if (!ph3doesExist || string.IsNullOrEmpty(photo3url))
+                                                    if (!path3doesExist || string.IsNullOrEmpty(photo3url))
                                                     {
-                                                        ph3json = new JObject
+                                                        path3json = new JObject
                                                         {
-                                                            { "CAFNo", caf },
-                                                            { "CAFDate", DateTime.Parse(date) },
-                                                            { "Photo3", "" }
+                                                            { "Host", host },
+                                                            { "Database", database },
+                                                            { "MediaID", caf},
+                                                            { "Path", ""}
                                                         };
                                                     }
                                                     else
                                                     {
-                                                        ph3json = new JObject
+                                                        path3json = new JObject
                                                         {
-                                                            { "CAFNo", caf },
-                                                            { "CAFDate", DateTime.Parse(date) },
-                                                            { "Photo3", File.ReadAllBytes(photo3url) }
+                                                            { "Host", host },
+                                                            { "Database", database },
+                                                            { "MediaID", caf},
+                                                            { "Path", File.ReadAllBytes(photo3url)}
                                                         };
                                                     }
 
                                                     HttpClient ph3client = new HttpClient();
-                                                    var ph3response = await ph3client.PostAsync(ph3link, new StringContent(ph3json.ToString(), Encoding.UTF8, ph3contentType));
+                                                    var ph3response = await ph3client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
 
                                                     if (ph3response.IsSuccessStatusCode)
                                                     {
@@ -1919,33 +1935,37 @@ namespace TBSMobile.View
                                                                 {
                                                                     sendStatus.Text = "Sending field activity video to server";
 
-                                                                    var vidlink = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Contact=" + contact + "&Request=Lqr9fy";
+                                                                    string path4file = "sync-caf-media-path-4-client-update-api.php";
+
+                                                                    var path4link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path4file;
                                                                     string vidcontentType = "application/json";
 
-                                                                    JObject vidjson;
-                                                                    bool viddoesExist = File.Exists(videourl);
+                                                                    JObject path4json;
+                                                                    bool path4doesExist = File.Exists(videourl);
 
-                                                                    if (viddoesExist)
+                                                                    if (!path4doesExist || string.IsNullOrEmpty(photo3url))
                                                                     {
-                                                                        vidjson = new JObject
+                                                                        path4json = new JObject
                                                                         {
-                                                                            { "CAFNo", caf },
-                                                                            { "CAFDate", DateTime.Parse(date) },
-                                                                            { "Video", File.ReadAllBytes(videourl) }
+                                                                            { "Host", host },
+                                                                            { "Database", database },
+                                                                            { "MediaID", caf},
+                                                                            { "Path", ""}
                                                                         };
                                                                     }
                                                                     else
                                                                     {
-                                                                        vidjson = new JObject
+                                                                        path4json = new JObject
                                                                         {
-                                                                            { "CAFNo", caf },
-                                                                            { "CAFDate", DateTime.Parse(date) },
-                                                                            { "Video", "" }
+                                                                            { "Host", host },
+                                                                            { "Database", database },
+                                                                            { "MediaID", caf},
+                                                                            { "Path", File.ReadAllBytes(videourl)}
                                                                         };
                                                                     }
 
                                                                     HttpClient vidclient = new HttpClient();
-                                                                    var vidresponse = await vidclient.PostAsync(vidlink, new StringContent(vidjson.ToString(), Encoding.UTF8, vidcontentType));
+                                                                    var vidresponse = await vidclient.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
 
                                                                     if (vidresponse.IsSuccessStatusCode)
                                                                     {
@@ -1955,8 +1975,8 @@ namespace TBSMobile.View
                                                                         {
                                                                             var vidresult = JsonConvert.DeserializeObject<List<ServerMessage>>(vidcontent, settings);
 
-                                                                            var viditem = ph3result[0];
-                                                                            var vidmessage = ph3item.Message;
+                                                                            var viditem = vidresult[0];
+                                                                            var vidmessage = viditem.Message;
 
                                                                             if (vidmessage.Equals("Inserted"))
                                                                             {
@@ -2050,64 +2070,14 @@ namespace TBSMobile.View
                                                                                     await conn.InsertAsync(others_insert);
                                                                                 }
 
-                                                                                sendStatus.Text = "Sending user logs to server";
+                                                                                var logType = "App Log";
+                                                                                var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                                int logdeleted = 0;
 
-                                                                                var logtype = "Mobile Log";
-                                                                                var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
-                                                                                var deleted = "0";
+                                                                                Save_Logs(contact, logType, log, database, logdeleted);
+                                                                                await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
 
-                                                                                string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
-                                                                                string logscontentType = "application/json";
-                                                                                JObject logsjson = new JObject
-                                                                                {
-                                                                                    { "ContactID", contact },
-                                                                                    { "LogType", logtype },
-                                                                                    { "Log", log },
-                                                                                    { "LogDate", DateTime.Parse(current_datetime) },
-                                                                                    { "DatabaseName", database },
-                                                                                    { "Deleted", deleted },
-                                                                                    { "LastUpdated", DateTime.Parse(current_datetime) }
-                                                                                };
-
-                                                                                HttpClient logsclient = new HttpClient();
-                                                                                var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
-
-                                                                                if (logsresponse.IsSuccessStatusCode)
-                                                                                {
-                                                                                    var logscontent = await logsresponse.Content.ReadAsStringAsync();
-                                                                                    if (!string.IsNullOrEmpty(logscontent))
-                                                                                    {
-                                                                                        var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
-
-                                                                                        var logsdataitem = logsdataresult[0];
-                                                                                        var logsdatamessage = logsdataitem.Message;
-
-                                                                                        if (logsdatamessage.Equals("Inserted"))
-                                                                                        {
-                                                                                            sendStatus.Text = "Saving user logs to the device";
-
-                                                                                            var logs_insert = new UserLogsTable
-                                                                                            {
-                                                                                                ContactID = contact,
-                                                                                                LogType = logtype,
-                                                                                                Log = log,
-                                                                                                LogDate = DateTime.Parse(current_datetime),
-                                                                                                DatabaseName = database,
-                                                                                                Deleted = Int32.Parse(deleted),
-                                                                                                LastUpdated = DateTime.Parse(current_datetime),
-                                                                                                LastSync = DateTime.Parse(current_datetime),
-                                                                                            };
-
-                                                                                            await conn.InsertOrReplaceAsync(logs_insert);
-
-                                                                                            Analytics.TrackEvent("Sent Field Activity Form");
-
-                                                                                            await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-
-                                                                                            await Application.Current.MainPage.Navigation.PopAsync();
-                                                                                        }
-                                                                                    }
-                                                                                }
+                                                                                await Application.Current.MainPage.Navigation.PopAsync();
                                                                             }
                                                                         }
                                                                     }
@@ -2211,63 +2181,14 @@ namespace TBSMobile.View
                                                                     Analytics.TrackEvent("Sent Field Activity Form");
                                                                     sendStatus.Text = "Sending user logs to server";
 
-                                                                    var logtype = "Mobile Log";
-                                                                    var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
-                                                                    var deleted = "0";
+                                                                    var logType = "App Log";
+                                                                    var log = "Sent caf to the server (<b>"+ caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                    int logdeleted = 0;
 
-                                                                    string logsurl = "http://" + ipaddress + Constants.requestUrl + "Host=" + host + "&Database=" + database + "&Request=pQ412v";
-                                                                    string logscontentType = "application/json";
-                                                                    JObject logsjson = new JObject
-                                                                    {
-                                                                        { "ContactID", contact },
-                                                                        { "LogType", logtype },
-                                                                        { "Log", log },
-                                                                        { "LogDate", DateTime.Parse(current_datetime) },
-                                                                        { "DatabaseName", database },
-                                                                        { "Deleted", deleted },
-                                                                        { "LastUpdated", DateTime.Parse(current_datetime) }
-                                                                    };
+                                                                    Save_Logs(contact, logType, log, database, logdeleted);
 
-                                                                    HttpClient logsclient = new HttpClient();
-                                                                    var logsresponse = await logsclient.PostAsync(logsurl, new StringContent(logsjson.ToString(), Encoding.UTF8, logscontentType));
-
-                                                                    if (logsresponse.IsSuccessStatusCode)
-                                                                    {
-                                                                        var logscontent = await logsresponse.Content.ReadAsStringAsync();
-                                                                        if (!string.IsNullOrEmpty(logscontent))
-                                                                        {
-                                                                            var logsdataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(logscontent, settings);
-
-                                                                            var logsdataitem = logsdataresult[0];
-                                                                            var logsdatamessage = logsdataitem.Message;
-
-                                                                            if (logsdatamessage.Equals("Inserted"))
-                                                                            {
-                                                                                sendStatus.Text = "Saving user logs to the device";
-
-                                                                                var logs_insert = new UserLogsTable
-                                                                                {
-                                                                                    ContactID = contact,
-                                                                                    LogType = logtype,
-                                                                                    Log = log,
-                                                                                    LogDate = DateTime.Parse(current_datetime),
-                                                                                    DatabaseName = database,
-                                                                                    Deleted = Int32.Parse(deleted),
-                                                                                    LastUpdated = DateTime.Parse(current_datetime),
-                                                                                    LastSync = DateTime.Parse(current_datetime)
-                                                                                };
-
-                                                                                await conn.InsertOrReplaceAsync(logs_insert);
-
-                                                                                await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-                                                                                await Application.Current.MainPage.Navigation.PopAsync();
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        Send_offline();
-                                                                    }
+                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                    await Application.Current.MainPage.Navigation.PopAsync();
                                                                 }
                                                             }
                                                         }
@@ -2710,6 +2631,27 @@ namespace TBSMobile.View
                     await Navigation.PushAsync(new FieldActivityForm(host, database, contact, ipaddress));
                 }
             }
+        }
+
+        public async void Save_Logs(string contactID, string logType, string log, string database, int deleted)
+        {
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
+            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            var logs_insert = new UserLogsTable
+            {
+                ContactID = contactID,
+                LogType = logType,
+                Log = log,
+                LogDate = DateTime.Parse(current_datetime),
+                DatabaseName = database,
+                Deleted = deleted,
+                LastUpdated = DateTime.Parse(current_datetime)
+            };
+
+            await conn.InsertOrReplaceAsync(logs_insert);
         }
     }
 }
