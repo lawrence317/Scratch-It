@@ -48,7 +48,7 @@ namespace TBSMobile.View
                 
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                    FirstTimeSyncUser(host, database, contact, ipaddress);
                 }
                 else
                 {
