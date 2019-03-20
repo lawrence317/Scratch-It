@@ -12,7 +12,7 @@ namespace TBSMobile.Data
         public string TownID { get; set; }
         [MaxLength(50)]
         public string ProvinceID { get; set; }
-        [MaxLength(200)]
+        [MaxLength(2000)]
         public string Town { get; set; }
         public DateTime LastSync { get; set; }
         public DateTime LastUpdated { get; set; }

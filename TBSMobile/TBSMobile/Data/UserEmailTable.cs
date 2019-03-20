@@ -10,7 +10,7 @@ namespace TBSMobile.Data
     {
         [MaxLength(50)]
         public string ContactID { get; set; }
-        [MaxLength(1000)]
+        [MaxLength(2000)]
         public string Email { get; set; }
         [MaxLength(100)]
         public string RecordLog { get; set; }

@@ -25,11 +25,11 @@ namespace TBSMobile.Data
         public string MobilePhoto2 { get; set; }
         public string MobilePhoto3 { get; set; }
         public string MobileVideo { get; set; }
-        [MaxLength(1000)]
+        [MaxLength(2000)]
         public string Remarks { get; set; }
-        [MaxLength(1000)]
+        [MaxLength(2000)]
         public string OtherConcern { get; set; }
-        [MaxLength(200)]
+        [MaxLength(2000)]
         public string GPSCoordinates { get; set; }
         [MaxLength(100)]
         public string RecordLog { get; set; }

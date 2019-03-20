@@ -34,7 +34,7 @@ namespace TBSMobile.Data
         public string Email { get; set; }
         [MaxLength(500)]
         public string Landmark { get; set; }
-        [MaxLength(200)]
+        [MaxLength(2000)]
         public string GPSCoordinates { get; set; }
         [MaxLength(50)]
         public string Supervisor { get; set; }

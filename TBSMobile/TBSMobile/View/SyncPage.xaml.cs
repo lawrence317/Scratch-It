@@ -263,7 +263,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -394,7 +394,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -518,7 +518,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -642,7 +642,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -777,7 +777,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -904,7 +904,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -1098,7 +1098,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -1488,7 +1488,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -1674,7 +1674,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -1828,7 +1828,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -1974,7 +1974,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -2120,7 +2120,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -2278,7 +2278,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -2632,7 +2632,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -2782,7 +2782,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -2907,7 +2907,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3026,7 +3026,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3143,7 +3143,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3271,7 +3271,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3394,7 +3394,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3514,7 +3514,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3639,7 +3639,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3756,7 +3756,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -3883,7 +3883,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
@@ -4002,7 +4002,7 @@ namespace TBSMobile.View
                     syncStatus.Text = "Checking connection to server";
 
                     Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 1000);
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
 
                     if (pingresult.Status.ToString() == "Success")
                     {
