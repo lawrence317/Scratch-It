@@ -16,6 +16,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Newtonsoft.Json;
 using Plugin.DeviceInfo;
+using System.Net.Sockets;
 
 namespace TBSMobile.View
 {
@@ -142,14 +143,14 @@ namespace TBSMobile.View
                             if (CrossConnectivity.Current.IsConnected)
                             {
                                 sendStatus.Text = "Checking connection to server";
+                                TcpClient tcpClient = new TcpClient();
 
-                                Ping ping = new Ping();
-                                PingReply pingresult = ping.Send(ipaddress, 2000);
-                                if (pingresult.Status.ToString() == "Success")
+                                try
                                 {
+                                    tcpClient.Connect(ipaddress, 7777);
                                     Send_online();
                                 }
-                                else
+                                catch (Exception)
                                 {
                                     Send_offline();
                                 }
@@ -537,11 +538,11 @@ namespace TBSMobile.View
             {
                 sendStatus.Text = "Sending retailer outlet to server";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string pathfile = "sync-retailer-outlet-client-update-api.php";
 
-                var url = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + pathfile;
+                var url = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {

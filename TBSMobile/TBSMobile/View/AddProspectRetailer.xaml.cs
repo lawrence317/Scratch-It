@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using TBSMobile.Data;
 using Xamarin.Essentials;
@@ -379,14 +380,14 @@ namespace TBSMobile.View
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
                                     sendStatus.Text = "Checking connection to server";
+                                    TcpClient tcpClient = new TcpClient();
 
-                                    Ping ping = new Ping();
-                                    PingReply pingresult = ping.Send(ipaddress, 2000);
-                                    if (pingresult.Status.ToString() == "Success")
+                                    try
                                     {
+                                        tcpClient.Connect(ipaddress, 7777);
                                         Send_online();
                                     }
-                                    else
+                                    catch (Exception)
                                     {
                                         Send_offline();
                                     }
@@ -861,11 +862,11 @@ namespace TBSMobile.View
             {
                 sendStatus.Text = "Sending prospect retailer to server";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string pathfile = "sync-prospect-directly-api.php";
 
-                var url = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + pathfile;
+                var url = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {
@@ -924,7 +925,7 @@ namespace TBSMobile.View
 
                             string path1file = "sync-contact-media-path-1-client-update-api.php";
 
-                            var path1link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path1file;
+                            var path1link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path1file;
                             string ph1contentType = "application/json";
 
                             JObject path1json;
@@ -970,7 +971,7 @@ namespace TBSMobile.View
 
                                         string path2file = "sync-contact-media-path-2-client-update-api.php";
 
-                                        var path2link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path2file;
+                                        var path2link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path2file;
                                         string ph2contentType = "application/json";
 
                                         JObject path2json;
@@ -1014,7 +1015,7 @@ namespace TBSMobile.View
                                                 {
                                                     string path3file = "sync-contact-media-path-3-client-update-api.php";
 
-                                                    var path3link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path3file;
+                                                    var path3link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path3file;
                                                     string ph3contentType = "application/json";
 
                                                     JObject path3json;
@@ -1063,7 +1064,7 @@ namespace TBSMobile.View
 
                                                                     string path4file = "sync-contact-media-path-4-client-update-api.php";
 
-                                                                    var path4link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path4file;
+                                                                    var path4link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path4file;
                                                                     string vidcontentType = "application/json";
 
                                                                     JObject path4json;

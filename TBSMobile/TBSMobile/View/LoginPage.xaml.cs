@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using TBSMobile.Data;
@@ -155,8 +156,8 @@ namespace TBSMobile.View
             var userName = entUser.Text;
             var password = entPassword.Text;
             var ipaddress = entIPAddress.Text;
-            var port = "7777";
-            var apifolder = "TBSApp";
+            
+            
 
             //Check if hostname, database, userName, password is not empty
             if (string.IsNullOrEmpty(hostName) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(ipaddress) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
@@ -186,18 +187,16 @@ namespace TBSMobile.View
                 //Check if there is an internet connection
                 if (CrossConnectivity.Current.IsConnected)
                 {
+                    TcpClient tcpClient = new TcpClient();
+
                     try
                     {
-                        Ping ping = new Ping();
-                        PingReply pingresult = ping.Send(ipaddress, 5000);
+                        tcpClient.Connect(ipaddress, 7777);
+                        string apifile = "login-api.php";
 
-                        if (pingresult.Status.ToString() == "Success")
-                        {
-                            string apifile = "login-api.php";
-
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                        string contentType = "application/json";
+                        JObject json = new JObject
                             {
                                 { "Host", hostName },
                                 { "Database", database },
@@ -206,83 +205,83 @@ namespace TBSMobile.View
                                 { "RegistrationCode", Constants.deviceID }
                             };
 
-                            HttpClient client = new HttpClient();
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        HttpClient client = new HttpClient();
+                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
-                            if (response.IsSuccessStatusCode)
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var content = await response.Content.ReadAsStringAsync();
+
+                            if (!string.IsNullOrEmpty(content))
                             {
-                                var content = await response.Content.ReadAsStringAsync();
-
-                                if (!string.IsNullOrEmpty(content))
+                                var settings = new JsonSerializerSettings
                                 {
-                                    var settings = new JsonSerializerSettings
+                                    NullValueHandling = NullValueHandling.Ignore,
+                                    MissingMemberHandling = MissingMemberHandling.Ignore
+                                };
+
+                                var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                var item = loginresult[0];
+                                var message = item.Message;
+
+                                if (message.Equals("Subscription Expired"))
+                                {
+                                    await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+
+                                    var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                    var body = "Good Day!<br/><br/> " +
+                                        "This user needs new product key.<br/><br/>" +
+                                        "userName: " + userName + "<br/>" +
+                                        "Device ID: " + Constants.deviceID + "<br/>";
+
+                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                    if (emailMessenger.CanSendEmail)
                                     {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                        MissingMemberHandling = MissingMemberHandling.Ignore
-                                    };
+                                        var emailsend = new EmailMessageBuilder()
+                                        .To(Constants.email)
+                                        .Subject(subject)
+                                        .BodyAsHtml(body)
+                                        .Build();
 
-                                    var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var item = loginresult[0];
-                                    var message = item.Message;
-
-                                    if (message.Equals("Subscription Expired"))
-                                    {
-                                        await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
-
-                                        var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                        var body = "Good Day!<br/><br/> " +
-                                            "This user needs new product key.<br/><br/>" +
-                                            "userName: " + userName + "<br/>" +
-                                            "Device ID: " + Constants.deviceID + "<br/>";
-
-                                        var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                        if (emailMessenger.CanSendEmail)
-                                        {
-                                            var emailsend = new EmailMessageBuilder()
-                                            .To(Constants.email)
-                                            .Subject(subject)
-                                            .BodyAsHtml(body)
-                                            .Build();
-
-                                            emailMessenger.SendEmail(emailsend);
-                                        }
+                                        emailMessenger.SendEmail(emailsend);
                                     }
-                                    else if (message.Equals("Subscription Trial Expired"))
+                                }
+                                else if (message.Equals("Subscription Trial Expired"))
+                                {
+                                    await DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+
+                                    var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                    var body = "Good Day!<br/><br/> " +
+                                        "This user needs new product key.<br/><br/>" +
+                                        "userName: " + userName + "<br/>" +
+                                        "Device ID: " + Constants.deviceID + "<br/>";
+
+                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                    if (emailMessenger.CanSendEmail)
                                     {
-                                        await DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                        var emailsend = new EmailMessageBuilder()
+                                        .To(Constants.email)
+                                        .Subject(subject)
+                                        .BodyAsHtml(body)
+                                        .Build();
 
-                                        var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                        var body = "Good Day!<br/><br/> " +
-                                            "This user needs new product key.<br/><br/>" +
-                                            "userName: " + userName + "<br/>" +
-                                            "Device ID: " + Constants.deviceID + "<br/>";
-
-                                        var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                        if (emailMessenger.CanSendEmail)
-                                        {
-                                            var emailsend = new EmailMessageBuilder()
-                                            .To(Constants.email)
-                                            .Subject(subject)
-                                            .BodyAsHtml(body)
-                                            .Build();
-
-                                            emailMessenger.SendEmail(emailsend);
-                                        }
+                                        emailMessenger.SendEmail(emailsend);
                                     }
-                                    else if (message.Equals("Subscription Not Found"))
+                                }
+                                else if (message.Equals("Subscription Not Found"))
+                                {
+                                    var trialsub = await DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
+
+                                    if (trialsub == true)
                                     {
-                                        var trialsub = await DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
+                                        var current_date = DateTime.Now.ToString("yyyy-MM-dd");
 
-                                        if (trialsub == true)
-                                        {
-                                            var current_date = DateTime.Now.ToString("yyyy-MM-dd");
+                                        string trialapifile = "activate-trial-api.php";
 
-                                            string trialapifile = "activate-trial-api.php";
-
-                                            var triallink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + trialapifile;
-                                            string trialcontentType = "application/json";
-                                            JObject trialjson = new JObject
+                                        var triallink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + trialapifile;
+                                        string trialcontentType = "application/json";
+                                        JObject trialjson = new JObject
                                             {
                                                 { "Host", hostName },
                                                 { "Database", database },
@@ -291,111 +290,36 @@ namespace TBSMobile.View
                                                 { "Username", userName}
                                             };
 
-                                            HttpClient trialclient = new HttpClient();
-                                            var trialresponse = await trialclient.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
+                                        HttpClient trialclient = new HttpClient();
+                                        var trialresponse = await trialclient.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
 
-                                            if (trialresponse.IsSuccessStatusCode)
+                                        if (trialresponse.IsSuccessStatusCode)
+                                        {
+                                            var trcontent = await trialresponse.Content.ReadAsStringAsync();
+
+                                            if (!string.IsNullOrEmpty(trcontent))
                                             {
-                                                var trcontent = await trialresponse.Content.ReadAsStringAsync();
+                                                var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
 
-                                                if (!string.IsNullOrEmpty(trcontent))
+                                                var trialitem = trialresult[0];
+                                                var trialmessage = trialitem.Message;
+                                                var trialcontactid = trialitem.ContactID;
+
+                                                if (trialmessage.Equals("Inserted"))
                                                 {
-                                                    var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
+                                                    var logType = "App Log";
+                                                    var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                    int deleted = 0;
 
-                                                    var trialitem = trialresult[0];
-                                                    var trialmessage = trialitem.Message;
-                                                    var trialcontactid = trialitem.ContactID;
+                                                    Save_Logs(trialcontactid, logType, log, database, deleted);
 
-                                                    if (trialmessage.Equals("Inserted"))
-                                                    {
-                                                        var logType = "App Log";
-                                                        var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                                        int deleted = 0;
-
-                                                        Save_Logs(trialcontactid, logType, log, database, deleted);
-
-                                                        await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
-                                                    }
+                                                    await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
                                                 }
                                             }
                                         }
-                                        else
-                                        {
-                                            var subject = "Register Device: " + userName + " - " + Constants.deviceID;
-                                            var body = "Good Day!<br/><br/> " +
-                                                "This user needs to register the device.<br/><br/>" +
-                                                "userName: " + userName + "<br/>" +
-                                                "Device ID: " + Constants.deviceID + "<br/>";
-
-                                            var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                            if (emailMessenger.CanSendEmail)
-                                            {
-                                                var emailsend = new EmailMessageBuilder()
-                                                .To(Constants.email)
-                                                .Subject(subject)
-                                                .BodyAsHtml(body)
-                                                .Build();
-
-                                                emailMessenger.SendEmail(emailsend);
-                                            }
-                                        }
                                     }
-                                    else if (message.Equals("Incorrect Login"))
+                                    else
                                     {
-                                        await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
-                                    }
-                                    else if (message.Equals("Credential Correct"))
-                                    {
-                                        var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
-
-                                        var contactID = result[0].ContactID;
-
-                                        var logType = "App Log";
-                                        var log = "Logged in (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                        int deleted = 0;
-
-                                        Save_Preferences(userName, password, contactID);
-                                        Save_Logs(contactID, logType, log, database, deleted);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                    else if (message.Equals("Not Connected"))
-                                    {
-                                        await DisplayAlert("Login Error", "Please check server and database name", "Got it");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                await DisplayAlert("Login Error", "Error fetching data. Server returned status code: {0} " + response.StatusCode, "Ok");
-                            }
-                        }
-                        else
-                        {
-                            try
-                            {
-                                var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UsrPassword = ? AND UserStatus='Active'", userName, password);
-                                var result = getUser.Result.Count;
-
-                                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                                if (result < 1)
-                                {
-                                    await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
-                                }
-                                else
-                                {
-                                    var item = getUser.Result[0];
-                                    var contactID = item.ContactID;
-
-                                    var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                    var subresult = getSubscription.Result.Count;
-
-                                    //Check if the device is registered
-                                    if (subresult < 1)
-                                    {
-                                        await DisplayAlert("Subscription Error", "Your device is not registered, please contact your administrator to register your device", "Send Email");
-
                                         var subject = "Register Device: " + userName + " - " + Constants.deviceID;
                                         var body = "Good Day!<br/><br/> " +
                                             "This user needs to register the device.<br/><br/>" +
@@ -414,184 +338,119 @@ namespace TBSMobile.View
                                             emailMessenger.SendEmail(emailsend);
                                         }
                                     }
-                                    else
-                                    {
-                                        var subitem = getSubscription.Result[0];
-                                        var startDate = subitem.DateStart;
-                                        var Trials = subitem.Trials;
+                                }
+                                else if (message.Equals("Incorrect Login"))
+                                {
+                                    await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                                }
+                                else if (message.Equals("Credential Correct"))
+                                {
+                                    var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
 
-                                        if (Trials == "0" || Trials == "1")
-                                        {
-                                            var ExpirationDate = startDate.AddDays(30);
+                                    var contactID = result[0].ContactID;
 
-                                            if (DateTime.Now > ExpirationDate)
-                                            {
-                                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                    var logType = "App Log";
+                                    var log = "Logged in (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                    int deleted = 0;
 
-                                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                                var body = "Good Day!<br/><br/> " +
-                                                    "This user needs new product key.<br/><br/>" +
-                                                    "userName: " + userName + "<br/>" +
-                                                    "Device ID: " + Constants.deviceID + "<br/>";
+                                    Save_Preferences(userName, password, contactID);
+                                    Save_Logs(contactID, logType, log, database, deleted);
 
-                                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                                if (emailMessenger.CanSendEmail)
-                                                {
-                                                    var emailsend = new EmailMessageBuilder()
-                                                    .To(Constants.email)
-                                                    .Subject(subject)
-                                                    .BodyAsHtml(body)
-                                                    .Build();
-
-                                                    emailMessenger.SendEmail(emailsend);
-                                                }
-
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                            }
-                                            else
-                                            {
-                                                Preferences.Set("username", userName, "private_prefs");
-                                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                            }
-                                        }
-                                        else if (Trials == "3")
-                                        {
-                                            var ExpirationDate = startDate.AddYears(1);
-
-                                            if (DateTime.Now > ExpirationDate)
-                                            {
-                                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
-
-                                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                                var body = "Good Day!<br/><br/> " +
-                                                    "This user needs new product key.<br/><br/>" +
-                                                    "userName: " + userName + "<br/>" +
-                                                    "Device ID: " + Constants.deviceID + "<br/>";
-
-                                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                                if (emailMessenger.CanSendEmail)
-                                                {
-                                                    var emailsend = new EmailMessageBuilder()
-                                                    .To(Constants.email)
-                                                    .Subject(subject)
-                                                    .BodyAsHtml(body)
-                                                    .Build();
-
-                                                    emailMessenger.SendEmail(emailsend);
-                                                }
-
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                            }
-                                            else
-                                            {
-                                                Preferences.Set("username", userName, "private_prefs");
-                                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                            }
-                                        }
-                                        else if (Trials == "4")
-                                        {
-                                            var ExpirationDate = startDate.AddYears(2);
-
-                                            if (DateTime.Now > ExpirationDate)
-                                            {
-                                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
-
-                                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                                var body = "Good Day!<br/><br/> " +
-                                                    "This user needs new product key.<br/><br/>" +
-                                                    "userName: " + userName + "<br/>" +
-                                                    "Device ID: " + Constants.deviceID + "<br/>";
-
-                                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                                if (emailMessenger.CanSendEmail)
-                                                {
-                                                    var emailsend = new EmailMessageBuilder()
-                                                    .To(Constants.email)
-                                                    .Subject(subject)
-                                                    .BodyAsHtml(body)
-                                                    .Build();
-
-                                                    emailMessenger.SendEmail(emailsend);
-                                                }
-
-                                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                            }
-                                            else
-                                            {
-                                                Preferences.Set("username", userName, "private_prefs");
-                                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var logtype = "Mobile Log";
-                                            var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
-                                            int deleted = 0;
-
-                                            var logs_insert = new UserLogsTable
-                                            {
-                                                ContactID = contactID,
-                                                LogType = logtype,
-                                                Log = log,
-                                                LogDate = DateTime.Parse(current_datetime),
-                                                DatabaseName = database,
-                                                Deleted = deleted,
-                                                LastUpdated = DateTime.Parse(current_datetime)
-                                            };
-
-                                            await conn.InsertOrReplaceAsync(logs_insert);
-
-                                            Preferences.Set("username", userName, "private_prefs");
-                                            Preferences.Set("ipaddress", ipaddress, "private_prefs");
-                                            Preferences.Set("host", hostName, "private_prefs");
-                                            Preferences.Set("database", database, "private_prefs");
-                                            Preferences.Set("password", password, "private_prefs");
-
-                                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                        }
-                                    }
+                                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                                }
+                                else if (message.Equals("Not Connected"))
+                                {
+                                    await DisplayAlert("Login Error", "Please check server and database name", "Got it");
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                Crashes.TrackError(ex);
-                            }
+                        }
+                        else
+                        {
+                            Offline_Login();
                         }
                     }
                     catch (Exception ex)
                     {
-                        Crashes.TrackError(ex);
+                        Offline_Login();
                     }
                 }
                 else
                 {
-                    try
+                    Offline_Login();
+                }
+            }
+        }
+
+        public async void Offline_Login()
+        {
+            try
+            {
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
+                var hostName = entHost.Text;
+                var database = entDatabase.Text;
+                var userName = entUser.Text;
+                var password = entPassword.Text;
+                var ipaddress = entIPAddress.Text;
+
+                var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UsrPassword = ? AND UserStatus='Active'", userName, password);
+                var result = getUser.Result.Count;
+
+                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                if (result < 1)
+                {
+                    await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                }
+                else
+                {
+                    var item = getUser.Result[0];
+                    var contactID = item.ContactID;
+
+                    var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                    var subresult = getSubscription.Result.Count;
+
+                    //Check if the device is registered
+                    if (subresult < 1)
                     {
-                        var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UsrPassword = ? AND UserStatus='Active'", userName, password);
-                        var result = getUser.Result.Count;
+                        await DisplayAlert("Subscription Error", "Your device is not registered, please contact your administrator to register your device", "Send Email");
 
-                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                        var subject = "Register Device: " + userName + " - " + Constants.deviceID;
+                        var body = "Good Day!<br/><br/> " +
+                            "This user needs to register the device.<br/><br/>" +
+                            "userName: " + userName + "<br/>" +
+                            "Device ID: " + Constants.deviceID + "<br/>";
 
-                        if (result < 1)
+                        var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                        if (emailMessenger.CanSendEmail)
                         {
-                            await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                            var emailsend = new EmailMessageBuilder()
+                            .To(Constants.email)
+                            .Subject(subject)
+                            .BodyAsHtml(body)
+                            .Build();
+
+                            emailMessenger.SendEmail(emailsend);
                         }
-                        else
+                    }
+                    else
+                    {
+                        var subitem = getSubscription.Result[0];
+                        var startDate = subitem.DateStart;
+                        var Trials = subitem.Trials;
+
+                        if (Trials == "0" || Trials == "1")
                         {
-                            var item = getUser.Result[0];
-                            var contactID = item.ContactID;
+                            var ExpirationDate = startDate.AddDays(30);
 
-                            var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                            var subresult = getSubscription.Result.Count;
-
-                            //Check if the device is registered
-                            if (subresult < 1)
+                            if (DateTime.Now > ExpirationDate)
                             {
-                                await DisplayAlert("Subscription Error", "Your device is not registered, please contact your administrator to register your device", "Send Email");
+                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
 
-                                var subject = "Register Device: " + userName + " - " + Constants.deviceID;
+                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
                                 var body = "Good Day!<br/><br/> " +
-                                    "This user needs to register the device.<br/><br/>" +
+                                    "This user needs new product key.<br/><br/>" +
                                     "userName: " + userName + "<br/>" +
                                     "Device ID: " + Constants.deviceID + "<br/>";
 
@@ -606,115 +465,116 @@ namespace TBSMobile.View
 
                                     emailMessenger.SendEmail(emailsend);
                                 }
+
+                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                             }
                             else
                             {
-                                var subitem = getSubscription.Result[0];
-                                var startDate = subitem.DateStart;
-                                var Trials = subitem.Trials;
-
-                                if (Trials == "0")
-                                {
-                                    var ExpirationDate = startDate.AddDays(30);
-
-                                    if (DateTime.Now > ExpirationDate)
-                                    {
-                                        var sendemail = await DisplayAlert("Subscription Expired", "Your subscription has been expired, please contact your administrator to register your device", "Send Email", "Cancel");
-
-                                        if (sendemail == true)
-                                        {
-                                            Send_Email(userName);
-                                        }
-
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                    }
-                                    else
-                                    {
-                                        Save_Preferences(userName, password, contactID);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                }
-                                else if (Trials == "1")
-                                {
-                                    var ExpirationDate = startDate.AddDays(30);
-
-                                    if (DateTime.Now > ExpirationDate)
-                                    {
-                                        var sendemail = await DisplayAlert("Trial Subscription Expired", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email", "Cancel");
-
-                                        if (sendemail == true)
-                                        {
-                                            Send_Email(userName);
-                                        }
-
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                    }
-                                    else
-                                    {
-                                        Save_Preferences(userName, password, contactID);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                }
-                                else if (Trials == "3")
-                                {
-                                    var ExpirationDate = startDate.AddYears(1);
-
-                                    if (DateTime.Now > ExpirationDate)
-                                    {
-                                        var sendemail = await DisplayAlert("Subscription Expired", "Your subscription has been expired, please contact your administrator to register your device", "Send Email", "Cancel");
-
-                                        if (sendemail == true)
-                                        {
-                                            Send_Email(userName);
-                                        }
-
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                    }
-                                    else
-                                    {
-                                        Save_Preferences(userName, password, contactID);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                }
-                                else if (Trials == "4")
-                                {
-                                    var ExpirationDate = startDate.AddYears(2);
-
-                                    if (DateTime.Now > ExpirationDate)
-                                    {
-                                        var sendemail = await DisplayAlert("Subscription Expired", "Your subscription has been expired, please contact your administrator to register your device", "Send Email", "Cancel");
-
-                                        if (sendemail == true)
-                                        {
-                                            Send_Email(userName);
-                                        }
-
-                                        await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
-                                    }
-                                    else
-                                    {
-                                        Save_Preferences(userName, password, contactID);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                }
-                                else
-                                {
-                                    Save_Preferences(userName, password, contactID);
-
-                                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                }
+                                Preferences.Set("username", userName, "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Crashes.TrackError(ex);
+                        else if (Trials == "3")
+                        {
+                            var ExpirationDate = startDate.AddYears(1);
+
+                            if (DateTime.Now > ExpirationDate)
+                            {
+                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+
+                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                var body = "Good Day!<br/><br/> " +
+                                    "This user needs new product key.<br/><br/>" +
+                                    "userName: " + userName + "<br/>" +
+                                    "Device ID: " + Constants.deviceID + "<br/>";
+
+                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                if (emailMessenger.CanSendEmail)
+                                {
+                                    var emailsend = new EmailMessageBuilder()
+                                    .To(Constants.email)
+                                    .Subject(subject)
+                                    .BodyAsHtml(body)
+                                    .Build();
+
+                                    emailMessenger.SendEmail(emailsend);
+                                }
+
+                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                            }
+                            else
+                            {
+                                Preferences.Set("username", userName, "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                            }
+                        }
+                        else if (Trials == "4")
+                        {
+                            var ExpirationDate = startDate.AddYears(2);
+
+                            if (DateTime.Now > ExpirationDate)
+                            {
+                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+
+                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                var body = "Good Day!<br/><br/> " +
+                                    "This user needs new product key.<br/><br/>" +
+                                    "userName: " + userName + "<br/>" +
+                                    "Device ID: " + Constants.deviceID + "<br/>";
+
+                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                if (emailMessenger.CanSendEmail)
+                                {
+                                    var emailsend = new EmailMessageBuilder()
+                                    .To(Constants.email)
+                                    .Subject(subject)
+                                    .BodyAsHtml(body)
+                                    .Build();
+
+                                    emailMessenger.SendEmail(emailsend);
+                                }
+
+                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                            }
+                            else
+                            {
+                                Preferences.Set("username", userName, "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                            }
+                        }
+                        else
+                        {
+                            var logtype = "Mobile Log";
+                            var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
+                            int deleted = 0;
+
+                            var logs_insert = new UserLogsTable
+                            {
+                                ContactID = contactID,
+                                LogType = logtype,
+                                Log = log,
+                                LogDate = DateTime.Parse(current_datetime),
+                                DatabaseName = database,
+                                Deleted = deleted,
+                                LastUpdated = DateTime.Parse(current_datetime)
+                            };
+
+                            await conn.InsertOrReplaceAsync(logs_insert);
+
+                            Preferences.Set("username", userName, "private_prefs");
+                            Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                            Preferences.Set("host", hostName, "private_prefs");
+                            Preferences.Set("database", database, "private_prefs");
+                            Preferences.Set("password", password, "private_prefs");
+
+                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -847,13 +707,29 @@ namespace TBSMobile.View
             }
             else
             {
-                //Check if there is an internet connection
-                connectstack.IsVisible = false;
-                loginstack.IsVisible = true;
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    TcpClient tcpClient = new TcpClient();
 
-                Preferences.Set("ipaddress", ipaddress, "private_prefs");
-                Preferences.Set("host", hostName, "private_prefs");
-                Preferences.Set("database", database, "private_prefs");
+                    try
+                    {
+                        tcpClient.Connect(ipaddress, 7777);
+
+                        //Check if there is an internet connection
+                        connectstack.IsVisible = false;
+                        loginstack.IsVisible = true;
+
+                        Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                        Preferences.Set("host", hostName, "private_prefs");
+                        Preferences.Set("database", database, "private_prefs");
+                    }
+                    catch (Exception ex)
+                    {
+                        await DisplayAlert("Connection Failed", "Connection to server failed. Switching to offline mode", "Got it");
+                    }
+               }
+
+                            
             }
         }
     }

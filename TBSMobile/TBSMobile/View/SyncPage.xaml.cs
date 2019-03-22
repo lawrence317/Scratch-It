@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using TBSMobile.Data;
@@ -43,14 +44,14 @@ namespace TBSMobile.View
             //Check if there is an internet connection
             if (CrossConnectivity.Current.IsConnected)
             {
-                Ping ping = new Ping();
-                PingReply pingresult = ping.Send(ipaddress, 5000);
-                
-                if (pingresult.Status.ToString() == "Success")
+                TcpClient tcpClient = new TcpClient();
+
+                try
                 {
+                    tcpClient.Connect(ipaddress, 7777);
                     FirstTimeSyncUser(host, database, contact, ipaddress);
                 }
-                else
+                catch (Exception)
                 {
                     Application.Current.MainPage.Navigation.PushAsync(new MainMenu(host, database, contact, ipaddress));
                 }
@@ -254,19 +255,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-user-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
+                    TcpClient tcpClient = new TcpClient();
 
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time user sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -277,7 +278,7 @@ namespace TBSMobile.View
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                         int count = 0;
-                       
+
                         var settings = new JsonSerializerSettings
                         {
                             NullValueHandling = NullValueHandling.Ignore,
@@ -288,7 +289,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -361,7 +362,7 @@ namespace TBSMobile.View
                             SyncUserClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -385,8 +386,8 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-user-client-update-api.php";
                 HttpClient client = new HttpClient();
 
@@ -394,11 +395,11 @@ namespace TBSMobile.View
                 {
                     syncStatus.Text = "Checking connection to server";
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
+                    TcpClient tcpClient = new TcpClient();
 
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing user client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -432,7 +433,7 @@ namespace TBSMobile.View
                                 var lastupdated = result.LastUpdated;
                                 var deleted = result.Deleted;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -495,7 +496,7 @@ namespace TBSMobile.View
 
                         SyncUserServerUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -519,19 +520,20 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-user-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
+                    TcpClient tcpClient = new TcpClient();
 
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
+
                         syncStatus.Text = "Initializing user server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -545,9 +547,9 @@ namespace TBSMobile.View
                             MissingMemberHandling = MissingMemberHandling.Ignore
                         };
 
-                        syncStatus.Text = "Getting user updates from server";                        
+                        syncStatus.Text = "Getting user updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -573,8 +575,7 @@ namespace TBSMobile.View
                                 for (int i = 0; i < dataresult.Count; i++)
                                 {
                                     syncStatus.Text = "Checking server update " + updatecount + " out of " + dataresult.Count;
-
-
+                                    
                                     var item = dataresult[i];
                                     var userid = item.UserID;
                                     var usrpassword = item.UsrPassword;
@@ -618,7 +619,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -643,19 +644,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-system-serial-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time system serial sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -677,7 +677,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -754,7 +754,7 @@ namespace TBSMobile.View
                             SyncSystemSerialServerUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -778,19 +778,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-system-serial-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing system serial server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -806,7 +805,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting system serial updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -880,7 +879,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -905,19 +904,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-contacts-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time contacts sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -939,7 +937,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -1075,7 +1073,7 @@ namespace TBSMobile.View
                             SyncContactsClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -1099,20 +1097,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contacts-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -1177,7 +1174,7 @@ namespace TBSMobile.View
                                 var deleted = result.Deleted;
                                 var lastUpdated = result.LastUpdated;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -1220,7 +1217,7 @@ namespace TBSMobile.View
                                 };
 
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                                
+
                                 if (response.IsSuccessStatusCode)
                                 {
                                     var content = await response.Content.ReadAsStringAsync();
@@ -1265,7 +1262,7 @@ namespace TBSMobile.View
 
                         SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -1289,20 +1286,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contact-media-path-1-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts image 1 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -1316,7 +1312,7 @@ namespace TBSMobile.View
                             NullValueHandling = NullValueHandling.Ignore,
                             MissingMemberHandling = MissingMemberHandling.Ignore
                         };
-                        
+
 
                         if (changesresultCount > 0)
                         {
@@ -1330,7 +1326,7 @@ namespace TBSMobile.View
                                 var contactID = result.ContactID;
                                 var media = result.MobilePhoto1;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -1403,6 +1399,11 @@ namespace TBSMobile.View
 
                         SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
                     }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
+                    }
                 }
                 else
                 {
@@ -1422,20 +1423,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contact-media-path-2-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts image 2 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -1449,8 +1449,7 @@ namespace TBSMobile.View
                             NullValueHandling = NullValueHandling.Ignore,
                             MissingMemberHandling = MissingMemberHandling.Ignore
                         };
-
-
+                        
                         if (changesresultCount > 0)
                         {
                             int clientupdate = 1;
@@ -1463,7 +1462,7 @@ namespace TBSMobile.View
                                 var contactID = result.ContactID;
                                 var media = result.MobilePhoto2;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -1536,6 +1535,11 @@ namespace TBSMobile.View
 
                         SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
                     }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
+                    }
                 }
                 else
                 {
@@ -1555,20 +1559,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contact-media-path-3-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts image 3 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -1596,7 +1599,7 @@ namespace TBSMobile.View
                                 var contactID = result.ContactID;
                                 var media = result.MobilePhoto3;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -1669,6 +1672,11 @@ namespace TBSMobile.View
 
                         SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
                     }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
+                    }
                 }
                 else
                 {
@@ -1688,20 +1696,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contact-media-path-4-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts video changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -1731,7 +1738,7 @@ namespace TBSMobile.View
                                 var contactID = result.ContactID;
                                 var media = result.MobileVideo;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -1806,6 +1813,11 @@ namespace TBSMobile.View
 
                         SyncContactsServerUpdate(host, database, contact, ipaddress);
                     }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
+                    }
                 }
                 else
                 {
@@ -1825,19 +1837,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-contacts-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing contacts server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -1853,7 +1864,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting contacts updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -1986,7 +1997,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2011,19 +2022,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-retailer-outlet-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time retailer outlet sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2045,7 +2055,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -2141,7 +2151,7 @@ namespace TBSMobile.View
                             SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2165,20 +2175,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-retailer-outlet-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing retailer outlet client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2223,7 +2232,7 @@ namespace TBSMobile.View
                                 var deleted = result.Deleted;
                                 var lastUpdated = result.LastUpdated;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -2297,7 +2306,7 @@ namespace TBSMobile.View
 
                         SyncRetailerOutletServerUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2321,19 +2330,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-retailer-outlet-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing retailer outlet server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -2349,7 +2357,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting retailer outlet updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -2442,7 +2450,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2467,19 +2475,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-caf-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time caf sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2501,7 +2508,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -2601,7 +2608,7 @@ namespace TBSMobile.View
                             SyncCAFClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2625,20 +2632,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2681,7 +2687,7 @@ namespace TBSMobile.View
                                 var deleted = result.Deleted;
                                 var lastUpdated = result.LastUpdated;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -2751,7 +2757,7 @@ namespace TBSMobile.View
 
                         SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -2775,20 +2781,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-media-path-1-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf image 1 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2816,7 +2821,7 @@ namespace TBSMobile.View
                                 var cafNo = result.CAFNo;
                                 var media = result.MobilePhoto1;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -2887,7 +2892,12 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
-                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
                     }
                 }
                 else
@@ -2908,20 +2918,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-media-path-2-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf image 2 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -2949,7 +2958,7 @@ namespace TBSMobile.View
                                 var cafNo = result.CAFNo;
                                 var media = result.MobilePhoto2;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -3020,7 +3029,12 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
-                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
                     }
                 }
                 else
@@ -3040,21 +3054,18 @@ namespace TBSMobile.View
             try
             {
                 syncStatus.Text = "Checking internet connection";
-
-                var port = "7777";
-                var apifolder = "TBSApp";
+                                
                 string apifile = "sync-caf-media-path-3-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf image 3 changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -3082,7 +3093,7 @@ namespace TBSMobile.View
                                 var cafNo = result.CAFNo;
                                 var media = result.MobilePhoto3;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -3153,7 +3164,12 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
-                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
                     }
                 }
                 else
@@ -3174,20 +3190,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+               
+                
                 string apifile = "sync-caf-media-path-4-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf video changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -3217,7 +3232,7 @@ namespace TBSMobile.View
                                 var cafNo = result.CAFNo;
                                 var media = result.MobileVideo;
 
-                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string pathcontentType = "application/json";
 
                                 JObject pathjson;
@@ -3292,6 +3307,11 @@ namespace TBSMobile.View
 
                         SyncCAFServerUpdate(host, database, contact, ipaddress);
                     }
+                    catch (Exception)
+                    {
+                        syncStatus.Text = "Syncing failed. Server is unreachable.";
+                        Sync_Failed();
+                    }
                 }
                 else
                 {
@@ -3311,19 +3331,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -3339,7 +3358,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting caf updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -3436,7 +3455,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -3461,19 +3480,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-caf-activity-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time caf activity sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -3495,7 +3513,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -3562,7 +3580,7 @@ namespace TBSMobile.View
                             SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -3586,20 +3604,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-activity-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf activity client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -3631,7 +3648,7 @@ namespace TBSMobile.View
                                 var lastupdated = result.LastUpdated;
                                 var deleted = result.Deleted;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -3642,7 +3659,7 @@ namespace TBSMobile.View
                                     { "LastUpdated", lastupdated },
                                     { "Deleted", deleted }
                                 };
-                                
+
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -3691,7 +3708,7 @@ namespace TBSMobile.View
 
                         SyncCAFActivityServerUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -3715,19 +3732,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-caf-activity-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing caf activity server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -3743,7 +3759,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting caf activity updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -3807,7 +3823,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -3832,19 +3848,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-email-recipient-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time email recipient sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -3866,7 +3881,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -3936,7 +3951,7 @@ namespace TBSMobile.View
                             SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -3960,20 +3975,19 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-email-recipient-client-update-api.php";
                 HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing email recipient client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -4006,7 +4020,7 @@ namespace TBSMobile.View
                                 var lastupdated = result.LastUpdated;
                                 var deleted = result.Deleted;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -4069,7 +4083,7 @@ namespace TBSMobile.View
 
                         SyncEmailRecipientServerUpdate(host, database, contact, ipaddress);
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4093,19 +4107,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-email-recipient-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing email recipient server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -4121,7 +4134,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting email recipient updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -4188,7 +4201,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4213,19 +4226,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-province-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time province sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -4247,7 +4259,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -4314,7 +4326,7 @@ namespace TBSMobile.View
                             SyncProvinceServerUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4338,19 +4350,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-province-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing province server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -4366,7 +4377,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting province updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -4430,7 +4441,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4455,19 +4466,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "first-time-sync-town-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing first-time town sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -4489,7 +4499,7 @@ namespace TBSMobile.View
                         {
                             syncStatus.Text = "Getting data from the server";
 
-                            var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -4558,7 +4568,7 @@ namespace TBSMobile.View
                             SyncTownServerUpdate(host, database, contact, ipaddress);
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4582,19 +4592,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-town-server-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing customer salesman server changes sync";
 
                         var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -4610,7 +4619,7 @@ namespace TBSMobile.View
 
                         syncStatus.Text = "Getting town updates from server";
 
-                        var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
 
                         JObject json = new JObject
@@ -4676,7 +4685,7 @@ namespace TBSMobile.View
                             Sync_Failed();
                         }
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
@@ -4701,19 +4710,18 @@ namespace TBSMobile.View
             {
                 syncStatus.Text = "Checking internet connection";
 
-                var port = "7777";
-                var apifolder = "TBSApp";
+                
+                
                 string apifile = "sync-user-logs-client-update-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     syncStatus.Text = "Checking connection to server";
+                    TcpClient tcpClient = new TcpClient();
 
-                    Ping ping = new Ping();
-                    PingReply pingresult = ping.Send(ipaddress, 2000);
-
-                    if (pingresult.Status.ToString() == "Success")
+                    try
                     {
+                        tcpClient.Connect(ipaddress, 7777);
                         syncStatus.Text = "Initializing user logs client changes sync";
 
                         var db = DependencyService.Get<ISQLiteDB>();
@@ -4748,7 +4756,7 @@ namespace TBSMobile.View
                                 var lastupdated = result.LastUpdated;
                                 var deleted = result.Deleted;
 
-                                var link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                                 string contentType = "application/json";
                                 JObject json = new JObject
                                 {
@@ -4811,7 +4819,7 @@ namespace TBSMobile.View
 
                         OnSyncComplete();
                     }
-                    else
+                    catch (Exception)
                     {
                         syncStatus.Text = "Syncing failed. Server is unreachable.";
                         Sync_Failed();
