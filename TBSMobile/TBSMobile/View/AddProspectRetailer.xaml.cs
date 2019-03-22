@@ -1056,6 +1056,7 @@ namespace TBSMobile.View
 
                                                             if (ph3message.Equals("Inserted"))
                                                             {
+
                                                                 if (!string.IsNullOrEmpty(videourl))
                                                                 {
                                                                     sendStatus.Text = "Sending prospect retailer video to server";
@@ -1157,6 +1158,16 @@ namespace TBSMobile.View
                                                                                 await DisplayAlert("Data Sent", "Prospect retailer has been sent to the server", "Got it");
                                                                                 await Application.Current.MainPage.Navigation.PopModalAsync();
                                                                             }
+                                                                            else
+                                                                            {
+                                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + vidmessage;
+                                                                                Send_offline();
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                                            Send_offline();
                                                                         }
                                                                     }
                                                                     else
@@ -1221,6 +1232,16 @@ namespace TBSMobile.View
                                                                     await Application.Current.MainPage.Navigation.PopModalAsync();
                                                                 }
                                                             }
+                                                            else
+                                                            {
+                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph3message;
+                                                                Send_offline();
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                            Send_offline();
                                                         }
                                                     }
                                                     else
@@ -1228,6 +1249,16 @@ namespace TBSMobile.View
                                                         Send_offline();
                                                     }
                                                 }
+                                                else
+                                                {
+                                                    sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph2message;
+                                                    Send_offline();
+                                                }
+                                            }
+                                            else
+                                            {
+                                                sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                Send_offline();
                                             }
                                         }
                                         else
@@ -1236,6 +1267,16 @@ namespace TBSMobile.View
                                         }
 
                                     }
+                                    else
+                                    {
+                                        sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph1message;
+                                        Send_offline();
+                                    }
+                                }
+                                else
+                                {
+                                    sendStatus.Text = "Syncing failed. Failed to send the data. ";
+                                    Send_offline();
                                 }
                             }
                             else
@@ -1243,6 +1284,16 @@ namespace TBSMobile.View
                                 Send_offline();
                             }
                         }
+                        else
+                        {
+                            sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                            Send_offline();
+                        }
+                    }
+                    else
+                    {
+                        sendStatus.Text = "Syncing failed. Failed to send the data.";
+                        Send_offline();
                     }
                 }
                 else

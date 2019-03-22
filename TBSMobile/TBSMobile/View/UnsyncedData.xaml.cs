@@ -1,9 +1,5 @@
 ﻿using Microsoft.AppCenter.Crashes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -11,7 +7,7 @@ using Xamarin.Forms.Xaml;
 
 namespace TBSMobile.View
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
+    [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class UnsyncedData : CarouselPage
     {
         string contact;
@@ -101,7 +97,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate, StartTime DESC LIMIT 50", contact);
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate DESC, StartTime DESC", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)

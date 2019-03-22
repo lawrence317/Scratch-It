@@ -620,6 +620,16 @@ namespace TBSMobile.View
                             await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
                             await Application.Current.MainPage.Navigation.PopModalAsync();
                         }
+                        else
+                        {
+                            sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                            Send_offline();
+                        }
+                    }
+                    else
+                    {
+                        sendStatus.Text = "Syncing failed. Failed to send the data.";
+                        Send_offline();
                     }
                 }
                 else

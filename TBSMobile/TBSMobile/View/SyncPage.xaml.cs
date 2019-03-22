@@ -375,7 +375,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -388,6 +388,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-user-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -446,7 +447,6 @@ namespace TBSMobile.View
                                     { "Deleted", deleted }
                                 };
 
-                                HttpClient client = new HttpClient();
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -465,6 +465,16 @@ namespace TBSMobile.View
 
                                             clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -499,7 +509,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -622,7 +632,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -758,7 +768,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -884,7 +894,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1079,7 +1089,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1092,6 +1102,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-contacts-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1208,9 +1219,8 @@ namespace TBSMobile.View
                                     { "LastUpdated", lastUpdated }
                                 };
 
-                                HttpClient client = new HttpClient();
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
+                                
                                 if (response.IsSuccessStatusCode)
                                 {
                                     var content = await response.Content.ReadAsStringAsync();
@@ -1223,218 +1233,18 @@ namespace TBSMobile.View
 
                                         if (datamessage.Equals("Inserted"))
                                         {
-                                            string path1file = "sync-contact-media-path-1-client-update-api.php";
-
-                                            var path1link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path1file;
-                                            string path1contentType = "application/json";
-
-                                            JObject path1json;
-                                            bool path1doesExist = File.Exists(mobilePhoto1);
-
-                                            if (!path1doesExist || string.IsNullOrEmpty(mobilePhoto1))
-                                            {
-                                                path1json = new JObject
-                                                {
-                                                   { "Host", host },
-                                                   { "Database", database },
-                                                   { "MediaID", contactID},
-                                                   { "Path", ""}
-                                                };
-                                            }
-                                            else
-                                            {
-                                                path1json = new JObject
-                                                {
-                                                    { "Host", host },
-                                                    { "Database", database },
-                                                    { "MediaID", contactID},
-                                                    { "Path", File.ReadAllBytes(mobilePhoto1)}
-                                                };
-                                            }
-
-                                            HttpClient path1client = new HttpClient();
-                                            var path1response = await path1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, path1contentType));
-
-                                            if (path1response.IsSuccessStatusCode)
-                                            {
-                                                var path1content = await path1response.Content.ReadAsStringAsync();
-                                                if (!string.IsNullOrEmpty(path1content))
-                                                {
-                                                    var path1result = JsonConvert.DeserializeObject<List<ServerMessage>>(path1content, settings);
-
-                                                    var path1item = path1result[0];
-                                                    var path1message = path1item.Message;
-
-                                                    if (path1message.Equals("Inserted"))
-                                                    {
-                                                        string path2file = "sync-contact-media-path-2-client-update-api.php";
-
-                                                        var path2link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path2file;
-                                                        string path2contentType = "application/json";
-
-                                                        JObject path2json;
-                                                        bool path2doesExist = File.Exists(mobilePhoto2);
-
-                                                        if (!path2doesExist || string.IsNullOrEmpty(mobilePhoto2))
-                                                        {
-                                                            path2json = new JObject
-                                                            {
-                                                               { "Host", host },
-                                                               { "Database", database },
-                                                               { "MediaID", contactID},
-                                                               { "Path", ""}
-                                                            };
-                                                        }
-                                                        else
-                                                        {
-                                                            path2json = new JObject
-                                                            {
-                                                                { "Host", host },
-                                                                { "Database", database },
-                                                                { "MediaID", contactID},
-                                                                { "Path", File.ReadAllBytes(mobilePhoto2)}
-                                                            };
-                                                        }
-
-                                                        HttpClient path2client = new HttpClient();
-                                                        var path2response = await path2client.PostAsync(path1link, new StringContent(path2json.ToString(), Encoding.UTF8, path2contentType));
-
-                                                        if (path2response.IsSuccessStatusCode)
-                                                        {
-                                                            var path2content = await path2response.Content.ReadAsStringAsync();
-                                                            if (!string.IsNullOrEmpty(path2content))
-                                                            {
-                                                                var path2result = JsonConvert.DeserializeObject<List<ServerMessage>>(path2content, settings);
-
-                                                                var path2item = path2result[0];
-                                                                var path2message = path2item.Message;
-
-                                                                if (path2message.Equals("Inserted"))
-                                                                {
-                                                                    string path3file = "sync-contact-media-path-3-client-update-api.php";
-
-                                                                    var path3link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path3file;
-                                                                    string path3contentType = "application/json";
-
-                                                                    JObject path3json;
-                                                                    bool path3doesExist = File.Exists(mobilePhoto3);
-
-                                                                    if (!path3doesExist || string.IsNullOrEmpty(mobilePhoto3))
-                                                                    {
-                                                                        path3json = new JObject
-                                                                        {
-                                                                           { "Host", host },
-                                                                           { "Database", database },
-                                                                           { "MediaID", contactID},
-                                                                           { "Path", ""}
-                                                                        };
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        path3json = new JObject
-                                                                        {
-                                                                            { "Host", host },
-                                                                            { "Database", database },
-                                                                            { "MediaID", contactID},
-                                                                            { "Path", File.ReadAllBytes(mobilePhoto3)}
-                                                                        };
-                                                                    }
-
-                                                                    HttpClient path3client = new HttpClient();
-                                                                    var path3response = await path3client.PostAsync(path1link, new StringContent(path3json.ToString(), Encoding.UTF8, path3contentType));
-
-                                                                    if (path3response.IsSuccessStatusCode)
-                                                                    {
-                                                                        var path3content = await path3response.Content.ReadAsStringAsync();
-                                                                        if (!string.IsNullOrEmpty(path3content))
-                                                                        {
-                                                                            var path3result = JsonConvert.DeserializeObject<List<ServerMessage>>(path3content, settings);
-
-                                                                            var path3item = path3result[0];
-                                                                            var path3message = path3item.Message;
-
-                                                                            if (path3message.Equals("Inserted"))
-                                                                            {
-                                                                                string path4file = "sync-contact-media-path-4-client-update-api.php";
-
-                                                                                var path4link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path4file;
-                                                                                string path4contentType = "application/json";
-
-                                                                                JObject path4json;
-                                                                                bool path4doesExist = File.Exists(mobileVideo);
-
-                                                                                if (!path4doesExist || string.IsNullOrEmpty(mobileVideo))
-                                                                                {
-                                                                                    path4json = new JObject
-                                                                                    {
-                                                                                       { "Host", host },
-                                                                                       { "Database", database },
-                                                                                       { "MediaID", contactID},
-                                                                                       { "Path", ""}
-                                                                                    };
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    path4json = new JObject
-                                                                                    {
-                                                                                        { "Host", host },
-                                                                                        { "Database", database },
-                                                                                        { "MediaID", contactID},
-                                                                                        { "Path", File.ReadAllBytes(mobileVideo)}
-                                                                                    };
-                                                                                }
-
-                                                                                HttpClient path4client = new HttpClient();
-                                                                                var path4response = await path4client.PostAsync(path1link, new StringContent(path4json.ToString(), Encoding.UTF8, path4contentType));
-
-                                                                                if (path4response.IsSuccessStatusCode)
-                                                                                {
-                                                                                    var path4content = await path4response.Content.ReadAsStringAsync();
-                                                                                    if (!string.IsNullOrEmpty(path4content))
-                                                                                    {
-                                                                                        var path4result = JsonConvert.DeserializeObject<List<ServerMessage>>(path4content, settings);
-
-                                                                                        var path4item = path4result[0];
-                                                                                        var path4message = path4item.Message;
-
-                                                                                        if (path4message.Equals("Inserted"))
-                                                                                        {
-                                                                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
-
-                                                                                            clientupdate++;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                                                    Sync_Failed();
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                                        Sync_Failed();
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                            Sync_Failed();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                Sync_Failed();
-                                            }
+                                            clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -1453,7 +1263,7 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
-                        SyncContactsServerUpdate(host, database, contact, ipaddress);
+                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
                     }
                     else
                     {
@@ -1469,7 +1279,543 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncContactsMedia1ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-contact-media-path-1-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing contacts image 1 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+                        
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending contacts image 1 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var contactID = result.ContactID;
+                                var media = result.MobilePhoto1;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced contacts image 1: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>Contacts Image 1</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncContactsMedia2ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-contact-media-path-2-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing contacts image 2 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending contacts media 2 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var contactID = result.ContactID;
+                                var media = result.MobilePhoto2;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced contacts image 2: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>Contacts Image 2</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncContactsMedia3ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-contact-media-path-3-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing contacts image 3 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending contacts image 3 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var contactID = result.ContactID;
+                                var media = result.MobilePhoto3;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced contacts image 3: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>Contacts Image 3</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncContactsMedia4ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-contact-media-path-4-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing contacts video changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending contacts video to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var contactID = result.ContactID;
+                                var media = result.MobileVideo;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", contactID},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced contacts video: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>Contacts Video</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsServerUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1654,7 +2000,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1809,7 +2155,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1822,6 +2168,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-retailer-outlet-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1902,7 +2249,6 @@ namespace TBSMobile.View
                                     { "LastUpdated", lastUpdated }
                                 };
 
-                                HttpClient client = new HttpClient();
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -1921,6 +2267,16 @@ namespace TBSMobile.View
 
                                             clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -1955,7 +2311,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2100,7 +2456,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2259,7 +2615,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2272,6 +2628,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-caf-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2313,10 +2670,6 @@ namespace TBSMobile.View
                                 var customerID = result.CustomerID;
                                 var startTime = result.StartTime;
                                 var endTime = result.EndTime;
-                                var photo1 = result.Photo1;
-                                var photo2 = result.Photo2;
-                                var photo3 = result.Photo3;
-                                var video = result.Video;
                                 var mobilePhoto1 = result.MobilePhoto1;
                                 var mobilePhoto2 = result.MobilePhoto2;
                                 var mobilePhoto3 = result.MobilePhoto3;
@@ -2352,7 +2705,6 @@ namespace TBSMobile.View
                                     { "LastUpdated", lastUpdated }
                                 };
 
-                                HttpClient client = new HttpClient();
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -2367,218 +2719,18 @@ namespace TBSMobile.View
 
                                         if (datamessage.Equals("Inserted"))
                                         {
-                                            string path1file = "sync-caf-media-path-1-client-update-api.php";
-
-                                            var path1link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path1file;
-                                            string path1contentType = "application/json";
-
-                                            JObject path1json;
-                                            bool path1doesExist = File.Exists(mobilePhoto1);
-
-                                            if (!path1doesExist || string.IsNullOrEmpty(mobilePhoto1))
-                                            {
-                                                path1json = new JObject
-                                                {
-                                                   { "Host", host },
-                                                   { "Database", database },
-                                                   { "MediaID", cafNo},
-                                                   { "Path", ""}
-                                                };
-                                            }
-                                            else
-                                            {
-                                                path1json = new JObject
-                                                {
-                                                    { "Host", host },
-                                                    { "Database", database },
-                                                    { "MediaID", cafNo},
-                                                    { "Path", File.ReadAllBytes(mobilePhoto1)}
-                                                };
-                                            }
-
-                                            HttpClient path1client = new HttpClient();
-                                            var path1response = await path1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, path1contentType));
-
-                                            if (path1response.IsSuccessStatusCode)
-                                            {
-                                                var path1content = await path1response.Content.ReadAsStringAsync();
-                                                if (!string.IsNullOrEmpty(path1content))
-                                                {
-                                                    var path1result = JsonConvert.DeserializeObject<List<ServerMessage>>(path1content, settings);
-
-                                                    var path1item = path1result[0];
-                                                    var path1message = path1item.Message;
-
-                                                    if (path1message.Equals("Inserted"))
-                                                    {
-                                                        string path2file = "sync-caf-media-path-2-client-update-api.php";
-
-                                                        var path2link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path2file;
-                                                        string path2contentType = "application/json";
-
-                                                        JObject path2json;
-                                                        bool path2doesExist = File.Exists(mobilePhoto2);
-
-                                                        if (!path2doesExist || string.IsNullOrEmpty(mobilePhoto2))
-                                                        {
-                                                            path2json = new JObject
-                                                            {
-                                                               { "Host", host },
-                                                               { "Database", database },
-                                                               { "MediaID", cafNo},
-                                                               { "Path", ""}
-                                                            };
-                                                        }
-                                                        else
-                                                        {
-                                                            path2json = new JObject
-                                                            {
-                                                                { "Host", host },
-                                                                { "Database", database },
-                                                                { "MediaID", cafNo},
-                                                                { "Path", File.ReadAllBytes(mobilePhoto2)}
-                                                            };
-                                                        }
-
-                                                        HttpClient path2client = new HttpClient();
-                                                        var path2response = await path2client.PostAsync(path1link, new StringContent(path2json.ToString(), Encoding.UTF8, path2contentType));
-
-                                                        if (path2response.IsSuccessStatusCode)
-                                                        {
-                                                            var path2content = await path2response.Content.ReadAsStringAsync();
-                                                            if (!string.IsNullOrEmpty(path2content))
-                                                            {
-                                                                var path2result = JsonConvert.DeserializeObject<List<ServerMessage>>(path2content, settings);
-
-                                                                var path2item = path2result[0];
-                                                                var path2message = path2item.Message;
-
-                                                                if (path2message.Equals("Inserted"))
-                                                                {
-                                                                    string path3file = "sync-caf-media-path-3-client-update-api.php";
-
-                                                                    var path3link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path3file;
-                                                                    string path3contentType = "application/json";
-
-                                                                    JObject path3json;
-                                                                    bool path3doesExist = File.Exists(mobilePhoto3);
-
-                                                                    if (!path3doesExist || string.IsNullOrEmpty(mobilePhoto3))
-                                                                    {
-                                                                        path3json = new JObject
-                                                                        {
-                                                                           { "Host", host },
-                                                                           { "Database", database },
-                                                                           { "MediaID", cafNo},
-                                                                           { "Path", ""}
-                                                                        };
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        path3json = new JObject
-                                                                        {
-                                                                            { "Host", host },
-                                                                            { "Database", database },
-                                                                            { "MediaID", cafNo},
-                                                                            { "Path", File.ReadAllBytes(mobilePhoto3)}
-                                                                        };
-                                                                    }
-
-                                                                    HttpClient path3client = new HttpClient();
-                                                                    var path3response = await path3client.PostAsync(path1link, new StringContent(path3json.ToString(), Encoding.UTF8, path3contentType));
-
-                                                                    if (path3response.IsSuccessStatusCode)
-                                                                    {
-                                                                        var path3content = await path3response.Content.ReadAsStringAsync();
-                                                                        if (!string.IsNullOrEmpty(path3content))
-                                                                        {
-                                                                            var path3result = JsonConvert.DeserializeObject<List<ServerMessage>>(path3content, settings);
-
-                                                                            var path3item = path3result[0];
-                                                                            var path3message = path3item.Message;
-
-                                                                            if (path3message.Equals("Inserted"))
-                                                                            {
-                                                                                string path4file = "sync-caf-media-path-4-client-update-api.php";
-
-                                                                                var path4link = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + path4file;
-                                                                                string path4contentType = "application/json";
-
-                                                                                JObject path4json;
-                                                                                bool path4doesExist = File.Exists(mobileVideo);
-
-                                                                                if (!path4doesExist || string.IsNullOrEmpty(mobileVideo))
-                                                                                {
-                                                                                    path4json = new JObject
-                                                                                    {
-                                                                                       { "Host", host },
-                                                                                       { "Database", database },
-                                                                                       { "MediaID", cafNo},
-                                                                                       { "Path", ""}
-                                                                                    };
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    path4json = new JObject
-                                                                                    {
-                                                                                        { "Host", host },
-                                                                                        { "Database", database },
-                                                                                        { "MediaID", cafNo},
-                                                                                        { "Path", File.ReadAllBytes(mobileVideo)}
-                                                                                    };
-                                                                                }
-
-                                                                                HttpClient path4client = new HttpClient();
-                                                                                var path4response = await path4client.PostAsync(path1link, new StringContent(path4json.ToString(), Encoding.UTF8, path4contentType));
-
-                                                                                if (path4response.IsSuccessStatusCode)
-                                                                                {
-                                                                                    var path4content = await path4response.Content.ReadAsStringAsync();
-                                                                                    if (!string.IsNullOrEmpty(path4content))
-                                                                                    {
-                                                                                        var path4result = JsonConvert.DeserializeObject<List<ServerMessage>>(path4content, settings);
-
-                                                                                        var path4item = path4result[0];
-                                                                                        var path4message = path4item.Message;
-
-                                                                                        if (path4message.Equals("Inserted"))
-                                                                                        {
-                                                                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
-
-                                                                                            clientupdate++;
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                                                    Sync_Failed();
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                                        Sync_Failed();
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                            Sync_Failed();
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                syncStatus.Text = "Syncing failed. Server is unreachable.";
-                                                Sync_Failed();
-                                            }
+                                            clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -2597,7 +2749,7 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
-                        SyncCAFServerUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
                     }
                     else
                     {
@@ -2613,7 +2765,543 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncCafMedia1ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-caf-media-path-1-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing caf image 1 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending caf image 1 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var cafNo = result.CAFNo;
+                                var media = result.MobilePhoto1;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced caf image 1: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>CAF Image 1</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncCafMedia2ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-caf-media-path-2-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing caf image 2 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending caf image 2 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var cafNo = result.CAFNo;
+                                var media = result.MobilePhoto2;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced caf image 2: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>CAF Image 2</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncCafMedia3ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-caf-media-path-3-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing caf image 3 changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending caf image 3 to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var cafNo = result.CAFNo;
+                                var media = result.MobilePhoto3;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced caf image 3: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>CAF Image 3</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
+        }
+
+        public async void SyncCafMedia4ClientUpdate(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                syncStatus.Text = "Checking internet connection";
+
+                var port = "7777";
+                var apifolder = "TBSApp";
+                string apifile = "sync-caf-media-path-4-client-update-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    syncStatus.Text = "Checking connection to server";
+
+                    Ping ping = new Ping();
+                    PingReply pingresult = ping.Send(ipaddress, 2000);
+
+                    if (pingresult.Status.ToString() == "Success")
+                    {
+                        syncStatus.Text = "Initializing caf video changes sync";
+
+                        var db = DependencyService.Get<ISQLiteDB>();
+                        var conn = db.GetConnection();
+
+                        var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                        var changesresultCount = datachanges.Result.Count;
+
+                        var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+
+                        if (changesresultCount > 0)
+                        {
+                            int clientupdate = 1;
+
+                            for (int i = 0; i < changesresultCount; i++)
+                            {
+                                syncStatus.Text = "Sending caf video to server " + clientupdate + " out of " + changesresultCount;
+
+                                var result = datachanges.Result[i];
+                                var cafNo = result.CAFNo;
+                                var media = result.MobileVideo;
+
+                                var pathlink = "http://" + ipaddress + ":" + port + "/" + apifolder + "/api/" + apifile;
+                                string pathcontentType = "application/json";
+
+                                JObject pathjson;
+                                bool pathdoesExist = File.Exists(media);
+
+                                if (!pathdoesExist || string.IsNullOrEmpty(media))
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    pathjson = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", cafNo},
+                                        { "Path", File.ReadAllBytes(media)}
+                                    };
+                                }
+
+                                var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
+
+                                if (pathresponse.IsSuccessStatusCode)
+                                {
+                                    var pathcontent = await pathresponse.Content.ReadAsStringAsync();
+                                    if (!string.IsNullOrEmpty(pathcontent))
+                                    {
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime));
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
+                                    }
+                                }
+                                else
+                                {
+                                    syncStatus.Text = "Syncing failed. Server is unreachable.";
+                                    Sync_Failed();
+                                }
+                            }
+
+                            synccount += "Total synced caf video: " + (clientupdate - 1) + "\n";
+
+                            var logType = "App Log";
+                            var log = "Sent client updates to the server (<b>CAF Video</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int logdeleted = 0;
+
+                            Save_Logs(contact, logType, log, database, logdeleted);
+                        }
+
+                        SyncCAFServerUpdate(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    syncStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
+                    Sync_Failed();
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2762,7 +3450,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2888,7 +3576,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -2901,6 +3589,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-caf-activity-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2953,8 +3642,7 @@ namespace TBSMobile.View
                                     { "LastUpdated", lastupdated },
                                     { "Deleted", deleted }
                                 };
-
-                                HttpClient client = new HttpClient();
+                                
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -2973,6 +3661,16 @@ namespace TBSMobile.View
 
                                             clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -3007,7 +3705,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3123,7 +3821,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3252,7 +3950,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3265,6 +3963,7 @@ namespace TBSMobile.View
                 var port = "7777";
                 var apifolder = "TBSApp";
                 string apifile = "sync-email-recipient-client-update-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3320,7 +4019,6 @@ namespace TBSMobile.View
                                     { "Deleted", deleted }
                                 };
 
-                                HttpClient client = new HttpClient();
                                 var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                                 if (response.IsSuccessStatusCode)
@@ -3339,6 +4037,16 @@ namespace TBSMobile.View
 
                                             clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -3375,7 +4083,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3494,7 +4202,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3620,7 +4328,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3736,7 +4444,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3864,7 +4572,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -3982,7 +4690,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -4073,6 +4781,16 @@ namespace TBSMobile.View
 
                                             clientupdate++;
                                         }
+                                        else
+                                        {
+                                            syncStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            Sync_Failed();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        syncStatus.Text = "Syncing failed. Failed to send the data.";
+                                        Sync_Failed();
                                     }
                                 }
                                 else
@@ -4107,7 +4825,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                //Crashes.TrackError(ex);
+                Crashes.TrackError(ex);
             }
         }
 
