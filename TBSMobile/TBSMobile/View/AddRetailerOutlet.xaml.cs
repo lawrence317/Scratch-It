@@ -147,8 +147,14 @@ namespace TBSMobile.View
 
                                 try
                                 {
-                                    tcpClient.Connect(ipaddress, 7777);
-                                    Send_online();
+                                    if (tcpClient.ConnectAsync(ipaddress, 7777).Wait(1000))
+                                    {
+                                        Send_online();
+                                    }
+                                    else
+                                    {
+                                        Send_offline();
+                                    }
                                 }
                                 catch (Exception)
                                 {
