@@ -732,11 +732,15 @@ namespace TBSMobile.View
                         else
                         {
                             await DisplayAlert("Connection Failed", "Connection to server failed. Switching to offline mode", "Got it");
+                            connectstack.IsVisible = false;
+                            loginstack.IsVisible = true;
                         }
                     }
                     catch (Exception ex)
                     {
                         await DisplayAlert("Connection Failed", "Connection to server failed. Switching to offline mode", "Got it");
+                        connectstack.IsVisible = false;
+                        loginstack.IsVisible = true;
                     }
                }
 
