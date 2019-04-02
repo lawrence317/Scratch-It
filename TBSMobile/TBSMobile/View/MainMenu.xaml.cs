@@ -178,6 +178,10 @@ namespace TBSMobile.View
                                 btnRetailer.IsEnabled = true;
                                 btnResend.IsEnabled = true;
                             }
+                            finally
+                            {
+                                tcpClient.Close();
+                            }
                         }
                         else
                         {
@@ -483,6 +487,10 @@ namespace TBSMobile.View
                                 btnPR.IsEnabled = true;
                                 btnRetailer.IsEnabled = true;
                                 btnResend.IsEnabled = true;
+                            }
+                            finally
+                            {
+                                tcpClient.Close();
                             }
                         }
                         else
@@ -896,6 +904,11 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
+
                 }
                 else
                 {
@@ -1038,6 +1051,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -1178,6 +1195,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -1320,6 +1341,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -1466,6 +1491,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -1627,6 +1656,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -1781,6 +1814,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -1922,6 +1959,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -2065,6 +2106,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -2206,6 +2251,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -2353,6 +2402,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -2485,6 +2538,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -2622,6 +2679,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -2761,6 +2822,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -2880,6 +2945,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -3001,6 +3070,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -3119,6 +3192,10 @@ namespace TBSMobile.View
                     {
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
+                    }
+                    finally
+                    {
+                        tcpClient.Close();
                     }
                 }
                 else
@@ -3241,6 +3318,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Server is unreachable.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -3361,6 +3442,10 @@ namespace TBSMobile.View
                         lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
                         OnSyncFailed();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -3399,6 +3484,10 @@ namespace TBSMobile.View
                 {
                     lblStatus.Text = "Online - Server unreachable. Connect to VPN";
                     lblStatus.BackgroundColor = Color.FromHex("#e67e22");
+                }
+                finally
+                {
+                    tcpClient.Close();
                 }
             }
             else
@@ -3439,6 +3528,10 @@ namespace TBSMobile.View
                 {
                     lblStatus.Text = "Online - Server unreachable. Connect to VPN";
                     lblStatus.BackgroundColor = Color.FromHex("#e67e22");
+                }
+                finally
+                {
+                    tcpClient.Close();
                 }
             }
             else
@@ -3494,6 +3587,10 @@ namespace TBSMobile.View
                 {
                     await DisplayAlert("Resync data failed", "Server unreachable, please connect to your VPN to retry", "Got it");
                     OnSyncFailed();
+                }
+                finally
+                {
+                    tcpClient.Close();
                 }
             }
             else

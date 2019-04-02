@@ -397,6 +397,10 @@ namespace TBSMobile.View
                                     {
                                         Send_offline();
                                     }
+                                    finally
+                                    {
+                                        tcpClient.Close();
+                                    }
                                 }
                                 else
                                 {

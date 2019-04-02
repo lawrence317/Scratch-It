@@ -379,6 +379,10 @@ namespace TBSMobile.View
                     {
                         Offline_Login();
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                 }
                 else
                 {
@@ -742,9 +746,11 @@ namespace TBSMobile.View
                         connectstack.IsVisible = false;
                         loginstack.IsVisible = true;
                     }
+                    finally
+                    {
+                        tcpClient.Close();
+                    }
                }
-
-                            
             }
         }
     }
