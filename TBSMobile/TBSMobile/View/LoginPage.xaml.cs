@@ -105,7 +105,7 @@ namespace TBSMobile.View
             lblRegistrationCode.Text = "Device ID: " + CrossDeviceInfo.Current.Id;
         }
 
-        public async Task CreateTableAsync()
+        public async void CreateTableAsync()
         {
             try
             {

@@ -208,7 +208,7 @@ namespace TBSMobile.View
             lstName.IsVisible = false;
         }
 
-        private void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void lstName_ItemTappedAsync(object sender, ItemTappedEventArgs e)
         {
             try
             {
@@ -234,7 +234,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -243,7 +244,7 @@ namespace TBSMobile.View
             search();
         }
 
-        public void search()
+        public async void search()
         {
             try
             {
@@ -278,7 +279,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -378,7 +380,7 @@ namespace TBSMobile.View
             }
         }
 
-        public void province_search()
+        public async void province_searchAsync()
         {
             try
             {
@@ -413,7 +415,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -433,15 +436,15 @@ namespace TBSMobile.View
 
         private void provinceSearch_Focused(object sender, FocusEventArgs e)
         {
-            province_search();
+            province_searchAsync();
         }
 
         private void provinceSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            province_search();
+            province_searchAsync();
         }
 
-        private void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             try
             {
@@ -480,7 +483,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 

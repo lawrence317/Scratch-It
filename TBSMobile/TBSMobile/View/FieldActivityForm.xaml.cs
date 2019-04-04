@@ -102,7 +102,7 @@ namespace TBSMobile.View
             return true;
         }
 
-        public void getRecipients()
+        public async void getRecipients()
         {
             try
             {
@@ -123,7 +123,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -197,7 +198,7 @@ namespace TBSMobile.View
             lstName.IsVisible = false;
         }
 
-        private void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             try
             {
@@ -260,11 +261,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        public void name_search()
+        public async void name_search()
         {
             try
             {
@@ -301,11 +303,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void codePicker_SelectedIndexChanged(object sender, EventArgs e)
+        private async void codePicker_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -447,7 +450,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
             
         }
@@ -1433,7 +1437,7 @@ namespace TBSMobile.View
             }
         }
 
-        private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+        private async void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
             try
             {
@@ -1491,7 +1495,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1521,7 +1526,7 @@ namespace TBSMobile.View
             }
         }
 
-        public void province_search()
+        public async void province_search()
         {
             try
             {
@@ -1556,7 +1561,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1584,7 +1590,7 @@ namespace TBSMobile.View
             province_search();
         }
 
-        private void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             try
             {
@@ -1623,7 +1629,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
