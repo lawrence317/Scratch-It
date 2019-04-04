@@ -330,6 +330,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("userlastsync", current_datetime, "private_prefs");
+
                             FirstTimeSyncSystemSerial(host, database, contact, ipaddress);
                         }
                         else
@@ -351,7 +353,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -470,7 +472,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -577,7 +579,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -698,7 +700,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -809,7 +811,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -989,7 +991,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1164,7 +1166,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1287,7 +1289,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1409,7 +1411,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1532,7 +1534,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1659,7 +1661,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1829,7 +1831,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -1969,7 +1971,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2110,7 +2112,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2240,7 +2242,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2384,7 +2386,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2519,7 +2521,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2642,7 +2644,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2765,7 +2767,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -2887,7 +2889,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3013,7 +3015,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3147,7 +3149,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3258,7 +3260,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3372,7 +3374,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3473,7 +3475,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3587,7 +3589,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3705,7 +3707,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3809,7 +3811,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -3920,7 +3922,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -4021,7 +4023,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -4134,7 +4136,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -4237,7 +4239,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -4357,7 +4359,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);
+                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
