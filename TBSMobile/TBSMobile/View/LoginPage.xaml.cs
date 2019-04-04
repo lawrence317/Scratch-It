@@ -187,201 +187,185 @@ namespace TBSMobile.View
                 //Check if there is an internet connection
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    TcpClient tcpClient = new TcpClient();
+                    string apifile = "login-api.php";
 
-                    try
+                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        if (tcpClient.ConnectAsync(ipaddress, 7777).Wait(1000))
-                        {
-                            string apifile = "login-api.php";
+                        { "Host", hostName },
+                        { "Database", database },
+                        { "userName", userName },
+                        { "Password", password },
+                        { "RegistrationCode", Constants.deviceID }
+                    };
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                    HttpClient client = new HttpClient();
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            var settings = new JsonSerializerSettings
                             {
-                                { "Host", hostName },
-                                { "Database", database },
-                                { "userName", userName },
-                                { "Password", password },
-                                { "RegistrationCode", Constants.deviceID }
+                                NullValueHandling = NullValueHandling.Ignore,
+                                MissingMemberHandling = MissingMemberHandling.Ignore
                             };
 
-                            HttpClient client = new HttpClient();
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                            if (response.IsSuccessStatusCode)
+                            var item = loginresult[0];
+                            var message = item.Message;
+
+                            if (message.Equals("Subscription Expired"))
                             {
-                                var content = await response.Content.ReadAsStringAsync();
+                                await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
 
-                                if (!string.IsNullOrEmpty(content))
+                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                var body = "Good Day!<br/><br/> " +
+                                    "This user needs new product key.<br/><br/>" +
+                                    "userName: " + userName + "<br/>" +
+                                    "Device ID: " + Constants.deviceID + "<br/>";
+
+                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                if (emailMessenger.CanSendEmail)
                                 {
-                                    var settings = new JsonSerializerSettings
+                                    var emailsend = new EmailMessageBuilder()
+                                    .To(Constants.email)
+                                    .Subject(subject)
+                                    .BodyAsHtml(body)
+                                    .Build();
+
+                                    emailMessenger.SendEmail(emailsend);
+                                }
+                            }
+                            else if (message.Equals("Subscription Trial Expired"))
+                            {
+                                await DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+
+                                var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
+                                var body = "Good Day!<br/><br/> " +
+                                    "This user needs new product key.<br/><br/>" +
+                                    "userName: " + userName + "<br/>" +
+                                    "Device ID: " + Constants.deviceID + "<br/>";
+
+                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                if (emailMessenger.CanSendEmail)
+                                {
+                                    var emailsend = new EmailMessageBuilder()
+                                    .To(Constants.email)
+                                    .Subject(subject)
+                                    .BodyAsHtml(body)
+                                    .Build();
+
+                                    emailMessenger.SendEmail(emailsend);
+                                }
+                            }
+                            else if (message.Equals("Subscription Not Found"))
+                            {
+                                var trialsub = await DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
+
+                                if (trialsub == true)
+                                {
+                                    var current_date = DateTime.Now.ToString("yyyy-MM-dd");
+
+                                    string trialapifile = "activate-trial-api.php";
+
+                                    var triallink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + trialapifile;
+                                    string trialcontentType = "application/json";
+                                    JObject trialjson = new JObject
                                     {
-                                        NullValueHandling = NullValueHandling.Ignore,
-                                        MissingMemberHandling = MissingMemberHandling.Ignore
+                                        { "Host", hostName },
+                                        { "Database", database },
+                                        { "RegistrationCode", Constants.deviceID },
+                                        { "Date",  DateTime.Parse(current_date)},
+                                        { "Username", userName}
                                     };
 
-                                    var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                                    HttpClient trialclient = new HttpClient();
+                                    var trialresponse = await trialclient.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
 
-                                    var item = loginresult[0];
-                                    var message = item.Message;
-
-                                    if (message.Equals("Subscription Expired"))
+                                    if (trialresponse.IsSuccessStatusCode)
                                     {
-                                        await DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                        var trcontent = await trialresponse.Content.ReadAsStringAsync();
 
-                                        var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                        var body = "Good Day!<br/><br/> " +
-                                            "This user needs new product key.<br/><br/>" +
-                                            "userName: " + userName + "<br/>" +
-                                            "Device ID: " + Constants.deviceID + "<br/>";
-
-                                        var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                        if (emailMessenger.CanSendEmail)
+                                        if (!string.IsNullOrEmpty(trcontent))
                                         {
-                                            var emailsend = new EmailMessageBuilder()
-                                            .To(Constants.email)
-                                            .Subject(subject)
-                                            .BodyAsHtml(body)
-                                            .Build();
+                                            var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
 
-                                            emailMessenger.SendEmail(emailsend);
-                                        }
-                                    }
-                                    else if (message.Equals("Subscription Trial Expired"))
-                                    {
-                                        await DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                            var trialitem = trialresult[0];
+                                            var trialmessage = trialitem.Message;
+                                            var trialcontactid = trialitem.ContactID;
 
-                                        var subject = "Subscription Expired: " + userName + " - " + Constants.deviceID;
-                                        var body = "Good Day!<br/><br/> " +
-                                            "This user needs new product key.<br/><br/>" +
-                                            "userName: " + userName + "<br/>" +
-                                            "Device ID: " + Constants.deviceID + "<br/>";
-
-                                        var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                        if (emailMessenger.CanSendEmail)
-                                        {
-                                            var emailsend = new EmailMessageBuilder()
-                                            .To(Constants.email)
-                                            .Subject(subject)
-                                            .BodyAsHtml(body)
-                                            .Build();
-
-                                            emailMessenger.SendEmail(emailsend);
-                                        }
-                                    }
-                                    else if (message.Equals("Subscription Not Found"))
-                                    {
-                                        var trialsub = await DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
-
-                                        if (trialsub == true)
-                                        {
-                                            var current_date = DateTime.Now.ToString("yyyy-MM-dd");
-
-                                            string trialapifile = "activate-trial-api.php";
-
-                                            var triallink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + trialapifile;
-                                            string trialcontentType = "application/json";
-                                            JObject trialjson = new JObject
+                                            if (trialmessage.Equals("Inserted"))
                                             {
-                                                { "Host", hostName },
-                                                { "Database", database },
-                                                { "RegistrationCode", Constants.deviceID },
-                                                { "Date",  DateTime.Parse(current_date)},
-                                                { "Username", userName}
-                                            };
+                                                var logType = "App Log";
+                                                var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                int deleted = 0;
 
-                                            HttpClient trialclient = new HttpClient();
-                                            var trialresponse = await trialclient.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
+                                                Save_Logs(trialcontactid, logType, log, database, deleted);
 
-                                            if (trialresponse.IsSuccessStatusCode)
-                                            {
-                                                var trcontent = await trialresponse.Content.ReadAsStringAsync();
-
-                                                if (!string.IsNullOrEmpty(trcontent))
-                                                {
-                                                    var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
-
-                                                    var trialitem = trialresult[0];
-                                                    var trialmessage = trialitem.Message;
-                                                    var trialcontactid = trialitem.ContactID;
-
-                                                    if (trialmessage.Equals("Inserted"))
-                                                    {
-                                                        var logType = "App Log";
-                                                        var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                                        int deleted = 0;
-
-                                                        Save_Logs(trialcontactid, logType, log, database, deleted);
-
-                                                        await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var subject = "Register Device: " + userName + " - " + Constants.deviceID;
-                                            var body = "Good Day!<br/><br/> " +
-                                                "This user needs to register the device.<br/><br/>" +
-                                                "userName: " + userName + "<br/>" +
-                                                "Device ID: " + Constants.deviceID + "<br/>";
-
-                                            var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                            if (emailMessenger.CanSendEmail)
-                                            {
-                                                var emailsend = new EmailMessageBuilder()
-                                                .To(Constants.email)
-                                                .Subject(subject)
-                                                .BodyAsHtml(body)
-                                                .Build();
-
-                                                emailMessenger.SendEmail(emailsend);
+                                                await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
                                             }
                                         }
                                     }
-                                    else if (message.Equals("Incorrect Login"))
+                                    else
                                     {
-                                        await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                                        Offline_Login();
                                     }
-                                    else if (message.Equals("Credential Correct"))
+                                }
+                                else
+                                {
+                                    var subject = "Register Device: " + userName + " - " + Constants.deviceID;
+                                    var body = "Good Day!<br/><br/> " +
+                                        "This user needs to register the device.<br/><br/>" +
+                                        "userName: " + userName + "<br/>" +
+                                        "Device ID: " + Constants.deviceID + "<br/>";
+
+                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                    if (emailMessenger.CanSendEmail)
                                     {
-                                        var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
+                                        var emailsend = new EmailMessageBuilder()
+                                        .To(Constants.email)
+                                        .Subject(subject)
+                                        .BodyAsHtml(body)
+                                        .Build();
 
-                                        var contactID = result[0].ContactID;
-
-                                        var logType = "App Log";
-                                        var log = "Logged in (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                        int deleted = 0;
-
-                                        Save_Preferences(userName, password, contactID);
-                                        Save_Logs(contactID, logType, log, database, deleted);
-
-                                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
-                                    }
-                                    else if (message.Equals("Not Connected"))
-                                    {
-                                        await DisplayAlert("Login Error", "Please check server and database name", "Got it");
+                                        emailMessenger.SendEmail(emailsend);
                                     }
                                 }
                             }
-                            else
+                            else if (message.Equals("Incorrect Login"))
                             {
-                                Offline_Login();
+                                await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                            }
+                            else if (message.Equals("Credential Correct"))
+                            {
+                                var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
+
+                                var contactID = result[0].ContactID;
+
+                                var logType = "App Log";
+                                var log = "Logged in (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int deleted = 0;
+
+                                Save_Preferences(userName, password, contactID);
+                                Save_Logs(contactID, logType, log, database, deleted);
+
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(hostName, database, contactID, ipaddress));
+                            }
+                            else if (message.Equals("Not Connected"))
+                            {
+                                await DisplayAlert("Login Error", "Please check server and database name", "Got it");
                             }
                         }
-                        else
-                        {
-                            Offline_Login();
-                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
                         Offline_Login();
-                    }
-                    finally
-                    {
-                        tcpClient.Close();
                     }
                 }
                 else
@@ -719,38 +703,26 @@ namespace TBSMobile.View
             {
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    TcpClient tcpClient = new TcpClient();
+                    //Check if there is an internet connection
+                    connectstack.IsVisible = false;
+                    loginstack.IsVisible = true;
 
-                    try
-                    {
-                        if (tcpClient.ConnectAsync(ipaddress, 7777).Wait(1000))
-                        {
-                            //Check if there is an internet connection
-                            connectstack.IsVisible = false;
-                            loginstack.IsVisible = true;
+                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                    Preferences.Set("host", hostName, "private_prefs");
+                    Preferences.Set("database", database, "private_prefs");
+                }
+                else
+                {
+                    //Check if there is an internet connection
+                    connectstack.IsVisible = false;
+                    loginstack.IsVisible = true;
 
-                            Preferences.Set("ipaddress", ipaddress, "private_prefs");
-                            Preferences.Set("host", hostName, "private_prefs");
-                            Preferences.Set("database", database, "private_prefs");
-                        }
-                        else
-                        {
-                            await DisplayAlert("Connection Failed", "Connection to server failed. Switching to offline mode", "Got it");
-                            connectstack.IsVisible = false;
-                            loginstack.IsVisible = true;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        await DisplayAlert("Connection Failed", "Connection to server failed. Switching to offline mode", "Got it");
-                        connectstack.IsVisible = false;
-                        loginstack.IsVisible = true;
-                    }
-                    finally
-                    {
-                        tcpClient.Close();
-                    }
-               }
+                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
+                    Preferences.Set("host", hostName, "private_prefs");
+                    Preferences.Set("database", database, "private_prefs");
+
+                    await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
+                }
             }
         }
     }

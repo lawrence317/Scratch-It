@@ -379,28 +379,7 @@ namespace TBSMobile.View
 
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
-                                    sendStatus.Text = "Checking connection to server";
-                                    TcpClient tcpClient = new TcpClient();
-
-                                    try
-                                    {
-                                        if (tcpClient.ConnectAsync(ipaddress, 7777).Wait(1000))
-                                        {
-                                            Send_online();
-                                        }
-                                        else
-                                        {
-                                            Send_offline();
-                                        }
-                                    }
-                                    catch (Exception)
-                                    {
-                                        Send_offline();
-                                    }
-                                    finally
-                                    {
-                                        tcpClient.Close();
-                                    }
+                                    Send_online();
                                 }
                                 else
                                 {
@@ -871,8 +850,6 @@ namespace TBSMobile.View
             try
             {
                 sendStatus.Text = "Sending prospect retailer to server";
-
-                
                 
                 string pathfile = "sync-prospect-directly-api.php";
 
