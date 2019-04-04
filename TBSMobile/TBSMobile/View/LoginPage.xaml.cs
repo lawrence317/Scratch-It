@@ -33,7 +33,7 @@ namespace TBSMobile.View
         protected async override void OnAppearing()
         {
             base.OnAppearing();
-            await CreateTableAsync();
+            CreateTableAsync();
             var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
             if (string.IsNullOrEmpty(appdate))
@@ -56,7 +56,8 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 }
             }
         }
