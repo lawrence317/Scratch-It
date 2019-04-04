@@ -1121,7 +1121,7 @@ namespace TBSMobile.View
                             await DisplayAlert("Contact Content", json.ToString(), "ok");
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
+                            await DisplayAlert("Contact Content", response.StatusCode.ToString(), "ok");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
@@ -2073,13 +2073,17 @@ namespace TBSMobile.View
                                         { "LastUpdated", lastUpdated }
                                     };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            await DisplayAlert("Retailer Content", json.ToString(), "ok");
 
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            await DisplayAlert("Retailer Content", response.StatusCode.ToString(), "ok");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
+
+                                    await DisplayAlert("Retailer Content", content, "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -2487,8 +2491,10 @@ namespace TBSMobile.View
                                         { "LastUpdated", lastUpdated }
                                     };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            await DisplayAlert("CAF Content", json.ToString(), "ok");
 
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            await DisplayAlert("CAF Content", response.StatusCode.ToString(), "ok");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
@@ -3347,13 +3353,17 @@ namespace TBSMobile.View
                                         { "Deleted", deleted }
                                     };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
+                            await DisplayAlert("CAF Activity Content", json.ToString(), "ok");
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            await DisplayAlert("CAF ACtivity Content", response.StatusCode.ToString(), "ok");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
+                                    await DisplayAlert("CAF Activity Content", json.ToString(), "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -4296,6 +4306,7 @@ namespace TBSMobile.View
 
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
+                    HttpClient client = new HttpClient();
 
                     var datachanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = datachanges.Result.Count;
@@ -4340,14 +4351,16 @@ namespace TBSMobile.View
                                         { "Deleted", deleted }
                                     };
 
-                            HttpClient client = new HttpClient();
+                            
+                            await DisplayAlert("Logs Content", json.ToString(), "ok");
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
+                            await DisplayAlert("Logs Content", response.StatusCode.ToString(), "ok");
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
+                                    await DisplayAlert("Logs Content", content, "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
