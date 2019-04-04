@@ -130,7 +130,7 @@ namespace TBSMobile.View
             lstRetailerGroup.SelectedItem = null;
         }
 
-        private void lstRetailerGroup_Refreshing(object sender, EventArgs e)
+        private async void lstRetailerGroup_Refreshing(object sender, EventArgs e)
         {
             try
             {
@@ -240,11 +240,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbRCode_Activated(object sender, EventArgs e)
+        private async void sbRCode_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -352,11 +353,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbStreet_Activated(object sender, EventArgs e)
+        private async void sbStreet_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -464,11 +466,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbBarangay_Activated(object sender, EventArgs e)
+        private async void sbBarangay_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -576,11 +579,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbDistrict_Activated(object sender, EventArgs e)
+        private async void sbDistrict_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -688,11 +692,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbCity_Activated(object sender, EventArgs e)
+        private async void sbCity_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -800,11 +805,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void sbProvince_Activated(object sender, EventArgs e)
+        private async void sbProvince_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -912,11 +918,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        private void Search_TextChanged(object sender, TextChangedEventArgs e)
+        private async void Search_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
@@ -1061,7 +1068,8 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 }
             }
         }

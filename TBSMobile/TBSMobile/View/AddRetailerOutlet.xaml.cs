@@ -86,7 +86,8 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 }
             }
         }
@@ -158,7 +159,8 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 }
             }
         }
@@ -208,7 +210,7 @@ namespace TBSMobile.View
             lstName.IsVisible = false;
         }
 
-        private async void lstName_ItemTappedAsync(object sender, ItemTappedEventArgs e)
+        private async void lstName_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             try
             {
@@ -633,7 +635,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 Send_offline();
             }
         }

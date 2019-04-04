@@ -34,7 +34,7 @@ namespace TBSMobile.View
             GetActivity(contact);
         }
 
-        public void GetActivity(string contact)
+        public async void GetActivity(string contact)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace TBSMobile.View
             lstActivity.SelectedItem = null;
         }
 
-        private void lstActivity_Refreshing(object sender, EventArgs e)
+        private async void lstActivity_Refreshing(object sender, EventArgs e)
         {
             try
             {

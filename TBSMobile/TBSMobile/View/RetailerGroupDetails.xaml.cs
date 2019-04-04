@@ -42,12 +42,13 @@ namespace TBSMobile.View
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
                 }
             }
         }
 
-        public void GetRetailerGroupDetails(string code)
+        public async void GetRetailerGroupDetails(string code)
         {
             try
             {
@@ -103,7 +104,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
     }

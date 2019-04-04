@@ -60,7 +60,7 @@ namespace TBSMobile.View
             }
         }
 
-        public void GetRetailerGroup(string contact)
+        public async void GetRetailerGroup(string contact)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace TBSMobile.View
             }
         }
 
-        public void GetActivity(string contact)
+        public async void GetActivity(string contact)
         {
             try
             {
@@ -117,11 +117,12 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
-        public void GetProspectRetailer(string contact)
+        public async void GetProspectRetailer(string contact)
         {
             try
             {
@@ -148,7 +149,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -201,7 +203,7 @@ namespace TBSMobile.View
             lstActivity.SelectedItem = null;
         }
 
-        private void lstActivity_Refreshing(object sender, EventArgs e)
+        private async void lstActivity_Refreshing(object sender, EventArgs e)
         {
             try
             {
@@ -230,7 +232,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -283,7 +286,7 @@ namespace TBSMobile.View
             lstProspect.SelectedItem = null;
         }
 
-        private void lstProspect_Refreshing(object sender, EventArgs e)
+        private async void lstProspect_Refreshing(object sender, EventArgs e)
         {
             try
             {
@@ -312,7 +315,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 
@@ -364,7 +368,7 @@ namespace TBSMobile.View
             lstRetailerGroup.SelectedItem = null;
         }
 
-        private void lstRetailerGroup_Refreshing(object sender, EventArgs e)
+        private async void lstRetailerGroup_Refreshing(object sender, EventArgs e)
         {
             try
             {
@@ -393,7 +397,8 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Exception Error", ex.ToString(), "ok");
             }
         }
 

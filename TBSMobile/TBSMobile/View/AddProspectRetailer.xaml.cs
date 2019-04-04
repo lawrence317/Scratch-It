@@ -288,7 +288,8 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                        Crashes.TrackError(ex);
+                        await DisplayAlert("Exception Error", ex.ToString(), "ok");
                     }
                 }
             }
@@ -321,7 +322,8 @@ namespace TBSMobile.View
                }
                catch (Exception ex)
                {
-                   Crashes.TrackError(ex);  await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                   Crashes.TrackError(ex);
+                   await DisplayAlert("Exception Error", ex.ToString(), "ok");
                }
            }
         }
@@ -691,7 +693,7 @@ namespace TBSMobile.View
             }
         }
 
-        public async System.Threading.Tasks.Task province_searchAsync()
+        public async void province_searchAsync()
         {
             try
             {
@@ -755,7 +757,7 @@ namespace TBSMobile.View
             province_searchAsync();
         }
 
-        private async System.Threading.Tasks.Task lstProvince_ItemTappedAsync(object sender, ItemTappedEventArgs e)
+        private async void lstProvince_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             try
             {
