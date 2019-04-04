@@ -862,7 +862,7 @@ namespace TBSMobile.View
                         if (response.IsSuccessStatusCode)
                         {
                             var content = await response.Content.ReadAsStringAsync();
-
+                            await DisplayAlert("Contact Content", content, "ok");
                             if (!string.IsNullOrEmpty(content))
                             {
                                 var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
@@ -2472,6 +2472,8 @@ namespace TBSMobile.View
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
+                                await DisplayAlert("CAF Content", content, "ok");
+
                                 if (!string.IsNullOrEmpty(content))
                                 {
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
