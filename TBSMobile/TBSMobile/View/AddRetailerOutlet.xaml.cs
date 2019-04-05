@@ -87,7 +87,7 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 }
             }
         }
@@ -160,7 +160,7 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 }
             }
         }
@@ -237,7 +237,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -282,7 +282,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -418,7 +418,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -486,7 +486,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -532,8 +532,6 @@ namespace TBSMobile.View
             try
             {
                 sendStatus.Text = "Sending retailer outlet to server";
-
-                
                 
                 string pathfile = "sync-retailer-outlet-client-update-api.php";
 
@@ -636,7 +634,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 Send_offline();
             }
         }
@@ -722,7 +720,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -784,7 +782,7 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 }
             }
         }
@@ -809,7 +807,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -833,7 +831,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -919,7 +917,7 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 }
             }
         }

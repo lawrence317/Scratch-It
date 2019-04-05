@@ -273,11 +273,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -330,7 +330,7 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
-                            Preferences.Set("userlastsync", current_datetime, "private_prefs");
+                            Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
 
                             FirstTimeSyncSystemSerial(host, database, contact, ipaddress);
                         }
@@ -354,7 +354,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -474,7 +475,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -485,6 +486,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-user-server-update-api.php";
+                var lastchecked = Preferences.Get("userchangeslastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -507,11 +509,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -565,6 +568,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncSystemSerial(host, database, contact, ipaddress);
                     }
                     else
@@ -582,7 +587,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -621,12 +626,12 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact },
-                                    { "RegistrationCode", Constants.deviceID }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact },
+                            { "RegistrationCode", Constants.deviceID }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -682,6 +687,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncContacts(host, database, contact, ipaddress);
                         }
                         else
@@ -704,7 +711,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -715,6 +723,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-system-serial-server-update-api.php";
+                var lastchecked = Preferences.Get("systemserialchangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -737,12 +746,13 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact },
-                                { "RegistrationCode", Constants.deviceID }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "RegistrationCode", Constants.deviceID },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -799,6 +809,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncContacts(host, database, contact, ipaddress);
                     }
                     else
@@ -816,7 +828,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -855,11 +867,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -975,6 +987,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncRetailerOutlet(host, database, contact, ipaddress);
                         }
                         else
@@ -997,7 +1011,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -1117,18 +1132,14 @@ namespace TBSMobile.View
                                         { "Deleted", deleted },
                                         { "LastUpdated", lastUpdated }
                                     };
-
-                            await DisplayAlert("Contact Content", json.ToString(), "ok");
-
+                            
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                            await DisplayAlert("Contact Content", response.StatusCode.ToString(), "ok");
+                            
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    await DisplayAlert("Contact Content", content, "ok");
-
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -1177,7 +1188,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1301,7 +1312,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1424,7 +1435,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1548,7 +1559,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1676,7 +1687,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1687,6 +1698,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-contacts-server-update-api.php";
+                var lastchecked = Preferences.Get("contactschangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1709,11 +1721,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -1830,6 +1843,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncRetailerOutlet(host, database, contact, ipaddress);
                     }
                     else
@@ -1847,7 +1862,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -1886,11 +1901,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -1966,6 +1981,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncCAF(host, database, contact, ipaddress);
                         }
                         else
@@ -1988,7 +2005,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -2072,18 +2090,14 @@ namespace TBSMobile.View
                                         { "Deleted", deleted },
                                         { "LastUpdated", lastUpdated }
                                     };
-
-                            await DisplayAlert("Retailer Content", json.ToString(), "ok");
-
+                            
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                            await DisplayAlert("Retailer Content", response.StatusCode.ToString(), "ok");
+                            
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-
-                                    await DisplayAlert("Retailer Content", content, "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -2134,7 +2148,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -2145,6 +2159,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-retailer-outlet-server-update-api.php";
+                var lastchecked = Preferences.Get("retaileroutletchangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2167,11 +2182,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2248,6 +2264,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncCAF(host, database, contact, ipaddress);
                     }
                     else
@@ -2265,7 +2283,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -2304,11 +2322,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2388,6 +2406,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("cafchangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncCAFActivity(host, database, contact, ipaddress);
                         }
                         else
@@ -2410,7 +2430,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -2491,14 +2512,14 @@ namespace TBSMobile.View
                                         { "LastUpdated", lastUpdated }
                                     };
 
-                            await DisplayAlert("CAF Content", json.ToString(), "ok");
+                            
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                            await DisplayAlert("CAF Content", response.StatusCode.ToString(), "ok");
+                            
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
-                                await DisplayAlert("CAF Content", content, "ok");
+                                
 
                                 if (!string.IsNullOrEmpty(content))
                                 {
@@ -2550,7 +2571,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -2674,7 +2695,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -2798,7 +2819,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -2921,7 +2942,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3005,7 +3026,7 @@ namespace TBSMobile.View
 
                                     if (pathmessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime));
+                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
 
                                         clientupdate++;
                                     }
@@ -3048,7 +3069,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3059,6 +3080,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-caf-server-update-api.php";
+                var lastchecked = Preferences.Get("cafchangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3081,11 +3103,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3166,6 +3189,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("cafchangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncCAFActivity(host, database, contact, ipaddress);
                     }
                     else
@@ -3183,7 +3208,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3222,10 +3247,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3273,6 +3299,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("cafactivitychangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncEmailRecipient(host, database, contact, ipaddress);
                         }
                         else
@@ -3295,7 +3323,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -3336,6 +3365,7 @@ namespace TBSMobile.View
 
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
+                            var contactid = result.ContactID;
                             var activityID = result.ActivityID;
                             var lastsync = DateTime.Parse(current_datetime);
                             var lastupdated = result.LastUpdated;
@@ -3348,22 +3378,19 @@ namespace TBSMobile.View
                                         { "Host", host },
                                         { "Database", database },
                                         { "CAFNo", cafNo },
+                                        { "ContactID", contactid },
                                         { "ActivityID", activityID },
                                         { "LastUpdated", lastupdated },
                                         { "Deleted", deleted }
                                     };
-
-
-                            await DisplayAlert("CAF Activity Content", json.ToString(), "ok");
-
+                            
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                            await DisplayAlert("CAF ACtivity Content", response.StatusCode.ToString(), "ok");
+
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    await DisplayAlert("CAF Activity Content", json.ToString(), "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -3414,7 +3441,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3425,6 +3452,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-caf-activity-server-update-api.php";
+                var lastchecked = Preferences.Get("cafactivitychangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3447,10 +3475,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3471,6 +3501,7 @@ namespace TBSMobile.View
 
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
+                                var contactid = item.ContactID;
                                 var activityID = item.ActivityID;
                                 var lastsync = DateTime.Parse(current_datetime);
                                 var lastupdated = item.LastUpdated;
@@ -3479,6 +3510,7 @@ namespace TBSMobile.View
                                 var insertdata = new ActivityTable
                                 {
                                     CAFNo = cafNo,
+                                    ContactID = contactid,
                                     ActivityID = activityID,
                                     LastSync = lastsync,
                                     LastUpdated = lastupdated,
@@ -3499,6 +3531,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("cafactivitychangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncEmailRecipient(host, database, contact, ipaddress);
                     }
                     else
@@ -3516,7 +3550,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3555,11 +3589,11 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "ContactID", contact }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3609,6 +3643,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("emailrecipientchangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncProvince(host, database, contact, ipaddress);
                         }
                         else
@@ -3631,7 +3667,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -3750,7 +3787,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3761,6 +3798,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-email-recipient-server-update-api.php";
+                var lastchecked = Preferences.Get("emailrecipientchangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3783,11 +3821,12 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3838,6 +3877,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("emailrecipientchangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncProvince(host, database, contact, ipaddress);
                     }
                     else
@@ -3855,7 +3896,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -3894,10 +3935,10 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -3945,6 +3986,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
+
                             FirstTimeSyncTown(host, database, contact, ipaddress);
                         }
                         else
@@ -3967,7 +4010,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -3978,6 +4022,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-province-server-update-api.php";
+                var lastchecked = Preferences.Get("provincechangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -4000,10 +4045,11 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -4052,6 +4098,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
+
                         FirstTimeSyncTown(host, database, contact, ipaddress);
                     }
                     else
@@ -4069,7 +4117,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -4108,10 +4156,10 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database }
-                                };
+                        {
+                            { "Host", host },
+                            { "Database", database }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -4161,6 +4209,8 @@ namespace TBSMobile.View
                                 Save_Logs(contact, logType, log, database, logdeleted);
                             }
 
+                            Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
+
                             SyncUserLogsClientUpdate(host, database, contact, ipaddress);
                         }
                         else
@@ -4183,7 +4233,8 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Sync_Failed();
             }
         }
 
@@ -4194,6 +4245,7 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-town-server-update-api.php";
+                var lastchecked = Preferences.Get("townchangelastcheck", String.Empty, "private_prefs");
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -4216,10 +4268,11 @@ namespace TBSMobile.View
                     string contentType = "application/json";
 
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "LastChecked", lastchecked }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -4270,6 +4323,8 @@ namespace TBSMobile.View
                             Save_Logs(contact, logType, log, database, logdeleted);
                         }
 
+                        Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
+
                         SyncUserLogsClientUpdate(host, database, contact, ipaddress);
                     }
                     else
@@ -4287,7 +4342,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -4350,17 +4405,14 @@ namespace TBSMobile.View
                                         { "LastUpdated", lastupdated },
                                         { "Deleted", deleted }
                                     };
-
                             
-                            await DisplayAlert("Logs Content", json.ToString(), "ok");
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-                            await DisplayAlert("Logs Content", response.StatusCode.ToString(), "ok");
+
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    await DisplayAlert("Logs Content", content, "ok");
                                     var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
                                     var dataitem = dataresult[0];
@@ -4411,7 +4463,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 

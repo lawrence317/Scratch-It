@@ -57,7 +57,7 @@ namespace TBSMobile.View
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 }
             }
         }
@@ -137,7 +137,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
@@ -196,13 +196,13 @@ namespace TBSMobile.View
                         var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
-                    {
-                        { "Host", hostName },
-                        { "Database", database },
-                        { "userName", userName },
-                        { "Password", password },
-                        { "RegistrationCode", Constants.deviceID }
-                    };
+                        {
+                            { "Host", hostName },
+                            { "Database", database },
+                            { "userName", userName },
+                            { "Password", password },
+                            { "RegistrationCode", Constants.deviceID }
+                        };
 
                         HttpClient client = new HttpClient();
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -381,7 +381,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
                 Offline_Login();
             }
         }
@@ -580,7 +580,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("Exception Error", ex.ToString(), "ok");
+                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
             }
         }
 
