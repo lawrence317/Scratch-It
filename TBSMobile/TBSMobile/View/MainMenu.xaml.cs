@@ -2487,16 +2487,16 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting data from the server";
+                    lblStatus.Text = "Getting contact data from the server";
 
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                        {
+                            { "Host", host },
+                            { "Database", database },
+                            { "ContactID", contact }
+                        };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2589,7 +2589,7 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting data from the server";
+                    lblStatus.Text = "Getting retailer outlet data from the server";
 
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
@@ -2690,7 +2690,7 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting data from the server";
+                    lblStatus.Text = "Getting caf data from the server";
 
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
@@ -2792,15 +2792,16 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting data from the server";
+                    lblStatus.Text = "Getting caf activity data from the server";
 
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2895,7 +2896,7 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting data from the server";
+                    lblStatus.Text = "Getting email recipient data from the server";
 
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
