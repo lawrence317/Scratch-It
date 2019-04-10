@@ -1780,478 +1780,518 @@ namespace TBSMobile.View
 
                     if (!string.IsNullOrEmpty(content))
                     {
-                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                        var dataitem = dataresult[0];
-                        var datamessage = dataitem.Message;
-
-                        if (datamessage.Equals("Inserted"))
+                        try
                         {
-                            sendStatus.Text = "Sending field activity photo 1 to server";
+                            var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                            string path1file = "sync-caf-media-path-1-client-update-api.php";
+                            var dataitem = dataresult[0];
+                            var datamessage = dataitem.Message;
 
-                            var path1link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path1file;
-                            string ph1contentType = "application/json";
-
-                            JObject path1json;
-                            bool path1doesExist = File.Exists(photo1url);
-
-                            if (!path1doesExist || string.IsNullOrEmpty(photo1url))
+                            if (datamessage.Equals("Inserted"))
                             {
-                                path1json = new JObject
+                                sendStatus.Text = "Sending field activity photo 1 to server";
+
+                                string path1file = "sync-caf-media-path-1-client-update-api.php";
+
+                                var path1link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path1file;
+                                string ph1contentType = "application/json";
+
+                                JObject path1json;
+                                bool path1doesExist = File.Exists(photo1url);
+
+                                if (!path1doesExist || string.IsNullOrEmpty(photo1url))
                                 {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", caf},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                path1json = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", caf},
-                                    { "Path", File.ReadAllBytes(photo1url)}
-                                };
-                            }
-
-                            HttpClient ph1client = new HttpClient();
-                            var ph1response = await ph1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
-
-                            if (ph1response.IsSuccessStatusCode)
-                            {
-                                var ph1content = await ph1response.Content.ReadAsStringAsync();
-
-                                if (!string.IsNullOrEmpty(ph1content))
-                                {
-                                    var ph1result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph1content, settings);
-
-                                    var ph1item = ph1result[0];
-                                    var ph1message = ph1item.Message;
-
-                                    if (ph1message.Equals("Inserted"))
+                                    path1json = new JObject
                                     {
-                                        sendStatus.Text = "Sending field activity photo 2 to server";
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", caf},
+                                        { "Path", ""}
+                                    };
+                                }
+                                else
+                                {
+                                    path1json = new JObject
+                                    {
+                                        { "Host", host },
+                                        { "Database", database },
+                                        { "MediaID", caf},
+                                        { "Path", File.ReadAllBytes(photo1url)}
+                                    };
+                                }
 
-                                        string path2file = "sync-caf-media-path-2-client-update-api.php";
+                                HttpClient ph1client = new HttpClient();
+                                var ph1response = await ph1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
 
-                                        var path2link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path2file;
-                                        string ph2contentType = "application/json";
+                                if (ph1response.IsSuccessStatusCode)
+                                {
+                                    var ph1content = await ph1response.Content.ReadAsStringAsync();
 
-                                        JObject path2json;
-                                        bool path2doesExist = File.Exists(photo2url);
-
-                                        if (!path2doesExist || string.IsNullOrEmpty(photo2url))
+                                    if (!string.IsNullOrEmpty(ph1content))
+                                    {
+                                        try
                                         {
-                                            path2json = new JObject
+                                            var ph1result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph1content, settings);
+
+                                            var ph1item = ph1result[0];
+                                            var ph1message = ph1item.Message;
+
+                                            if (ph1message.Equals("Inserted"))
                                             {
-                                                { "Host", host },
-                                                { "Database", database },
-                                                { "MediaID", caf},
-                                                { "Path", ""}
-                                            };
-                                        }
-                                        else
-                                        {
-                                            path2json = new JObject
-                                            {
-                                                { "Host", host },
-                                                { "Database", database },
-                                                { "MediaID", caf},
-                                                { "Path", File.ReadAllBytes(photo2url)}
-                                            };
-                                        }
+                                                sendStatus.Text = "Sending field activity photo 2 to server";
 
-                                        HttpClient ph2client = new HttpClient();
-                                        var ph2response = await ph2client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
+                                                string path2file = "sync-caf-media-path-2-client-update-api.php";
 
-                                        if (ph2response.IsSuccessStatusCode)
-                                        {
-                                            var ph2content = await ph2response.Content.ReadAsStringAsync();
+                                                var path2link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path2file;
+                                                string ph2contentType = "application/json";
 
-                                            if (!string.IsNullOrEmpty(ph2content))
-                                            {
-                                                var ph2result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph2content, settings);
+                                                JObject path2json;
+                                                bool path2doesExist = File.Exists(photo2url);
 
-                                                var ph2item = ph2result[0];
-                                                var ph2message = ph2item.Message;
-
-                                                if (ph2message.Equals("Inserted"))
+                                                if (!path2doesExist || string.IsNullOrEmpty(photo2url))
                                                 {
-                                                    sendStatus.Text = "Sending field activity photo 3 to server";
-
-                                                    string path3file = "sync-caf-media-path-3-client-update-api.php";
-
-                                                    var path3link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path3file;
-                                                    string ph3contentType = "application/json";
-                                                    
-                                                    JObject path3json;
-                                                    bool path3doesExist = File.Exists(photo3url);
-
-                                                    if (!path3doesExist || string.IsNullOrEmpty(photo3url))
+                                                    path2json = new JObject
                                                     {
-                                                        path3json = new JObject
-                                                        {
-                                                            { "Host", host },
-                                                            { "Database", database },
-                                                            { "MediaID", caf},
-                                                            { "Path", ""}
-                                                        };
-                                                    }
-                                                    else
+                                                        { "Host", host },
+                                                        { "Database", database },
+                                                        { "MediaID", caf},
+                                                        { "Path", ""}
+                                                    };
+                                                }
+                                                else
+                                                {
+                                                    path2json = new JObject
                                                     {
-                                                        path3json = new JObject
-                                                        {
-                                                            { "Host", host },
-                                                            { "Database", database },
-                                                            { "MediaID", caf},
-                                                            { "Path", File.ReadAllBytes(photo3url)}
-                                                        };
-                                                    }
+                                                        { "Host", host },
+                                                        { "Database", database },
+                                                        { "MediaID", caf},
+                                                        { "Path", File.ReadAllBytes(photo2url)}
+                                                    };
+                                                }
 
-                                                    HttpClient ph3client = new HttpClient();
-                                                    var ph3response = await ph3client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
+                                                HttpClient ph2client = new HttpClient();
+                                                var ph2response = await ph2client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
 
-                                                    if (ph3response.IsSuccessStatusCode)
+                                                if (ph2response.IsSuccessStatusCode)
+                                                {
+                                                    var ph2content = await ph2response.Content.ReadAsStringAsync();
+
+                                                    if (!string.IsNullOrEmpty(ph2content))
                                                     {
-                                                        var ph3content = await ph3response.Content.ReadAsStringAsync();
-
-                                                        if (!string.IsNullOrEmpty(ph3content))
+                                                        try
                                                         {
-                                                            var ph3result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph3content, settings);
+                                                            var ph2result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph2content, settings);
 
-                                                            var ph3item = ph3result[0];
-                                                            var ph3message = ph3item.Message;
+                                                            var ph2item = ph2result[0];
+                                                            var ph2message = ph2item.Message;
 
-                                                            if (ph3message.Equals("Inserted"))
+                                                            if (ph2message.Equals("Inserted"))
                                                             {
-                                                                if (!string.IsNullOrEmpty(videourl))
+                                                                sendStatus.Text = "Sending field activity photo 3 to server";
+
+                                                                string path3file = "sync-caf-media-path-3-client-update-api.php";
+
+                                                                var path3link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path3file;
+                                                                string ph3contentType = "application/json";
+
+                                                                JObject path3json;
+                                                                bool path3doesExist = File.Exists(photo3url);
+
+                                                                if (!path3doesExist || string.IsNullOrEmpty(photo3url))
                                                                 {
-                                                                    sendStatus.Text = "Sending field activity video to server";
-
-                                                                    string path4file = "sync-caf-media-path-4-client-update-api.php";
-
-                                                                    var path4link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path4file;
-                                                                    string vidcontentType = "application/json";
-
-                                                                    JObject path4json;
-                                                                    bool path4doesExist = File.Exists(videourl);
-
-                                                                    if (!path4doesExist || string.IsNullOrEmpty(photo3url))
+                                                                    path3json = new JObject
                                                                     {
-                                                                        path4json = new JObject
-                                                                        {
-                                                                            { "Host", host },
-                                                                            { "Database", database },
-                                                                            { "MediaID", caf},
-                                                                            { "Path", ""}
-                                                                        };
-                                                                    }
-                                                                    else
+                                                                        { "Host", host },
+                                                                        { "Database", database },
+                                                                        { "MediaID", caf},
+                                                                        { "Path", ""}
+                                                                    };
+                                                                }
+                                                                else
+                                                                {
+                                                                    path3json = new JObject
                                                                     {
-                                                                        path4json = new JObject
-                                                                        {
-                                                                            { "Host", host },
-                                                                            { "Database", database },
-                                                                            { "MediaID", caf},
-                                                                            { "Path", File.ReadAllBytes(videourl)}
-                                                                        };
-                                                                    }
+                                                                        { "Host", host },
+                                                                        { "Database", database },
+                                                                        { "MediaID", caf},
+                                                                        { "Path", File.ReadAllBytes(photo3url)}
+                                                                    };
+                                                                }
 
-                                                                    HttpClient vidclient = new HttpClient();
-                                                                    var vidresponse = await vidclient.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
+                                                                HttpClient ph3client = new HttpClient();
+                                                                var ph3response = await ph3client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
 
-                                                                    if (vidresponse.IsSuccessStatusCode)
+                                                                if (ph3response.IsSuccessStatusCode)
+                                                                {
+                                                                    var ph3content = await ph3response.Content.ReadAsStringAsync();
+
+                                                                    if (!string.IsNullOrEmpty(ph3content))
                                                                     {
-                                                                        var vidcontent = await vidresponse.Content.ReadAsStringAsync();
-
-                                                                        if (!string.IsNullOrEmpty(vidcontent))
+                                                                        try
                                                                         {
-                                                                            var vidresult = JsonConvert.DeserializeObject<List<ServerMessage>>(vidcontent, settings);
+                                                                            var ph3result = JsonConvert.DeserializeObject<List<ServerMessage>>(ph3content, settings);
 
-                                                                            var viditem = vidresult[0];
-                                                                            var vidmessage = viditem.Message;
+                                                                            var ph3item = ph3result[0];
+                                                                            var ph3message = ph3item.Message;
 
-                                                                            if (vidmessage.Equals("Inserted"))
+                                                                            if (ph3message.Equals("Inserted"))
                                                                             {
-                                                                                sendStatus.Text = "Saving field activity to the device";
-
-                                                                                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
-
-                                                                                var caf_insert = new CAFTable
+                                                                                if (!string.IsNullOrEmpty(videourl))
                                                                                 {
-                                                                                    CAFNo = caf,
-                                                                                    EmployeeID = employeeNumber,
-                                                                                    CAFDate = DateTime.Parse(date),
-                                                                                    CustomerID = retailerCode,
-                                                                                    StartTime = DateTime.Parse(startTime),
-                                                                                    EndTime = DateTime.Parse(endTime),
-                                                                                    Photo1 = photo1url,
-                                                                                    Photo2 = photo2url,
-                                                                                    Photo3 = photo3url,
-                                                                                    Video = videourl,
-                                                                                    MobilePhoto1 = photo1url,
-                                                                                    MobilePhoto2 = photo2url,
-                                                                                    MobilePhoto3 = photo3url,
-                                                                                    MobileVideo = videourl,
-                                                                                    GPSCoordinates = actlocation,
-                                                                                    Remarks = remarks,
-                                                                                    OtherConcern = otherconcern,
-                                                                                    RecordLog = recordlog,
-                                                                                    LastSync = DateTime.Parse(current_datetime),
-                                                                                    LastUpdated = DateTime.Parse(current_datetime)
-                                                                                };
+                                                                                    sendStatus.Text = "Sending field activity video to server";
 
-                                                                                await conn.InsertAsync(caf_insert);
+                                                                                    string path4file = "sync-caf-media-path-4-client-update-api.php";
 
-                                                                                if (swRekorida.IsToggled == true)
+                                                                                    var path4link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path4file;
+                                                                                    string vidcontentType = "application/json";
+
+                                                                                    JObject path4json;
+                                                                                    bool path4doesExist = File.Exists(videourl);
+
+                                                                                    if (!path4doesExist || string.IsNullOrEmpty(photo3url))
+                                                                                    {
+                                                                                        path4json = new JObject
+                                                                                        {
+                                                                                            { "Host", host },
+                                                                                            { "Database", database },
+                                                                                            { "MediaID", caf},
+                                                                                            { "Path", ""}
+                                                                                        };
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        path4json = new JObject
+                                                                                        {
+                                                                                            { "Host", host },
+                                                                                            { "Database", database },
+                                                                                            { "MediaID", caf},
+                                                                                            { "Path", File.ReadAllBytes(videourl)}
+                                                                                        };
+                                                                                    }
+
+                                                                                    HttpClient vidclient = new HttpClient();
+                                                                                    var vidresponse = await vidclient.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
+
+                                                                                    if (vidresponse.IsSuccessStatusCode)
+                                                                                    {
+                                                                                        var vidcontent = await vidresponse.Content.ReadAsStringAsync();
+
+                                                                                        if (!string.IsNullOrEmpty(vidcontent))
+                                                                                        {
+                                                                                            try
+                                                                                            {
+                                                                                                var vidresult = JsonConvert.DeserializeObject<List<ServerMessage>>(vidcontent, settings);
+
+                                                                                                var viditem = vidresult[0];
+                                                                                                var vidmessage = viditem.Message;
+
+                                                                                                if (vidmessage.Equals("Inserted"))
+                                                                                                {
+                                                                                                    sendStatus.Text = "Saving field activity to the device";
+
+                                                                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
+
+                                                                                                    var caf_insert = new CAFTable
+                                                                                                    {
+                                                                                                        CAFNo = caf,
+                                                                                                        EmployeeID = employeeNumber,
+                                                                                                        CAFDate = DateTime.Parse(date),
+                                                                                                        CustomerID = retailerCode,
+                                                                                                        StartTime = DateTime.Parse(startTime),
+                                                                                                        EndTime = DateTime.Parse(endTime),
+                                                                                                        Photo1 = photo1url,
+                                                                                                        Photo2 = photo2url,
+                                                                                                        Photo3 = photo3url,
+                                                                                                        Video = videourl,
+                                                                                                        MobilePhoto1 = photo1url,
+                                                                                                        MobilePhoto2 = photo2url,
+                                                                                                        MobilePhoto3 = photo3url,
+                                                                                                        MobileVideo = videourl,
+                                                                                                        GPSCoordinates = actlocation,
+                                                                                                        Remarks = remarks,
+                                                                                                        OtherConcern = otherconcern,
+                                                                                                        RecordLog = recordlog,
+                                                                                                        LastSync = DateTime.Parse(current_datetime),
+                                                                                                        LastUpdated = DateTime.Parse(current_datetime)
+                                                                                                    };
+
+                                                                                                    await conn.InsertAsync(caf_insert);
+
+                                                                                                    if (swRekorida.IsToggled == true)
+                                                                                                    {
+                                                                                                        var rekorida_insert = new ActivityTable
+                                                                                                        {
+                                                                                                            CAFNo = caf,
+                                                                                                            ContactID = employeeNumber,
+                                                                                                            ActivityID = "ACT00001",
+                                                                                                            RecordLog = recordlog,
+                                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                                        };
+
+                                                                                                        await conn.InsertAsync(rekorida_insert);
+                                                                                                    }
+
+                                                                                                    if (swMerchandizing.IsToggled == true)
+                                                                                                    {
+                                                                                                        var merchandizing_insert = new ActivityTable
+                                                                                                        {
+                                                                                                            CAFNo = caf,
+                                                                                                            ContactID = employeeNumber,
+                                                                                                            ActivityID = "ACT00002",
+                                                                                                            RecordLog = recordlog,
+                                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                                        };
+
+                                                                                                        await conn.InsertAsync(merchandizing_insert);
+                                                                                                    }
+
+                                                                                                    if (swTradeCheck.IsToggled == true)
+                                                                                                    {
+                                                                                                        var trade_check_insert = new ActivityTable
+                                                                                                        {
+                                                                                                            CAFNo = caf,
+                                                                                                            ContactID = employeeNumber,
+                                                                                                            ActivityID = "ACT00003",
+                                                                                                            RecordLog = recordlog,
+                                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                                        };
+
+                                                                                                        await conn.InsertAsync(trade_check_insert);
+                                                                                                    }
+
+                                                                                                    if (swOthers.IsToggled == true)
+                                                                                                    {
+                                                                                                        var others_insert = new ActivityTable
+                                                                                                        {
+                                                                                                            CAFNo = caf,
+                                                                                                            ContactID = employeeNumber,
+                                                                                                            ActivityID = "ACT00004",
+                                                                                                            RecordLog = recordlog,
+                                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                                        };
+
+                                                                                                        await conn.InsertAsync(others_insert);
+                                                                                                    }
+
+                                                                                                    var logType = "App Log";
+                                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                                                    int logdeleted = 0;
+
+                                                                                                    Save_Logs(contact, logType, log, database, logdeleted);
+                                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+
+                                                                                                    await Application.Current.MainPage.Navigation.PopAsync();
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + vidmessage;
+                                                                                                    Send_offline();
+                                                                                                }
+                                                                                            }
+                                                                                            catch (Exception)
+                                                                                            {
+                                                                                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + vidcontent, "ok");
+                                                                                                Send_offline();
+                                                                                            }
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                                                            Send_offline();
+                                                                                        }
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        Send_offline();
+                                                                                    }
+                                                                                }
+                                                                                else
                                                                                 {
-                                                                                    var rekorida_insert = new ActivityTable
+                                                                                    sendStatus.Text = "Saving field activity to the device";
+
+                                                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
+
+                                                                                    var caf_insert = new CAFTable
                                                                                     {
                                                                                         CAFNo = caf,
-                                                                                        ContactID = employeeNumber,
-                                                                                        ActivityID = "ACT00001",
+                                                                                        EmployeeID = employeeNumber,
+                                                                                        CAFDate = DateTime.Parse(date),
+                                                                                        CustomerID = retailerCode,
+                                                                                        StartTime = DateTime.Parse(startTime),
+                                                                                        EndTime = DateTime.Parse(endTime),
+                                                                                        Photo1 = photo1url,
+                                                                                        Photo2 = photo2url,
+                                                                                        Photo3 = photo3url,
+                                                                                        Video = videourl,
+                                                                                        MobilePhoto1 = photo1url,
+                                                                                        MobilePhoto2 = photo2url,
+                                                                                        MobilePhoto3 = photo3url,
+                                                                                        MobileVideo = videourl,
+                                                                                        GPSCoordinates = actlocation,
+                                                                                        Remarks = remarks,
+                                                                                        OtherConcern = otherconcern,
                                                                                         RecordLog = recordlog,
                                                                                         LastSync = DateTime.Parse(current_datetime),
                                                                                         LastUpdated = DateTime.Parse(current_datetime)
                                                                                     };
 
-                                                                                    await conn.InsertAsync(rekorida_insert);
-                                                                                }
+                                                                                    await conn.InsertAsync(caf_insert);
 
-                                                                                if (swMerchandizing.IsToggled == true)
-                                                                                {
-                                                                                    var merchandizing_insert = new ActivityTable
+                                                                                    if (swRekorida.IsToggled == true)
                                                                                     {
-                                                                                        CAFNo = caf,
-                                                                                        ContactID = employeeNumber,
-                                                                                        ActivityID = "ACT00002",
-                                                                                        RecordLog = recordlog,
-                                                                                        LastSync = DateTime.Parse(current_datetime),
-                                                                                        LastUpdated = DateTime.Parse(current_datetime)
-                                                                                    };
+                                                                                        var rekorida_insert = new ActivityTable
+                                                                                        {
+                                                                                            CAFNo = caf,
+                                                                                            ContactID = employeeNumber,
+                                                                                            ActivityID = "ACT00001",
+                                                                                            RecordLog = recordlog,
+                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                        };
 
-                                                                                    await conn.InsertAsync(merchandizing_insert);
-                                                                                }
+                                                                                        await conn.InsertAsync(rekorida_insert);
+                                                                                    }
 
-                                                                                if (swTradeCheck.IsToggled == true)
-                                                                                {
-                                                                                    var trade_check_insert = new ActivityTable
+                                                                                    if (swMerchandizing.IsToggled == true)
                                                                                     {
-                                                                                        CAFNo = caf,
-                                                                                        ContactID = employeeNumber,
-                                                                                        ActivityID = "ACT00003",
-                                                                                        RecordLog = recordlog,
-                                                                                        LastSync = DateTime.Parse(current_datetime),
-                                                                                        LastUpdated = DateTime.Parse(current_datetime)
-                                                                                    };
+                                                                                        var merchandizing_insert = new ActivityTable
+                                                                                        {
+                                                                                            CAFNo = caf,
+                                                                                            ContactID = employeeNumber,
+                                                                                            ActivityID = "ACT00002",
+                                                                                            RecordLog = recordlog,
+                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                        };
 
-                                                                                    await conn.InsertAsync(trade_check_insert);
-                                                                                }
+                                                                                        await conn.InsertAsync(merchandizing_insert);
+                                                                                    }
 
-                                                                                if (swOthers.IsToggled == true)
-                                                                                {
-                                                                                    var others_insert = new ActivityTable
+                                                                                    if (swTradeCheck.IsToggled == true)
                                                                                     {
-                                                                                        CAFNo = caf,
-                                                                                        ContactID = employeeNumber,
-                                                                                        ActivityID = "ACT00004",
-                                                                                        RecordLog = recordlog,
-                                                                                        LastSync = DateTime.Parse(current_datetime),
-                                                                                        LastUpdated = DateTime.Parse(current_datetime)
-                                                                                    };
+                                                                                        var trade_check_insert = new ActivityTable
+                                                                                        {
+                                                                                            CAFNo = caf,
+                                                                                            ContactID = employeeNumber,
+                                                                                            ActivityID = "ACT00003",
+                                                                                            RecordLog = recordlog,
+                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                        };
 
-                                                                                    await conn.InsertAsync(others_insert);
+                                                                                        await conn.InsertAsync(trade_check_insert);
+                                                                                    }
+
+                                                                                    if (swOthers.IsToggled == true)
+                                                                                    {
+                                                                                        var others_insert = new ActivityTable
+                                                                                        {
+                                                                                            CAFNo = caf,
+                                                                                            ContactID = employeeNumber,
+                                                                                            ActivityID = "ACT00004",
+                                                                                            RecordLog = recordlog,
+                                                                                            LastSync = DateTime.Parse(current_datetime),
+                                                                                            LastUpdated = DateTime.Parse(current_datetime)
+                                                                                        };
+
+                                                                                        await conn.InsertAsync(others_insert);
+                                                                                    }
+
+                                                                                    Analytics.TrackEvent("Sent Field Activity Form");
+                                                                                    sendStatus.Text = "Sending user logs to server";
+
+                                                                                    var logType = "App Log";
+                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                                    int logdeleted = 0;
+
+                                                                                    Save_Logs(contact, logType, log, database, logdeleted);
+
+                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                                    await Application.Current.MainPage.Navigation.PopAsync();
                                                                                 }
-
-                                                                                var logType = "App Log";
-                                                                                var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                                                                int logdeleted = 0;
-
-                                                                                Save_Logs(contact, logType, log, database, logdeleted);
-                                                                                await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-
-                                                                                await Application.Current.MainPage.Navigation.PopAsync();
                                                                             }
                                                                             else
                                                                             {
-                                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + vidmessage;
+                                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph3message;
                                                                                 Send_offline();
                                                                             }
                                                                         }
-                                                                        else
+                                                                        catch (Exception)
                                                                         {
-                                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph3content, "ok");
                                                                             Send_offline();
                                                                         }
                                                                     }
                                                                     else
                                                                     {
+                                                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                                                         Send_offline();
                                                                     }
                                                                 }
                                                                 else
                                                                 {
-                                                                    sendStatus.Text = "Saving field activity to the device";
-
-                                                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, editrecordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailerCode);
-
-                                                                    var caf_insert = new CAFTable
-                                                                    {
-                                                                        CAFNo = caf,
-                                                                        EmployeeID = employeeNumber,
-                                                                        CAFDate = DateTime.Parse(date),
-                                                                        CustomerID = retailerCode,
-                                                                        StartTime = DateTime.Parse(startTime),
-                                                                        EndTime = DateTime.Parse(endTime),
-                                                                        Photo1 = photo1url,
-                                                                        Photo2 = photo2url,
-                                                                        Photo3 = photo3url,
-                                                                        Video = videourl,
-                                                                        MobilePhoto1 = photo1url,
-                                                                        MobilePhoto2 = photo2url,
-                                                                        MobilePhoto3 = photo3url,
-                                                                        MobileVideo = videourl,
-                                                                        GPSCoordinates = actlocation,
-                                                                        Remarks = remarks,
-                                                                        OtherConcern = otherconcern,
-                                                                        RecordLog = recordlog,
-                                                                        LastSync = DateTime.Parse(current_datetime),
-                                                                        LastUpdated = DateTime.Parse(current_datetime)
-                                                                    };
-
-                                                                    await conn.InsertAsync(caf_insert);
-
-                                                                    if (swRekorida.IsToggled == true)
-                                                                    {
-                                                                        var rekorida_insert = new ActivityTable
-                                                                        {
-                                                                            CAFNo = caf,
-                                                                            ContactID = employeeNumber,
-                                                                            ActivityID = "ACT00001",
-                                                                            RecordLog = recordlog,
-                                                                            LastSync = DateTime.Parse(current_datetime),
-                                                                            LastUpdated = DateTime.Parse(current_datetime)
-                                                                        };
-
-                                                                        await conn.InsertAsync(rekorida_insert);
-                                                                    }
-
-                                                                    if (swMerchandizing.IsToggled == true)
-                                                                    {
-                                                                        var merchandizing_insert = new ActivityTable
-                                                                        {
-                                                                            CAFNo = caf,
-                                                                            ContactID = employeeNumber,
-                                                                            ActivityID = "ACT00002",
-                                                                            RecordLog = recordlog,
-                                                                            LastSync = DateTime.Parse(current_datetime),
-                                                                            LastUpdated = DateTime.Parse(current_datetime)
-                                                                        };
-
-                                                                        await conn.InsertAsync(merchandizing_insert);
-                                                                    }
-
-                                                                    if (swTradeCheck.IsToggled == true)
-                                                                    {
-                                                                        var trade_check_insert = new ActivityTable
-                                                                        {
-                                                                            CAFNo = caf,
-                                                                            ContactID = employeeNumber,
-                                                                            ActivityID = "ACT00003",
-                                                                            RecordLog = recordlog,
-                                                                            LastSync = DateTime.Parse(current_datetime),
-                                                                            LastUpdated = DateTime.Parse(current_datetime)
-                                                                        };
-
-                                                                        await conn.InsertAsync(trade_check_insert);
-                                                                    }
-
-                                                                    if (swOthers.IsToggled == true)
-                                                                    {
-                                                                        var others_insert = new ActivityTable
-                                                                        {
-                                                                            CAFNo = caf,
-                                                                            ContactID = employeeNumber,
-                                                                            ActivityID = "ACT00004",
-                                                                            RecordLog = recordlog,
-                                                                            LastSync = DateTime.Parse(current_datetime),
-                                                                            LastUpdated = DateTime.Parse(current_datetime)
-                                                                        };
-
-                                                                        await conn.InsertAsync(others_insert);
-                                                                    }
-
-                                                                    Analytics.TrackEvent("Sent Field Activity Form");
-                                                                    sendStatus.Text = "Sending user logs to server";
-
-                                                                    var logType = "App Log";
-                                                                    var log = "Sent caf to the server (<b>"+ caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                                                    int logdeleted = 0;
-
-                                                                    Save_Logs(contact, logType, log, database, logdeleted);
-
-                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
-                                                                    await Application.Current.MainPage.Navigation.PopAsync();
+                                                                    Send_offline();
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph3message;
+                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph2message;
                                                                 Send_offline();
                                                             }
                                                         }
-                                                        else
+                                                        catch (Exception)
                                                         {
-                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph2content, "ok");
                                                             Send_offline();
                                                         }
                                                     }
                                                     else
                                                     {
+                                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                                         Send_offline();
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph2message;
                                                     Send_offline();
                                                 }
                                             }
                                             else
                                             {
-                                                sendStatus.Text = "Syncing failed. Failed to send the data.";
+                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph1message;
                                                 Send_offline();
                                             }
                                         }
-                                        else
+                                        catch (Exception)
                                         {
+                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph1content, "ok");
                                             Send_offline();
                                         }
                                     }
                                     else
                                     {
-                                        sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph1message;
+                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                         Send_offline();
                                     }
                                 }
                                 else
                                 {
-                                    sendStatus.Text = "Syncing failed. Failed to send the data.";
                                     Send_offline();
                                 }
                             }
                             else
                             {
+                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
                                 Send_offline();
                             }
                         }
-                        else
+                        catch (Exception)
                         {
-                            sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                             Send_offline();
                         }
                     }

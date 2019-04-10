@@ -734,44 +734,44 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "ContactID", contactID },
-                                        { "FileAs", fileAs },
-                                        { "FirstName", firstName },
-                                        { "MiddleName", middleName },
-                                        { "LastName", lastName },
-                                        { "Position", position },
-                                        { "Company", company },
-                                        { "CompanyID", companyID },
-                                        { "RetailerType", retailerType },
-                                        { "PresStreet", presStreet },
-                                        { "PresBarangay", presBarangay },
-                                        { "PresDistrict", presDistrict },
-                                        { "PresTown", presTown },
-                                        { "PresProvince", presProvince },
-                                        { "PresCountry", presCountry },
-                                        { "Landmark", landmark },
-                                        { "Remarks", remarks },
-                                        { "RecordDate", recordDate },
-                                        { "StartTime", startTime },
-                                        { "EndTime", endTime },
-                                        { "Telephone1", telephone1 },
-                                        { "Telephone2", telephone2 },
-                                        { "Mobile", mobile },
-                                        { "Email", email },
-                                        { "MobilePhoto1", mobilePhoto1 },
-                                        { "MobilePhoto2", mobilePhoto2 },
-                                        { "MobilePhoto3", mobilePhoto3 },
-                                        { "MobileVideo", mobileVideo },
-                                        { "Employee", employee },
-                                        { "Customer", customer },
-                                        { "RecordLog", recordLog },
-                                        { "Supervisor", supervisor },
-                                        { "Deleted", deleted },
-                                        { "LastUpdated", lastUpdated }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "ContactID", contactID },
+                                { "FileAs", fileAs },
+                                { "FirstName", firstName },
+                                { "MiddleName", middleName },
+                                { "LastName", lastName },
+                                { "Position", position },
+                                { "Company", company },
+                                { "CompanyID", companyID },
+                                { "RetailerType", retailerType },
+                                { "PresStreet", presStreet },
+                                { "PresBarangay", presBarangay },
+                                { "PresDistrict", presDistrict },
+                                { "PresTown", presTown },
+                                { "PresProvince", presProvince },
+                                { "PresCountry", presCountry },
+                                { "Landmark", landmark },
+                                { "Remarks", remarks },
+                                { "RecordDate", recordDate },
+                                { "StartTime", startTime },
+                                { "EndTime", endTime },
+                                { "Telephone1", telephone1 },
+                                { "Telephone2", telephone2 },
+                                { "Mobile", mobile },
+                                { "Email", email },
+                                { "MobilePhoto1", mobilePhoto1 },
+                                { "MobilePhoto2", mobilePhoto2 },
+                                { "MobilePhoto3", mobilePhoto3 },
+                                { "MobileVideo", mobileVideo },
+                                { "Employee", employee },
+                                { "Customer", customer },
+                                { "RecordLog", recordLog },
+                                { "Supervisor", supervisor },
+                                { "Deleted", deleted },
+                                { "LastUpdated", lastUpdated }
+                            };
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
@@ -780,18 +780,26 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -905,18 +913,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1028,18 +1044,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1152,18 +1176,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1390,28 +1422,28 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "RetailerCode", retailerCode },
-                                        { "ContactID", contactID },
-                                        { "PresStreet", presStreet },
-                                        { "PresBarangay", presBarangay },
-                                        { "PresDistrict", presDistrict },
-                                        { "PresTown", presTown },
-                                        { "PresProvince", presProvince },
-                                        { "PresCountry", presCountry },
-                                        { "Telephone1", telephone1 },
-                                        { "Telephone2", telephone2 },
-                                        { "Mobile", mobile },
-                                        { "Email", email },
-                                        { "Landmark", landmark },
-                                        { "GPSCoordinates", gpsCoordinates },
-                                        { "Supervisor", supervisor },
-                                        { "RecordLog", recordLog },
-                                        { "Deleted", deleted },
-                                        { "LastUpdated", lastUpdated }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "RetailerCode", retailerCode },
+                                { "ContactID", contactID },
+                                { "PresStreet", presStreet },
+                                { "PresBarangay", presBarangay },
+                                { "PresDistrict", presDistrict },
+                                { "PresTown", presTown },
+                                { "PresProvince", presProvince },
+                                { "PresCountry", presCountry },
+                                { "Telephone1", telephone1 },
+                                { "Telephone2", telephone2 },
+                                { "Mobile", mobile },
+                                { "Email", email },
+                                { "Landmark", landmark },
+                                { "GPSCoordinates", gpsCoordinates },
+                                { "Supervisor", supervisor },
+                                { "RecordLog", recordLog },
+                                { "Deleted", deleted },
+                                { "LastUpdated", lastUpdated }
+                            };
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
@@ -1420,20 +1452,28 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), retailerCode);
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                                        clientupdate++;
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), retailerCode);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1558,18 +1598,26 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1682,18 +1730,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1806,18 +1862,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -1931,18 +1995,26 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        clientupdate++;
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
+
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -2057,20 +2129,28 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime));
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
 
-                                        clientupdate++;
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime));
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -2156,14 +2236,14 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "CAFNo", cafNo },
-                                        { "ActivityID", activityID },
-                                        { "LastUpdated", lastupdated },
-                                        { "Deleted", deleted }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "CAFNo", cafNo },
+                                { "ActivityID", activityID },
+                                { "LastUpdated", lastupdated },
+                                { "Deleted", deleted }
+                            };
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
@@ -2172,20 +2252,28 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                                        clientupdate++;
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -2272,15 +2360,15 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "ContactID", contactsID },
-                                        { "Email", email },
-                                        { "RecordLog", recordLog },
-                                        { "LastUpdated", lastupdated },
-                                        { "Deleted", deleted }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "ContactID", contactsID },
+                                { "Email", email },
+                                { "RecordLog", recordLog },
+                                { "LastUpdated", lastupdated },
+                                { "Deleted", deleted }
+                            };
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
@@ -2289,20 +2377,28 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactsID);
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                                        clientupdate++;
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactsID);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -2409,20 +2505,29 @@ namespace TBSMobile.View
                                 var content = await response.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(content))
                                 {
-                                    var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                    var dataitem = dataresult[0];
-                                    var datamessage = dataitem.Message;
-
-                                    if (datamessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", DateTime.Parse(current_datetime), contactsID, logtype, logs, logDate, database);
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                                        clientupdate++;
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", DateTime.Parse(current_datetime), contactsID, logtype, logs, logDate, database);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            OnSyncFailed();
+                                        }
+
                                     }
-                                    else
+                                    catch (Exception)
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                                         OnSyncFailed();
                                     }
                                 }
@@ -2508,34 +2613,43 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(content))
                         {
-                            var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
-                            var datacount = dataresult.Count;
-
-                            for (int i = 0; i < datacount; i++)
+                            try
                             {
-                                lblStatus.Text = "Checking contacts " + count + " out of " + datacount;
+                                var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
+                                var datacount = dataresult.Count;
 
-                                var item = dataresult[i];
-                                var contactID = item.ContactID;
-
-                                var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID = ?", contactID);
-                                var counts = getContacts.Result.Count;
-
-                                if (counts == 1)
+                                for (int i = 0; i < datacount; i++)
                                 {
-                                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
+                                    lblStatus.Text = "Checking contacts " + count + " out of " + datacount;
+
+                                    var item = dataresult[i];
+                                    var contactID = item.ContactID;
+
+                                    var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID = ?", contactID);
+                                    var counts = getContacts.Result.Count;
+
+                                    if (counts == 1)
+                                    {
+                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
+                                    }
+
+                                    count++;
                                 }
 
-                                count++;
+                                synccount += "Total checked contacts: " + count + "\n";
+
+                                var logType = "App Log";
+                                var log = "Initialized re-sync (<b>Contacts</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
+
+                                Save_Logs(contact, logType, log, database, logdeleted);
+
                             }
-
-                            synccount += "Total checked contacts: " + count + "\n";
-
-                            var logType = "App Log";
-                            var log = "Initialized re-sync (<b>Contacts</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
-
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                            catch (Exception)
+                            {
+                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
+                                OnSyncFailed();
+                            }
                         }
                         else
                         {
@@ -2610,34 +2724,42 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(content))
                         {
-                            var dataresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
-                            var datacount = dataresult.Count;
-
-                            for (int i = 0; i < datacount; i++)
+                            try
                             {
-                                lblStatus.Text = "Checking retailer outlet " + count + " out of " + datacount;
+                                var dataresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
+                                var datacount = dataresult.Count;
 
-                                var item = dataresult[i];
-                                var retailerCode = item.RetailerCode;
-
-                                var getContacts = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode = ?", retailerCode);
-                                var counts = getContacts.Result.Count;
-
-                                if (counts == 1)
+                                for (int i = 0; i < datacount; i++)
                                 {
-                                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
+                                    lblStatus.Text = "Checking retailer outlet " + count + " out of " + datacount;
+
+                                    var item = dataresult[i];
+                                    var retailerCode = item.RetailerCode;
+
+                                    var getContacts = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode = ?", retailerCode);
+                                    var counts = getContacts.Result.Count;
+
+                                    if (counts == 1)
+                                    {
+                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
+                                    }
+
+                                    count++;
                                 }
 
-                                count++;
+                                synccount += "Total checked retailer outlet: " + count + "\n";
+
+                                var logType = "App Log";
+                                var log = "Initialized re-sync (<b>Retailer Outlet</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
+
+                                Save_Logs(contact, logType, log, database, logdeleted);
                             }
-
-                            synccount += "Total checked retailer outlet: " + count + "\n";
-
-                            var logType = "App Log";
-                            var log = "Initialized re-sync (<b>Retailer Outlet</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
-
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                            catch (Exception)
+                            {
+                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
+                                OnSyncFailed();
+                            }
                         }
                         else
                         {
@@ -2711,34 +2833,42 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(content))
                         {
-                            var dataresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
-                            var datacount = dataresult.Count;
-
-                            for (int i = 0; i < datacount; i++)
+                            try
                             {
-                                lblStatus.Text = "Checking caf " + count + " out of " + datacount;
+                                var dataresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
+                                var datacount = dataresult.Count;
 
-                                var item = dataresult[i];
-                                var cafNo = item.CAFNo;
-
-                                var getContacts = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE CAFNo = ?", cafNo);
-                                var counts = getContacts.Result.Count;
-
-                                if (counts == 1)
+                                for (int i = 0; i < datacount; i++)
                                 {
-                                    await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
+                                    lblStatus.Text = "Checking caf " + count + " out of " + datacount;
+
+                                    var item = dataresult[i];
+                                    var cafNo = item.CAFNo;
+
+                                    var getContacts = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE CAFNo = ?", cafNo);
+                                    var counts = getContacts.Result.Count;
+
+                                    if (counts == 1)
+                                    {
+                                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
+                                    }
+
+                                    count++;
                                 }
 
-                                count++;
+                                synccount += "Total checked caf: " + count + "\n";
+
+                                var logType = "App Log";
+                                var log = "Initialized re-sync (<b>CAF</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
+
+                                Save_Logs(contact, logType, log, database, logdeleted);
                             }
-
-                            synccount += "Total checked caf: " + count + "\n";
-
-                            var logType = "App Log";
-                            var log = "Initialized re-sync (<b>CAF</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
-
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                            catch (Exception)
+                            {
+                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
+                                OnSyncFailed();
+                            }
                         }
                         else
                         {
@@ -2813,36 +2943,44 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(content))
                         {
-                            var dataresult = JsonConvert.DeserializeObject<List<ActivityTable>>(content, settings);
-                            var datacount = dataresult.Count;
-
-                            for (int i = 0; i < datacount; i++)
+                            try
                             {
-                                lblStatus.Text = "Checking caf activity " + count + " out of " + datacount;
+                                var dataresult = JsonConvert.DeserializeObject<List<ActivityTable>>(content, settings);
+                                var datacount = dataresult.Count;
 
-                                var item = dataresult[i];
-                                var cafNo = item.CAFNo;
-                                var contactId = item.ContactID;
-                                var activityid = item.ActivityID;
-
-                                var getContacts = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", cafNo, contactId, activityid);
-                                var counts = getContacts.Result.Count;
-
-                                if (counts == 1)
+                                for (int i = 0; i < datacount; i++)
                                 {
-                                    await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", 1, cafNo, contactId, activityid);
+                                    lblStatus.Text = "Checking caf activity " + count + " out of " + datacount;
+
+                                    var item = dataresult[i];
+                                    var cafNo = item.CAFNo;
+                                    var contactId = item.ContactID;
+                                    var activityid = item.ActivityID;
+
+                                    var getContacts = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", cafNo, contactId, activityid);
+                                    var counts = getContacts.Result.Count;
+
+                                    if (counts == 1)
+                                    {
+                                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", 1, cafNo, contactId, activityid);
+                                    }
+
+                                    count++;
                                 }
 
-                                count++;
+                                synccount += "Total checked caf activity: " + count + "\n";
+
+                                var logType = "App Log";
+                                var log = "Initialized re-sync (<b>CAF Activity</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
+
+                                Save_Logs(contact, logType, log, database, logdeleted);
                             }
-
-                            synccount += "Total checked caf activity: " + count + "\n";
-
-                            var logType = "App Log";
-                            var log = "Initialized re-sync (<b>CAF Activity</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
-
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                            catch (Exception)
+                            {
+                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
+                                OnSyncFailed();
+                            }
                         }
                         else
                         {
@@ -2901,11 +3039,11 @@ namespace TBSMobile.View
                     var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
                     HttpClient client = new HttpClient();
                     var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
@@ -2917,34 +3055,42 @@ namespace TBSMobile.View
 
                         if (!string.IsNullOrEmpty(content))
                         {
-                            var dataresult = JsonConvert.DeserializeObject<List<UserEmailTable>>(content, settings);
-                            var datacount = dataresult.Count;
-
-                            for (int i = 0; i < datacount; i++)
+                            try
                             {
-                                lblStatus.Text = "Syncing email recipient " + count + " out of " + datacount;
+                                var dataresult = JsonConvert.DeserializeObject<List<UserEmailTable>>(content, settings);
+                                var datacount = dataresult.Count;
 
-                                var item = dataresult[i];
-                                var contactsID = item.ContactID;
-
-                                var getContacts = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ?", contactsID);
-                                var counts = getContacts.Result.Count;
-
-                                if (counts == 1)
+                                for (int i = 0; i < datacount; i++)
                                 {
-                                    await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactsID);
+                                    lblStatus.Text = "Syncing email recipient " + count + " out of " + datacount;
+
+                                    var item = dataresult[i];
+                                    var contactsID = item.ContactID;
+
+                                    var getContacts = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ?", contactsID);
+                                    var counts = getContacts.Result.Count;
+
+                                    if (counts == 1)
+                                    {
+                                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactsID);
+                                    }
+
+                                    count++;
                                 }
 
-                                count++;
+                                synccount += "Total checked email recipient: " + count + "\n";
+
+                                var logType = "App Log";
+                                var log = "Initialized re-sync (<b>Email Recipient</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
+
+                                Save_Logs(contact, logType, log, database, logdeleted);
                             }
-
-                            synccount += "Total checked email recipient: " + count + "\n";
-
-                            var logType = "App Log";
-                            var log = "Initialized re-sync (<b>Email Recipient</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
-
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                            catch (Exception)
+                            {
+                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
+                                OnSyncFailed();
+                            }
                         }
                         else
                         {

@@ -569,54 +569,62 @@ namespace TBSMobile.View
                     var content = await response.Content.ReadAsStringAsync();
                     if (!string.IsNullOrEmpty(content))
                     {
-                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                        var dataitem = dataresult[0];
-                        var datamessage = dataitem.Message;
-
-                        if (datamessage.Equals("Inserted"))
+                        try
                         {
-                            sendStatus.Text = "Saving retailer outlet to the device";
+                            var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                            var retailer_group_insert = new RetailerGroupTable
+                            var dataitem = dataresult[0];
+                            var datamessage = dataitem.Message;
+
+                            if (datamessage.Equals("Inserted"))
                             {
-                                ContactID = id,
-                                RetailerCode = retailerCode,
-                                PresStreet = street,
-                                PresBarangay = barangay,
-                                PresDistrict = district,
-                                PresTown = town,
-                                PresProvince = province,
-                                PresCountry = country,
-                                Landmark = landmark,
-                                Telephone1 = telephone1,
-                                Telephone2 = telephone2,
-                                Mobile = mobile,
-                                Email = email,
-                                GPSCoordinates = location,
-                                Supervisor = contact,
-                                RecordLog = recordlog,
-                                Deleted = Convert.ToInt32(deleted),
-                                LastSync = DateTime.Parse(current_datetime),
-                                LastUpdated = DateTime.Parse(current_datetime)
-                            };
+                                sendStatus.Text = "Saving retailer outlet to the device";
 
-                            await conn.InsertAsync(retailer_group_insert);
+                                var retailer_group_insert = new RetailerGroupTable
+                                {
+                                    ContactID = id,
+                                    RetailerCode = retailerCode,
+                                    PresStreet = street,
+                                    PresBarangay = barangay,
+                                    PresDistrict = district,
+                                    PresTown = town,
+                                    PresProvince = province,
+                                    PresCountry = country,
+                                    Landmark = landmark,
+                                    Telephone1 = telephone1,
+                                    Telephone2 = telephone2,
+                                    Mobile = mobile,
+                                    Email = email,
+                                    GPSCoordinates = location,
+                                    Supervisor = contact,
+                                    RecordLog = recordlog,
+                                    Deleted = Convert.ToInt32(deleted),
+                                    LastSync = DateTime.Parse(current_datetime),
+                                    LastUpdated = DateTime.Parse(current_datetime)
+                                };
 
-                            Analytics.TrackEvent("Sent Retailer Outlet");
+                                await conn.InsertAsync(retailer_group_insert);
 
-                            var logType = "App Log";
-                            var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                            int logdeleted = 0;
+                                Analytics.TrackEvent("Sent Retailer Outlet");
 
-                            Save_Logs(contact, logType, log, database, logdeleted);
+                                var logType = "App Log";
+                                var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                int logdeleted = 0;
 
-                            await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
-                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                Save_Logs(contact, logType, log, database, logdeleted);
+
+                                await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
+                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                            }
+                            else
+                            {
+                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                Send_offline();
+                            }
                         }
-                        else
+                        catch (Exception)
                         {
-                            sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
                             Send_offline();
                         }
                     }
