@@ -2240,6 +2240,7 @@ namespace TBSMobile.View
                                 { "Host", host },
                                 { "Database", database },
                                 { "CAFNo", cafNo },
+                                { "ContactID", contact },
                                 { "ActivityID", activityID },
                                 { "LastUpdated", lastupdated },
                                 { "Deleted", deleted }
