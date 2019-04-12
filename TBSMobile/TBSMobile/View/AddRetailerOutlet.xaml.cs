@@ -4,23 +4,18 @@ using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Newtonsoft.Json;
 using Plugin.DeviceInfo;
-using System.Net.Sockets;
 
 namespace TBSMobile.View
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
+    [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class AddRetailerOutlet : ContentPage
 	{
         string contact;
@@ -80,14 +75,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -153,14 +148,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -237,7 +232,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -282,7 +277,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -418,7 +413,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -486,7 +481,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -608,42 +603,70 @@ namespace TBSMobile.View
                                 Analytics.TrackEvent("Sent Retailer Outlet");
 
                                 var logType = "App Log";
-                                var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                                 int logdeleted = 0;
 
                                 Save_Logs(contact, logType, log, database, logdeleted);
 
-                                await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Got it");
+                                await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Ok");
                                 await Application.Current.MainPage.Navigation.PopModalAsync();
                             }
                             else
                             {
-                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    Send_online();
+                                }
+                                else
+                                {
+                                    Send_offline();
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                            if (retry.Equals(true))
+                            {
+                                Send_online();
+                            }
+                            else
+                            {
                                 Send_offline();
                             }
                         }
-                        catch (Exception)
-                        {
-                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                            Send_offline();
-                        }
-                    }
-                    else
-                    {
-                        sendStatus.Text = "Syncing failed. Failed to send the data.";
-                        Send_offline();
                     }
                 }
                 else
                 {
-                    Send_offline();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        Send_online();
+                    }
+                    else
+                    {
+                        Send_offline();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-                Send_offline();
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    Send_online();
+                }
+                else
+                {
+                    Send_offline();
+                };
             }
         }
 
@@ -702,7 +725,7 @@ namespace TBSMobile.View
                 await conn.InsertOrReplaceAsync(retailer_group_insert);
 
                 var logtype = "Mobile Log";
-                var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
+                var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "App Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                 int deleted = 0;
 
                 sendStatus.Text = "Saving user logs to the device";
@@ -722,13 +745,13 @@ namespace TBSMobile.View
 
                 Analytics.TrackEvent("Sent Prospect Retailer");
 
-                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to sync your data", "Got it");
+                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to sync your data", "Ok");
                 await Application.Current.MainPage.Navigation.PopModalAsync();
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -736,7 +759,7 @@ namespace TBSMobile.View
         {
             if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (string.IsNullOrEmpty(entContact.Text))
                 {
@@ -783,14 +806,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -808,14 +831,14 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                   await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                     await Navigation.PopToRootAsync();
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -832,14 +855,14 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                   await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                     await Navigation.PopToRootAsync();
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -848,7 +871,7 @@ namespace TBSMobile.View
             if (string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entTownCode.Text) ||
                string.IsNullOrEmpty(entProvinceCode.Text) || string.IsNullOrEmpty(entCountry.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (string.IsNullOrEmpty(entStreet.Text))
                 {
@@ -918,14 +941,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }

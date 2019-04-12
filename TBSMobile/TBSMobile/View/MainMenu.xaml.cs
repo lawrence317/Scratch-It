@@ -3,8 +3,6 @@ using Microsoft.AppCenter.Crashes;
 using Plugin.Connectivity;
 using Plugin.Geolocator;
 using System;
-using System.Net;
-using System.Net.NetworkInformation;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -16,8 +14,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
 
 namespace TBSMobile.View
 {
@@ -84,43 +80,13 @@ namespace TBSMobile.View
                             var getemailchanges = conn.QueryAsync<UserEmailTable>(emailchangessql);
                             var emailchangesresultCount = getemailchanges.Result.Count;
 
-                            if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || emailchangesresultCount > 0)
+                            if (contactchangesresultCount > 0 || retaileroutletchangesresultCount > 0 || cafchangesresultCount > 0 || actchangesresultCount > 0 || emailchangesresultCount > 0)
                             {
-                                var optimalSpeed = 50;
-                                var connectionTypes = CrossConnectivity.Current.ConnectionTypes;
-                                var speeds = CrossConnectivity.Current.Bandwidths;
+                                lblStatus.Text = "Initializing data sync";
+                                lblStatus.BackgroundColor = Color.FromHex("#27ae60");
 
-                                if (connectionTypes.Any(speed => Convert.ToInt32(speed) < optimalSpeed))
-                                {
-                                    lblStatus.Text = "Initializing data sync";
-                                    lblStatus.BackgroundColor = Color.FromHex("#27ae60");
-
-                                    var confirm = await DisplayAlert("Auto-sync Connection Warning", "Slow connection detected. Do you want to sync the data?", "Yes", "No");
-                                    if (confirm == true)
-                                    {
-                                        SyncContactsClientUpdate(host, database, contact, ipaddress);
-                                        btnFAF.IsEnabled = false;
-                                        btnAH.IsEnabled = false;
-                                        btnLogout.IsEnabled = false;
-                                        btnUI.IsEnabled = false;
-                                        btnPR.IsEnabled = false;
-                                        btnRetailer.IsEnabled = false;
-                                        btnResend.IsEnabled = false;
-                                    }
-                                    else
-                                    {
-                                        lblStatus.Text = "Online - Connected to server";
-                                        lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
-                                        btnFAF.IsEnabled = true;
-                                        btnAH.IsEnabled = true;
-                                        btnLogout.IsEnabled = true;
-                                        btnUI.IsEnabled = true;
-                                        btnPR.IsEnabled = true;
-                                        btnRetailer.IsEnabled = true;
-                                        btnResend.IsEnabled = true;
-                                    }
-                                }
-                                else
+                                var confirm = await DisplayAlert("Auto-sync Data", "Do you want to sync the data?", "Yes", "No");
+                                if (confirm == true)
                                 {
                                     SyncContactsClientUpdate(host, database, contact, ipaddress);
                                     btnFAF.IsEnabled = false;
@@ -130,6 +96,18 @@ namespace TBSMobile.View
                                     btnPR.IsEnabled = false;
                                     btnRetailer.IsEnabled = false;
                                     btnResend.IsEnabled = false;
+                                }
+                                else
+                                {
+                                    lblStatus.Text = "Online - Connected to server";
+                                    lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
+                                    btnFAF.IsEnabled = true;
+                                    btnAH.IsEnabled = true;
+                                    btnLogout.IsEnabled = true;
+                                    btnUI.IsEnabled = true;
+                                    btnPR.IsEnabled = true;
+                                    btnRetailer.IsEnabled = true;
+                                    btnResend.IsEnabled = true;
                                 }
                             }
                             else
@@ -160,14 +138,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -212,14 +190,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -245,14 +223,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -278,14 +256,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -307,18 +285,23 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
                         Analytics.TrackEvent("Logged Out");
 
-                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                        var confirm = await DisplayAlert("Logout Confirmation", "Do you want to logout?", "Yes", "No");
+
+                        if (confirm.Equals(true))
+                        {
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
+                        }
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -374,7 +357,7 @@ namespace TBSMobile.View
                                     lblStatus.Text = "Initializing data sync";
                                     lblStatus.BackgroundColor = Color.FromHex("#27ae60");
 
-                                    var confirm = await DisplayAlert("Auto-sync Connection Speed Warning", "Slow connection detected. Do you want to sync the data?  Please do not turn off/lock your device during the syncing process.", "Yes", "No");
+                                    var confirm = await DisplayAlert("Auto-sync Data", "Do you want to sync the data?", "Yes", "No");
                                     if (confirm == true)
                                     {
                                         SyncContactsClientUpdate(host, database, contact, ipaddress);
@@ -439,7 +422,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -467,14 +450,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -500,14 +483,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -656,6 +639,8 @@ namespace TBSMobile.View
             public string Message { get; set; }
         }
 
+        // ------------------------------ Auto-Sync Function ------------------------------ //
+
         public async void SyncContactsClientUpdate(string host, string database, string contact, string ipaddress)
         {
             try
@@ -793,51 +778,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced client contacts update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
+
+                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
                     }
-
-                    SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-
+                    else
+                    {
+                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncContactsClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -866,7 +890,6 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-
                     if (changesresultCount > 0)
                     {
                         int clientupdate = 1;
@@ -888,22 +911,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -926,50 +949,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced contacts image 1: " + (clientupdate - 1) + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 1</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Contacts Image 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1019,22 +1082,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -1057,50 +1120,91 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced contacts image 2: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 2</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Contacts Image 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+
+                    }
+                    else
+                    {
+                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1129,7 +1233,6 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-
                     if (changesresultCount > 0)
                     {
                         int clientupdate = 1;
@@ -1151,22 +1254,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "MediaID", contactID},
-                                        { "Path", ""}
-                                    };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "MediaID", contactID},
-                                        { "Path", File.ReadAllBytes(media)}
-                                    };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -1189,50 +1292,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced contacts image 3: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 3</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Contacts Image 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1263,7 +1406,6 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-
                     if (changesresultCount > 0)
                     {
                         int clientupdate = 1;
@@ -1285,22 +1427,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", contactID},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", contactID},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -1310,57 +1452,106 @@ namespace TBSMobile.View
                                 var pathcontent = await pathresponse.Content.ReadAsStringAsync();
                                 if (!string.IsNullOrEmpty(pathcontent))
                                 {
-                                    var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                    var pathitem = pathresult[0];
-                                    var pathmessage = pathitem.Message;
-
-                                    if (pathmessage.Equals("Inserted"))
+                                    try
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
+                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
 
-                                        clientupdate++;
+                                        var pathitem = pathresult[0];
+                                        var pathmessage = pathitem.Message;
+
+                                        if (pathmessage.Equals("Inserted"))
+                                        {
+                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
                                     }
-                                    else
+                                    catch
                                     {
-                                        lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
-                                        OnSyncFailed();
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced contacts video: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Video</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Contacts Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+
+                    }
+                    else
+                    {
+                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1467,50 +1658,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced client retailer outlet update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Retailer Outlet</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                        SyncCAFClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncCAFClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1570,32 +1801,34 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "CAFNo", cafNo },
-                                        { "EmployeeID", employeeID },
-                                        { "CAFDate", cafDate },
-                                        { "CustomerID", customerID },
-                                        { "StartTime", startTime },
-                                        { "EndTime", endTime },
-                                        { "MobilePhoto1", mobilePhoto1 },
-                                        { "MobilePhoto2", mobilePhoto2 },
-                                        { "MobilePhoto3", mobilePhoto3 },
-                                        { "MobileVideo", mobileVideo },
-                                        { "GPSCoordinates", gpsLocation },
-                                        { "Remarks", remarks },
-                                        { "OtherConcern", otherConcern },
-                                        { "RecordLog", recordLog },
-                                        { "Deleted", deleted },
-                                        { "LastUpdated", lastUpdated }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "CAFNo", cafNo },
+                                { "EmployeeID", employeeID },
+                                { "CAFDate", cafDate },
+                                { "CustomerID", customerID },
+                                { "StartTime", startTime },
+                                { "EndTime", endTime },
+                                { "MobilePhoto1", mobilePhoto1 },
+                                { "MobilePhoto2", mobilePhoto2 },
+                                { "MobilePhoto3", mobilePhoto3 },
+                                { "MobileVideo", mobileVideo },
+                                { "GPSCoordinates", gpsLocation },
+                                { "Remarks", remarks },
+                                { "OtherConcern", otherConcern },
+                                { "RecordLog", recordLog },
+                                { "Deleted", deleted },
+                                { "LastUpdated", lastUpdated }
+                            };
+
 
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
                                 var content = await response.Content.ReadAsStringAsync();
+
                                 if (!string.IsNullOrEmpty(content))
                                 {
                                     try
@@ -1611,33 +1844,52 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced client caf update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
@@ -1647,14 +1899,32 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCAFClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1705,22 +1975,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -1743,50 +2013,91 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced caf image 1: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 1</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF Image 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1837,22 +2148,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -1875,51 +2186,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced caf image 2: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 2</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF Image 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
 
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                if (retry.Equals(true))
+                {
+                    SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -1948,7 +2298,6 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-
                     if (changesresultCount > 0)
                     {
                         int clientupdate = 1;
@@ -1970,22 +2319,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -2008,50 +2357,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced caf image 3: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 3</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF Image 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -2082,7 +2471,6 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-
                     if (changesresultCount > 0)
                     {
                         int clientupdate = 1;
@@ -2104,22 +2492,22 @@ namespace TBSMobile.View
                             if (!pathdoesExist || string.IsNullOrEmpty(media))
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", ""}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", ""}
+                                };
                             }
                             else
                             {
                                 pathjson = new JObject
-                                        {
-                                            { "Host", host },
-                                            { "Database", database },
-                                            { "MediaID", cafNo},
-                                            { "Path", File.ReadAllBytes(media)}
-                                        };
+                                {
+                                    { "Host", host },
+                                    { "Database", database },
+                                    { "MediaID", cafNo},
+                                    { "Path", File.ReadAllBytes(media)}
+                                };
                             }
 
                             var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
@@ -2138,56 +2526,97 @@ namespace TBSMobile.View
 
                                         if (pathmessage.Equals("Inserted"))
                                         {
-                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime));
+                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
 
                                             clientupdate++;
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + pathmessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + pathcontent, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced caf video: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Video</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                        SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -2207,7 +2636,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var datachanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE LastUpdated > LastSync AND Deleted != '1'");
+                    var datachanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = datachanges.Result.Count;
 
                     var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -2228,6 +2657,7 @@ namespace TBSMobile.View
 
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
+                            var contactid = result.ContactID;
                             var activityID = result.ActivityID;
                             var lastsync = DateTime.Parse(current_datetime);
                             var lastupdated = result.LastUpdated;
@@ -2240,7 +2670,7 @@ namespace TBSMobile.View
                                 { "Host", host },
                                 { "Database", database },
                                 { "CAFNo", cafNo },
-                                { "ContactID", contact },
+                                { "ContactID", contactid },
                                 { "ActivityID", activityID },
                                 { "LastUpdated", lastupdated },
                                 { "Deleted", deleted }
@@ -2268,50 +2698,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced client caf activity update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Activity</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>CAF Activity</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                        SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -2393,50 +2863,90 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
                                     }
-                                    catch (Exception)
-                                    {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
                                 }
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
                         synccount += "Total synced client email recipient update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Email Recipient</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Sent client updates to the server (<b>Email Recipient</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
 
-                    SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                        SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                    }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncEmailRecipientClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -2454,6 +2964,7 @@ namespace TBSMobile.View
 
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
+                    HttpClient client = new HttpClient();
 
                     var datachanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = datachanges.Result.Count;
@@ -2487,18 +2998,17 @@ namespace TBSMobile.View
                             var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
-                                    {
-                                        { "Host", host },
-                                        { "Database", database },
-                                        { "ContactID", contactsID },
-                                        { "LogType", logtype },
-                                        { "Log", logs },
-                                        { "LogDate", logDate },
-                                        { "LastUpdated", lastupdated },
-                                        { "Deleted", deleted }
-                                    };
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "ContactID", contactsID },
+                                { "LogType", logtype },
+                                { "Log", logs },
+                                { "LogDate", logDate },
+                                { "LastUpdated", lastupdated },
+                                { "Deleted", deleted }
+                            };
 
-                            HttpClient client = new HttpClient();
                             var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
@@ -2521,15 +3031,683 @@ namespace TBSMobile.View
                                         }
                                         else
                                         {
-                                            lblStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            };
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
                                             OnSyncFailed();
                                         }
-
                                     }
-                                    catch (Exception)
+                                }
+                            }
+                            else
+                            {
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
+                            }
+                        }
+
+                        synccount += "Total synced client user logs update: " + clientupdate + "\n";
+
+                        var logType = "App Log";
+                        var log = "Sent client updates to the server (<b>User Logs</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        int logdeleted = 0;
+
+                        Save_Logs(contact, logType, log, database, logdeleted);
+
+                        OnSyncComplete();
+                    }
+                    else
+                    {
+                        OnSyncComplete();
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    SyncUserLogsClientUpdate(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        // ------------------------------ Re-Sync Function ------------------------------ //
+
+        public async void ReSyncContacts(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-contacts-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    lblStatus.Text = "Initializing contacts re-sync";
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
+                    var changesresultCount = datachanges.Result.Count;
+
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    if (changesresultCount > 0)
+                    {
+                        int clientupdate = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
+                        {
+                            lblStatus.Text = "Checking contacts to server " + clientupdate + " out of " + changesresultCount;
+
+                            var result = datachanges.Result[i];
+                            var contactID = result.ContactID;
+
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            string contentType = "application/json";
+                            JObject json = new JObject
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "ContactID", contactID }
+                            };
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var content = await response.Content.ReadAsStringAsync();
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    try
                                     {
-                                        await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                        OnSyncFailed();
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Existed"))
+                                        {
+                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
+
+                                            clientupdate++;
+                                        }
+                                        else if (datamessage.Equals("Not Existed"))
+                                        {
+                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ?, Checked = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), 1, contactID);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                ReSyncContacts(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            ReSyncContacts(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    ReSyncContacts(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
+                            }
+                        }
+
+                        synccount += "Total synced client contacts update: " + clientupdate + "\n";
+
+                        var logType = "App Log";
+                        var log = "Re-synced data (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        int logdeleted = 0;
+
+                        Save_Logs(contact, logType, log, database, logdeleted);
+
+                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncContacts(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncContacts(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+        
+        public async void ReSyncRetailerOutlet(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-reatiler-outlet-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    lblStatus.Text = "Initializing retailer outlet re-sync";
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var datachanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
+                    var changesresultCount = datachanges.Result.Count;
+
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    if (changesresultCount > 0)
+                    {
+                        int clientupdate = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
+                        {
+                            lblStatus.Text = "Checking retailer outlet to server " + clientupdate + " out of " + changesresultCount;
+
+                            var result = datachanges.Result[i];
+                            var retailerCode = result.RetailerCode;
+
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            string contentType = "application/json";
+                            JObject json = new JObject
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "RetailerCode", retailerCode }
+                            };
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var content = await response.Content.ReadAsStringAsync();
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    try
+                                    {
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Existed"))
+                                        {
+                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
+                                            
+                                            clientupdate++;
+                                        }
+                                        else if (datamessage.Equals("Not Existed"))
+                                        {
+                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ?, Checked = ? WHERE RetailerCode = ?", DateTime.Parse(default_datetime), 1, retailerCode);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
+                            }
+                        }
+
+                        synccount += "Total synced client retailer outlet update: " + clientupdate + "\n";
+
+                        var logType = "App Log";
+                        var log = "Re-synced data (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        int logdeleted = 0;
+
+                        Save_Logs(contact, logType, log, database, logdeleted);
+
+                        ReSyncCAF(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        ReSyncCAF(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        public async void ReSyncCAF(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-caf-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    lblStatus.Text = "Initializing caf re-sync";
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND (Checked = '0' OR Checked = '')", contact);
+                    var changesresultCount = datachanges.Result.Count;
+
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    if (changesresultCount > 0)
+                    {
+                        int clientupdate = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
+                        {
+                            lblStatus.Text = "Checking caf to server " + clientupdate + " out of " + changesresultCount;
+
+                            var result = datachanges.Result[i];
+                            var cafNo = result.CAFNo;
+
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            string contentType = "application/json";
+                            JObject json = new JObject
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "CAFNo", cafNo }
+                            };
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var content = await response.Content.ReadAsStringAsync();
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    try
+                                    {
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Existed"))
+                                        {
+                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
+
+                                            clientupdate++;
+                                        }
+                                        else if (datamessage.Equals("Not Existed"))
+                                        {
+                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ?, Checked = ? WHERE CAFNo = ?", DateTime.Parse(default_datetime), 1, cafNo);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                ReSyncCAF(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            ReSyncCAF(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    ReSyncCAF(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
+                            }
+                        }
+
+                        synccount += "Total synced client caf update: " + clientupdate + "\n";
+
+                        var logType = "App Log";
+                        var log = "Re-synced data (<b>CAF</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        int logdeleted = 0;
+
+                        Save_Logs(contact, logType, log, database, logdeleted);
+
+                        ReSyncCAFActivity(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        ReSyncCAFActivity(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncCAF(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncCAF(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        public async void ReSyncCAFActivity(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-caf-activity-api.php";
+                HttpClient client = new HttpClient();
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    lblStatus.Text = "Initializing caf activity re-sync";
+
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+
+                    var datachanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
+                    var changesresultCount = datachanges.Result.Count;
+
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    if (changesresultCount > 0)
+                    {
+                        int clientupdate = 1;
+
+                        for (int i = 0; i < changesresultCount; i++)
+                        {
+                            lblStatus.Text = "Checking caf activity to server " + clientupdate + " out of " + changesresultCount;
+
+                            var result = datachanges.Result[i];
+                            var cafNo = result.CAFNo;
+                            var activityID = result.ActivityID;
+
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            string contentType = "application/json";
+                            JObject json = new JObject
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "CAFNo", cafNo },
+                                { "ContactID", contact },
+                                { "ActivityID", activityID }
+                            };
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var content = await response.Content.ReadAsStringAsync();
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    try
+                                    {
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Existed"))
+                                        {
+                                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
+
+                                            clientupdate++;
+                                        }
+                                        else if (datamessage.Equals("Not Existed"))
+                                        {
+                                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ?, Checked = ? WHERE CAFNo = ?", DateTime.Parse(default_datetime), 1, cafNo);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                ReSyncCAFActivity(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                        if (retry.Equals(true))
+                                        {
+                                            ReSyncCAFActivity(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
                                     }
                                 }
                                 else
@@ -2540,474 +3718,61 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                lblStatus.Text = "Syncing failed. Server is unreachable.";
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    ReSyncCAFActivity(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
 
-                        synccount += "Total synced client user logs update: " + clientupdate + "\n";
+                        synccount += "Total synced client caf activity update: " + clientupdate + "\n";
 
                         var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>User Logs</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        var log = "Re-synced data (<b>CAF Activity</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                         int logdeleted = 0;
 
                         Save_Logs(contact, logType, log, database, logdeleted);
-                    }
-
-                    OnSyncComplete();
-                }
-                else
-                {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-            }
-        }
-
-        public async void ReSyncContacts(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "first-time-sync-contacts-api.php";
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing contacts re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    int count = 1;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    lblStatus.Text = "Getting contact data from the server";
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
-                        {
-                            { "Host", host },
-                            { "Database", database },
-                            { "ContactID", contact }
-                        };
-
-                    HttpClient client = new HttpClient();
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var default_datetime = "0001-01-01 00:00:00";
-
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
-                                var datacount = dataresult.Count;
-
-                                for (int i = 0; i < datacount; i++)
-                                {
-                                    lblStatus.Text = "Checking contacts " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var contactID = item.ContactID;
-
-                                    var getContacts = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID = ?", contactID);
-                                    var counts = getContacts.Result.Count;
-
-                                    if (counts == 1)
-                                    {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
-                                    }
-
-                                    count++;
-                                }
-
-                                synccount += "Total checked contacts: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>Contacts</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-
-                            }
-                            catch (Exception)
-                            {
-                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                OnSyncFailed();
-                            }
-                        }
-                        else
-                        {
-                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                        }
-
-                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Supervisor = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
-
-                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        lblStatus.Text = "Syncing failed. Server is unreachable.";
-                        OnSyncFailed();
-                    }
-                }
-                else
-                {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-            }
-        }
-
-        public async void ReSyncRetailerOutlet(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-                
-                string apifile = "first-time-sync-retailer-outlet-api.php";
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing retailer outlet re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    int count = 1;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    lblStatus.Text = "Getting retailer outlet data from the server";
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
-
-                    HttpClient client = new HttpClient();
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var default_datetime = "0001-01-01 00:00:00";
-
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
-                                var datacount = dataresult.Count;
-
-                                for (int i = 0; i < datacount; i++)
-                                {
-                                    lblStatus.Text = "Checking retailer outlet " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var retailerCode = item.RetailerCode;
-
-                                    var getContacts = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE RetailerCode = ?", retailerCode);
-                                    var counts = getContacts.Result.Count;
-
-                                    if (counts == 1)
-                                    {
-                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
-                                    }
-
-                                    count++;
-                                }
-
-                                synccount += "Total checked retailer outlet: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>Retailer Outlet</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-                            }
-                            catch (Exception)
-                            {
-                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                OnSyncFailed();
-                            }
-                        }
-                        else
-                        {
-                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ?", DateTime.Parse(default_datetime), contact);
-                        }
-
-                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Supervisor = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
-
-                        ReSyncCAF(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        lblStatus.Text = "Syncing failed. Server is unreachable.";
-                        OnSyncFailed();
-                    }
-                }
-                else
-                {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-            }
-        }
-
-        public async void ReSyncCAF(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-                                
-                string apifile = "first-time-sync-caf-api.php";
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    int count = 1;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    lblStatus.Text = "Getting caf data from the server";
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contact }
-                            };
-
-                    HttpClient client = new HttpClient();
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var default_datetime = "0001-01-01 00:00:00";
-
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
-                                var datacount = dataresult.Count;
-
-                                for (int i = 0; i < datacount; i++)
-                                {
-                                    lblStatus.Text = "Checking caf " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var cafNo = item.CAFNo;
-
-                                    var getContacts = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE CAFNo = ?", cafNo);
-                                    var counts = getContacts.Result.Count;
-
-                                    if (counts == 1)
-                                    {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
-                                    }
-
-                                    count++;
-                                }
-
-                                synccount += "Total checked caf: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>CAF</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-                            }
-                            catch (Exception)
-                            {
-                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                OnSyncFailed();
-                            }
-                        }
-                        else
-                        {
-                            await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ?", DateTime.Parse(default_datetime), contact, 1);
-                        }
-
-                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET LastSync = ? WHERE EmployeeID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
-
-                        ReSyncCAFActivity(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        lblStatus.Text = "Syncing failed. Server is unreachable.";
-                        OnSyncFailed();
-                    }
-                }
-                else
-                {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-            }
-        }
-
-        public async void ReSyncCAFActivity(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-                                
-                string apifile = "first-time-sync-caf-activity-api.php";
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf activity re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    int count = 1;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    lblStatus.Text = "Getting caf activity data from the server";
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
-                    {
-                        { "Host", host },
-                        { "Database", database },
-                        { "ContactID", contact }
-                    };
-
-                    HttpClient client = new HttpClient();
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var default_datetime = "0001-01-01 00:00:00";
-
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<ActivityTable>>(content, settings);
-                                var datacount = dataresult.Count;
-
-                                for (int i = 0; i < datacount; i++)
-                                {
-                                    lblStatus.Text = "Checking caf activity " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var cafNo = item.CAFNo;
-                                    var contactId = item.ContactID;
-                                    var activityid = item.ActivityID;
-
-                                    var getContacts = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", cafNo, contactId, activityid);
-                                    var counts = getContacts.Result.Count;
-
-                                    if (counts == 1)
-                                    {
-                                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE CAFNo = ? AND ContactID = ? AND ActivityID = ?", 1, cafNo, contactId, activityid);
-                                    }
-
-                                    count++;
-                                }
-
-                                synccount += "Total checked caf activity: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>CAF Activity</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-                            }
-                            catch (Exception)
-                            {
-                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                OnSyncFailed();
-                            }
-                        }
-                        else
-                        {
-                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-                        }
-
-                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
 
                         ReSyncEmailRecipient(host, database, contact, ipaddress);
                     }
                     else
                     {
-                        lblStatus.Text = "Syncing failed. Server is unreachable.";
-                        OnSyncFailed();
+                        ReSyncEmailRecipient(host, database, contact, ipaddress);
                     }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncCAFActivity(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncCAFActivity(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -3016,8 +3781,9 @@ namespace TBSMobile.View
             try
             {
                 lblStatus.Text = "Checking internet connection";
-                
-                string apifile = "first-time-sync-email-recipient-api.php";
+
+                string apifile = "resync-email-recipient-api.php";
+                HttpClient client = new HttpClient();
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3026,8 +3792,10 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
 
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    int count = 1;
+                    var datachanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
+                    var changesresultCount = datachanges.Result.Count;
+
+                    var default_datetime = "0001-01-01 00:00:00";
 
                     var settings = new JsonSerializerSettings
                     {
@@ -3035,89 +3803,138 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    lblStatus.Text = "Getting email recipient data from the server";
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
+                    if (changesresultCount > 0)
                     {
-                        { "Host", host },
-                        { "Database", database },
-                        { "ContactID", contact }
-                    };
+                        int clientupdate = 1;
 
-                    HttpClient client = new HttpClient();
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var default_datetime = "0001-01-01 00:00:00";
-
-                        if (!string.IsNullOrEmpty(content))
+                        for (int i = 0; i < changesresultCount; i++)
                         {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<UserEmailTable>>(content, settings);
-                                var datacount = dataresult.Count;
+                            lblStatus.Text = "Checking email recipient to server " + clientupdate + " out of " + changesresultCount;
 
-                                for (int i = 0; i < datacount; i++)
+                            var result = datachanges.Result[i];
+                            var contactsID = result.ContactID;
+
+                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            string contentType = "application/json";
+                            JObject json = new JObject
+                            {
+                                { "Host", host },
+                                { "Database", database },
+                                { "ContactID", contactsID }
+                            };
+
+                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var content = await response.Content.ReadAsStringAsync();
+                                if (!string.IsNullOrEmpty(content))
                                 {
-                                    lblStatus.Text = "Syncing email recipient " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var contactsID = item.ContactID;
-
-                                    var getContacts = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ?", contactsID);
-                                    var counts = getContacts.Result.Count;
-
-                                    if (counts == 1)
+                                    try
                                     {
-                                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactsID);
+                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                                        var dataitem = dataresult[0];
+                                        var datamessage = dataitem.Message;
+
+                                        if (datamessage.Equals("Existed"))
+                                        {
+                                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactsID);
+
+                                            clientupdate++;
+                                        }
+                                        else if (datamessage.Equals("Not Existed"))
+                                        {
+                                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ?, Checked = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), 1, contactsID);
+
+                                            clientupdate++;
+                                        }
+                                        else
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                ReSyncEmailRecipient(host, database, contact, ipaddress);
+                                            }
+                                            else
+                                            {
+                                                OnSyncFailed();
+                                            }
+                                        }
                                     }
+                                    catch
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
 
-                                    count++;
+                                        if (retry.Equals(true))
+                                        {
+                                            ReSyncEmailRecipient(host, database, contact, ipaddress);
+                                        }
+                                        else
+                                        {
+                                            OnSyncFailed();
+                                        }
+                                    }
                                 }
-
-                                synccount += "Total checked email recipient: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>Email Recipient</b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
                             }
-                            catch (Exception)
+                            else
                             {
-                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                OnSyncFailed();
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    ReSyncEmailRecipient(host, database, contact, ipaddress);
+                                }
+                                else
+                                {
+                                    OnSyncFailed();
+                                }
                             }
                         }
-                        else
-                        {
-                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contact);
-                        }
 
-                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ? AND Checked != ?", DateTime.Parse(default_datetime), contact, 1);
+                        synccount += "Total synced client email recipient update: " + clientupdate + "\n";
+
+                        var logType = "App Log";
+                        var log = "Re-synced data (<b>Email Recipient</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                        int logdeleted = 0;
+
+                        Save_Logs(contact, logType, log, database, logdeleted);
 
                         SyncContactsClientUpdate(host, database, contact, ipaddress);
                     }
                     else
                     {
-                        lblStatus.Text = "Syncing failed. Server is unreachable.";
-                        OnSyncFailed();
+                        SyncContactsClientUpdate(host, database, contact, ipaddress);
                     }
                 }
                 else
                 {
-                    lblStatus.Text = "Syncing failed. Please connect to the internet to sync your data.";
-                    OnSyncFailed();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncEmailRecipient(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncEmailRecipient(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
             }
         }
 
@@ -3125,7 +3942,7 @@ namespace TBSMobile.View
         {
             if (CrossConnectivity.Current.IsConnected)
             {
-                DisplayAlert("Sync Completed", "Sync Summary: \n\n" + synccount, "Got it");
+                DisplayAlert("Sync Completed", "Sync Summary: \n\n" + synccount, "Ok");
                 synccount = "";
                 lblStatus.Text = "Online - Connected to server";
                 lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
@@ -3165,32 +3982,97 @@ namespace TBSMobile.View
             btnPR.IsEnabled = true;
             btnRetailer.IsEnabled = true;
             btnResend.IsEnabled = true;
+
+            return;
         }
 
         private async void BtnResend_Clicked(object sender, EventArgs e)
         {
             if (CrossConnectivity.Current.IsConnected)
             {
+                var db = DependencyService.Get<ISQLiteDB>();
+                var conn = db.GetConnection();
+
                 lblStatus.Text = "Initializing data sync";
                 lblStatus.BackgroundColor = Color.FromHex("#27ae60");
+                
+                var checkcontactresult = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
+                var checkcontactcount = checkcontactresult.Result.Count;
+                
+                var checkretaileroutletresult = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
+                var checkretaileroutletcount = checkretaileroutletresult.Result.Count;
+                
+                var checkcafresult = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND (Checked = '0' OR Checked = '')", contact);
+                var checkcafcount = checkcafresult.Result.Count;
+                
+                var checkactresult = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
+                var checkactcount = checkactresult.Result.Count;
+                
+                var checkemailresult = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
+                var checkemailcount = checkemailresult.Result.Count;
 
-                var resync = await DisplayAlert("Re-sync Warning", "Do you want to re-sync the data? Please do not turn off/lock your device during the syncing process.", "Yes", "No");
-                if (resync == true)
+                if (checkcontactcount > 0 || checkretaileroutletcount > 0 || checkcafcount > 0 || checkactcount  > 0|| checkemailcount > 0)
                 {
-                    ReSyncContacts(host, database, contact, ipaddress);
+                    var action = await DisplayActionSheet("Resync Data", "Cancel", null, "Resync Unchecked Data", "Resync All Data");
 
-                    btnFAF.IsEnabled = false;
-                    btnAH.IsEnabled = false;
-                    btnLogout.IsEnabled = false;
-                    btnUI.IsEnabled = false;
-                    btnPR.IsEnabled = false;
-                    btnRetailer.IsEnabled = false;
-                    btnResend.IsEnabled = false;
+                    if(action == "Resync Unchecked Data")
+                    {
+                        btnFAF.IsEnabled = false;
+                        btnAH.IsEnabled = false;
+                        btnLogout.IsEnabled = false;
+                        btnUI.IsEnabled = false;
+                        btnPR.IsEnabled = false;
+                        btnRetailer.IsEnabled = false;
+                        btnResend.IsEnabled = false;
+
+                        ReSyncContacts(host, database, contact, ipaddress);
+                    }
+                    else if(action == "Resync All Data")
+                    {
+                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET  Checked = ? WHERE Supervisor = ?", 0, contact);
+                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE Supervisor = ?", 0, contact);
+                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE EmployeeID = ?", 0, contact);
+                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE ContactID = ?", 0, contact);
+                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 0, contact);
+
+                        btnFAF.IsEnabled = false;
+                        btnAH.IsEnabled = false;
+                        btnLogout.IsEnabled = false;
+                        btnUI.IsEnabled = false;
+                        btnPR.IsEnabled = false;
+                        btnRetailer.IsEnabled = false;
+                        btnResend.IsEnabled = false;
+
+                        ReSyncContacts(host, database, contact, ipaddress);
+                    }
+                }
+                else
+                {
+                    var action = await DisplayActionSheet("Resync Data", "Cancel", null, "Resync All Data");
+
+                    if (action == "Resync All Data")
+                    {
+                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET  Checked = ? WHERE Supervisor = ?", 0, contact);
+                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE Supervisor = ?", 0, contact);
+                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE EmployeeID = ?", 0, contact);
+                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE ContactID = ?", 0, contact);
+                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 0, contact);
+
+                        btnFAF.IsEnabled = false;
+                        btnAH.IsEnabled = false;
+                        btnLogout.IsEnabled = false;
+                        btnUI.IsEnabled = false;
+                        btnPR.IsEnabled = false;
+                        btnRetailer.IsEnabled = false;
+                        btnResend.IsEnabled = false;
+
+                        ReSyncContacts(host, database, contact, ipaddress);
+                    }
                 }
             }
             else
             {
-                await DisplayAlert("Resync data failed", "No connection detected, please connect to the internet to retry", "Got it");
+                await DisplayAlert("Application Error", "Re-sync failed. Please connect to the internet to re-sync your data", "Ok");
                 OnSyncFailed();
             }
         }

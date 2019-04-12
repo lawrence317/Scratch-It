@@ -6,14 +6,8 @@ using Plugin.DeviceInfo;
 using Plugin.Messaging;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -51,13 +45,13 @@ namespace TBSMobile.View
                     else
                     {
                         btnLogin.IsEnabled = false;
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -137,7 +131,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -184,7 +178,7 @@ namespace TBSMobile.View
                         passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
                     }
 
-                    await DisplayAlert("Login Error", "Please fill-up the form", "Got it");
+                    await DisplayAlert("Login Error", "Please fill-up the form", "Ok");
                 }
                 else
                 {
@@ -300,21 +294,48 @@ namespace TBSMobile.View
 
                                                 if (!string.IsNullOrEmpty(trcontent))
                                                 {
-                                                    var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
-
-                                                    var trialitem = trialresult[0];
-                                                    var trialmessage = trialitem.Message;
-                                                    var trialcontactid = trialitem.ContactID;
-
-                                                    if (trialmessage.Equals("Inserted"))
+                                                    try
                                                     {
-                                                        var logType = "App Log";
-                                                        var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                                        int deleted = 0;
+                                                        var trialresult = JsonConvert.DeserializeObject<List<ServerMessage>>(trcontent, settings);
 
-                                                        Save_Logs(trialcontactid, logType, log, database, deleted);
+                                                        var trialitem = trialresult[0];
+                                                        var trialmessage = trialitem.Message;
+                                                        var trialcontactid = trialitem.ContactID;
 
-                                                        await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Got it");
+                                                        if (trialmessage.Equals("Inserted"))
+                                                        {
+                                                            var logType = "App Log";
+                                                            var log = "Activated Trial (<b>" + userName + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                            int deleted = 0;
+
+                                                            Save_Logs(trialcontactid, logType, log, database, deleted);
+
+                                                            await DisplayAlert("Trial Activated", "You activated trial for 30 days", "Ok");
+                                                        }
+                                                        else
+                                                        {
+                                                            var retry = await DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                                                            if (retry.Equals(true))
+                                                            {
+                                                                Login();
+                                                            }
+                                                            else
+                                                            {
+                                                                Offline_Login();
+                                                            };
+                                                        }
+                                                    }
+                                                    catch
+                                                    {
+                                                        var retry = await DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                                                        if (retry.Equals(true))
+                                                        {
+                                                            Login();
+                                                        }
+                                                        else
+                                                        {
+                                                            Offline_Login();
+                                                        };
                                                     }
                                                 }
                                             }
@@ -346,7 +367,7 @@ namespace TBSMobile.View
                                     }
                                     else if (message.Equals("Incorrect Login"))
                                     {
-                                        await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                                        await DisplayAlert("Login Error", "userName or password is incorrect", "Ok");
                                     }
                                     else if (message.Equals("Credential Correct"))
                                     {
@@ -355,7 +376,7 @@ namespace TBSMobile.View
                                         var contactID = result[0].ContactID;
 
                                         var logType = "App Log";
-                                        var log = "Logged in (<b>" + userName + "</b>) <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                        var log = "Logged in (<b>" + userName + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                                         int deleted = 0;
 
                                         Save_Preferences(userName, password, contactID);
@@ -365,19 +386,46 @@ namespace TBSMobile.View
                                     }
                                     else if (message.Equals("Not Connected"))
                                     {
-                                        await DisplayAlert("Login Error", "Please check server and database name", "Got it");
+                                        await DisplayAlert("Login Error", "Please check server and database name", "Ok");
+                                    }
+                                    else
+                                    {
+                                        var retry = await DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                                        if (retry.Equals(true))
+                                        {
+                                            Login();
+                                        }
+                                        else
+                                        {
+                                            Offline_Login();
+                                        };
                                     }
                                 }
-                                catch (Exception)
+                                catch
                                 {
-                                    await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                                    Offline_Login();
+                                    var retry = await DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                                    if (retry.Equals(true))
+                                    {
+                                        Login();
+                                    }
+                                    else
+                                    {
+                                        Offline_Login();
+                                    };
                                 }
                             }
                         }
                         else
                         {
-                            Offline_Login();
+                            var retry = await DisplayAlert("Application Error", "Login failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                            if (retry.Equals(true))
+                            {
+                                Login();
+                            }
+                            else
+                            {
+                                Offline_Login();
+                            };
                         }
                     }
                     else
@@ -389,8 +437,16 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-                Offline_Login();
+                var retry = await DisplayAlert("Application Error", "Login failed. \n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    Login();
+                }
+                else
+                {
+                    Offline_Login();
+                };
             }
         }
 
@@ -414,7 +470,7 @@ namespace TBSMobile.View
 
                 if (result < 1)
                 {
-                    await DisplayAlert("Login Error", "userName or password is incorrect", "Got it");
+                    await DisplayAlert("Login Error", "userName or password is incorrect", "Ok");
                 }
                 else
                 {
@@ -558,7 +614,7 @@ namespace TBSMobile.View
                         else
                         {
                             var logtype = "Mobile Log";
-                            var log = "Logged in (<b>" + userName + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
+                            var log = "Logged in (<b>" + userName + "</b>)" + "App Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
                             int deleted = 0;
 
                             var logs_insert = new UserLogsTable
@@ -588,7 +644,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -717,7 +773,7 @@ namespace TBSMobile.View
                     ipaddressFrame.BorderColor = Color.FromHex("#f2f2f5");
                 }
 
-                await DisplayAlert("Login Error", "Please fill-up the form", "Got it");
+                await DisplayAlert("Login Error", "Please fill-up the form", "Ok");
             }
             else
             {

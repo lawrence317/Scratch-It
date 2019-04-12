@@ -49,14 +49,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -120,7 +120,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -152,7 +152,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -183,14 +183,14 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
                         Crashes.TrackError(ex);
-                        await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
 
@@ -198,7 +198,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -237,7 +237,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -268,14 +268,14 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
                         Crashes.TrackError(ex);
-                        await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
 
@@ -283,7 +283,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -299,7 +299,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 200", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)
@@ -322,7 +322,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -353,21 +353,21 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
                         Crashes.TrackError(ex);
-                        await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -406,7 +406,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 

@@ -13,10 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Text;
 using TBSMobile.Data;
 using Xamarin.Essentials;
@@ -76,14 +73,14 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                   await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                   await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -125,7 +122,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -163,11 +160,11 @@ namespace TBSMobile.View
 
                 if (!locator.IsGeolocationAvailable)
                 {
-                    await DisplayAlert("GPS Error", "GPS location not available", "Got it");
+                    await DisplayAlert("GPS Error", "GPS location not available", "Ok");
                 }
                 else if (!locator.IsGeolocationEnabled)
                 {
-                    await DisplayAlert("GPS Error", "GPS location is not enabled", "Got it");
+                    await DisplayAlert("GPS Error", "GPS location is not enabled", "Ok");
                 }
                 else
                 {
@@ -263,7 +260,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -305,7 +302,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -452,7 +449,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
             
         }
@@ -489,7 +486,7 @@ namespace TBSMobile.View
 
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
-                await DisplayAlert("No Camera", "No Camera Available", "Got it");
+                await DisplayAlert("No Camera", "No Camera Available", "Ok");
                 return;
             }
 
@@ -525,7 +522,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -537,7 +534,7 @@ namespace TBSMobile.View
 
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
-                await DisplayAlert("No Camera", "No Camera Available", "Got it");
+                await DisplayAlert("No Camera", "No Camera Available", "Ok");
                 return;
             }
 
@@ -573,7 +570,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -585,7 +582,7 @@ namespace TBSMobile.View
 
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakePhotoSupported)
             {
-                await DisplayAlert("No Camera", "No Camera Available", "Got it");
+                await DisplayAlert("No Camera", "No Camera Available", "Ok");
                 return;
             }
 
@@ -621,7 +618,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -634,7 +631,7 @@ namespace TBSMobile.View
 
             if (!CrossMedia.Current.IsCameraAvailable || !CrossMedia.Current.IsTakeVideoSupported)
             {
-                await DisplayAlert("No Camera", "No Camera Available", "Got it");
+                await DisplayAlert("No Camera", "No Camera Available", "Ok");
                 return;
             }
 
@@ -669,7 +666,7 @@ namespace TBSMobile.View
             }
             catch (Exception ex)
             {
-                Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -694,13 +691,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -726,13 +723,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -758,13 +755,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -790,13 +787,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -822,13 +819,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -854,13 +851,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -870,7 +867,7 @@ namespace TBSMobile.View
             if (string.IsNullOrEmpty(entRetailerCode.Text) || codePicker.SelectedIndex < 0 || string.IsNullOrEmpty(entLandmark.Text) || string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) ||
                  string.IsNullOrEmpty(entCountry.Text) || string.IsNullOrEmpty(entTownCode.Text) || string.IsNullOrEmpty(entProvinceCode.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (codePicker.SelectedIndex < 0)
                 {
@@ -970,13 +967,13 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
-                        Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
             }
@@ -986,7 +983,7 @@ namespace TBSMobile.View
         {
             if (string.IsNullOrEmpty(entStreet.Text) || string.IsNullOrEmpty(entBarangay.Text) || string.IsNullOrEmpty(entCountry.Text) || string.IsNullOrEmpty(entTownCode.Text) || string.IsNullOrEmpty(entProvinceCode.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (string.IsNullOrEmpty(entStreet.Text))
                 {
@@ -1064,13 +1061,13 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
-                        Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
             }         
@@ -1097,13 +1094,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1114,7 +1111,7 @@ namespace TBSMobile.View
             {
                 if (string.IsNullOrEmpty(entLocation.Text) || string.IsNullOrEmpty(entOnsiteLocation.Text))
                 {
-                    await DisplayAlert("Form Required", "Please wait for the device to capture your location", "Got it");
+                    await DisplayAlert("Form Required", "Please wait for the device to capture your location", "Ok");
                 }
             }
             else
@@ -1130,13 +1127,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1145,7 +1142,7 @@ namespace TBSMobile.View
         {
             if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false)
                 {
@@ -1180,13 +1177,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1195,7 +1192,7 @@ namespace TBSMobile.View
         {
             if (string.IsNullOrEmpty(entPhoto1Url.Text) || string.IsNullOrEmpty(entPhoto2Url.Text) || string.IsNullOrEmpty(entPhoto3Url.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Got it");
+                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
                 if (string.IsNullOrEmpty(entPhoto1Url.Text))
                 {
@@ -1238,13 +1235,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1288,18 +1285,18 @@ namespace TBSMobile.View
                         }
                         catch (Exception ex)
                         {
-                            Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                            Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                         }
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1427,13 +1424,13 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                    Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                 }
             }
         }
@@ -1497,7 +1494,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -1563,7 +1560,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -1631,7 +1628,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-               await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+               await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -1727,8 +1724,6 @@ namespace TBSMobile.View
             try
             {
                 sendStatus.Text = "Sending field activity to server";
-
-                
                 
                 string pathfile = "sync-caf-directly-api.php";
 
@@ -2078,35 +2073,55 @@ namespace TBSMobile.View
                                                                                                     }
 
                                                                                                     var logType = "App Log";
-                                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                                                                                                     int logdeleted = 0;
 
                                                                                                     Save_Logs(contact, logType, log, database, logdeleted);
-                                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Ok");
 
                                                                                                     await Application.Current.MainPage.Navigation.PopAsync();
                                                                                                 }
                                                                                                 else
                                                                                                 {
-                                                                                                    sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + vidmessage;
+                                                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + vidmessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                    if (retry.Equals(true))
+                                                                                                    {
+                                                                                                        Send_online();
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        Send_offline();
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                            catch
+                                                                                            {
+                                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + vidcontent + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                if (retry.Equals(true))
+                                                                                                {
+                                                                                                    Send_online();
+                                                                                                }
+                                                                                                else
+                                                                                                {
                                                                                                     Send_offline();
                                                                                                 }
                                                                                             }
-                                                                                            catch (Exception)
-                                                                                            {
-                                                                                                await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + vidcontent, "ok");
-                                                                                                Send_offline();
-                                                                                            }
-                                                                                        }
-                                                                                        else
-                                                                                        {
-                                                                                            sendStatus.Text = "Syncing failed. Failed to send the data.";
-                                                                                            Send_offline();
                                                                                         }
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        Send_offline();
+                                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                                                                        if (retry.Equals(true))
+                                                                                        {
+                                                                                            Send_online();
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            Send_offline();
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                                 else
@@ -2205,112 +2220,200 @@ namespace TBSMobile.View
                                                                                     sendStatus.Text = "Sending user logs to server";
 
                                                                                     var logType = "App Log";
-                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                                                                                    var log = "Sent caf to the server (<b>" + caf + "/b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                                                                                     int logdeleted = 0;
 
                                                                                     Save_Logs(contact, logType, log, database, logdeleted);
 
-                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Got it");
+                                                                                    await DisplayAlert("Data Sent", "Your activity has been sent to the server", "Ok");
                                                                                     await Application.Current.MainPage.Navigation.PopAsync();
                                                                                 }
                                                                             }
                                                                             else
                                                                             {
-                                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph3message;
+                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph3message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                if (retry.Equals(true))
+                                                                                {
+                                                                                    Send_online();
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    Send_offline();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        catch
+                                                                        {
+                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph3content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                            if (retry.Equals(true))
+                                                                            {
+                                                                                Send_online();
+                                                                            }
+                                                                            else
+                                                                            {
                                                                                 Send_offline();
                                                                             }
                                                                         }
-                                                                        catch (Exception)
-                                                                        {
-                                                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph3content, "ok");
-                                                                            Send_offline();
-                                                                        }
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                                                    if (retry.Equals(true))
+                                                                    {
+                                                                        Send_online();
                                                                     }
                                                                     else
                                                                     {
-                                                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                                                         Send_offline();
                                                                     }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph2message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                if (retry.Equals(true))
+                                                                {
+                                                                    Send_online();
                                                                 }
                                                                 else
                                                                 {
                                                                     Send_offline();
                                                                 }
                                                             }
+                                                        }
+                                                        catch
+                                                        {
+                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph2content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                            if (retry.Equals(true))
+                                                            {
+                                                                Send_online();
+                                                            }
                                                             else
                                                             {
-                                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph2message;
                                                                 Send_offline();
                                                             }
                                                         }
-                                                        catch (Exception)
-                                                        {
-                                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph2content, "ok");
-                                                            Send_offline();
-                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                                    if (retry.Equals(true))
+                                                    {
+                                                        Send_online();
                                                     }
                                                     else
                                                     {
-                                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                                         Send_offline();
                                                     }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph1message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                if (retry.Equals(true))
+                                                {
+                                                    Send_online();
                                                 }
                                                 else
                                                 {
                                                     Send_offline();
                                                 }
                                             }
+                                        }
+                                        catch
+                                        {
+                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ph1content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                            if (retry.Equals(true))
+                                            {
+                                                Send_online();
+                                            }
                                             else
                                             {
-                                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + ph1message;
                                                 Send_offline();
                                             }
                                         }
-                                        catch (Exception)
-                                        {
-                                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + ph1content, "ok");
-                                            Send_offline();
-                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                                    if (retry.Equals(true))
+                                    {
+                                        Send_online();
                                     }
                                     else
                                     {
-                                        sendStatus.Text = "Syncing failed. Failed to send the data.";
                                         Send_offline();
                                     }
+                                }
+                            }
+                            else
+                            {
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+
+                                if (retry.Equals(true))
+                                {
+                                    Send_online();
                                 }
                                 else
                                 {
                                     Send_offline();
                                 }
                             }
+                        }
+                        catch
+                        {
+                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+
+                            if (retry.Equals(true))
+                            {
+                                Send_online();
+                            }
                             else
                             {
-                                sendStatus.Text = "Syncing failed. Failed to send the data.\n\n Error: " + datamessage;
                                 Send_offline();
                             }
                         }
-                        catch (Exception)
-                        {
-                            await DisplayAlert("App Error", "Syncing failed. Failed to send the data.\n\n Error:" + content, "ok");
-                            Send_offline();
-                        }
-                    }
-                    else
-                    {
-                        sendStatus.Text = "Syncing failed. Failed to send the data.";
-                        Send_offline();
                     }
                 }
                 else
                 {
-                    Send_offline();
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        Send_online();
+                    }
+                    else
+                    {
+                        Send_offline();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
-                Send_offline();
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    Send_online();
+                }
+                else
+                {
+                    Send_offline();
+                };
             }
         }
 
@@ -2438,7 +2541,7 @@ namespace TBSMobile.View
             }
 
             var logtype = "Mobile Log";
-            var log = "Added field activity(<b>" + caf + "</b>)" + "Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
+            var log = "Added field activity(<b>" + caf + "</b>)" + "App Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
             int deleted = 0;
 
             sendStatus.Text = "Saving user logs to the device";
@@ -2458,7 +2561,7 @@ namespace TBSMobile.View
 
             Analytics.TrackEvent("Sent Field Activity Form");
 
-            await DisplayAlert("Offline Send", "Your activity has been saved offline. Connect to the server to sync your activity", "Got it");
+            await DisplayAlert("Offline Send", "Your activity has been saved offline. Connect to the server to sync your activity", "Ok");
             await Application.Current.MainPage.Navigation.PopAsync();
         }
 
@@ -2584,7 +2687,7 @@ namespace TBSMobile.View
                     catch (Exception ex)
                     {
                         Crashes.TrackError(ex);
-                        await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
                 else
@@ -2623,7 +2726,7 @@ namespace TBSMobile.View
                     }
                     catch (Exception ex)
                     {
-                        Crashes.TrackError(ex); await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        Crashes.TrackError(ex); await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
 

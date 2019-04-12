@@ -1,11 +1,5 @@
 ﻿using Microsoft.AppCenter.Crashes;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -13,7 +7,7 @@ using Xamarin.Forms.Xaml;
 
 namespace TBSMobile.View
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
+    [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class ActivityHistoryList : ContentPage
 	{
         string contact;
@@ -62,7 +56,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -93,14 +87,14 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            await DisplayAlert("Application Error", "It appears you change the time/date of your phone. Please restore the correct time/date", "Got it");
+                           await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                             await Navigation.PopToRootAsync();
                         }
                     }
                     catch (Exception ex)
                     {
                         Crashes.TrackError(ex);
-                        await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                        await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
                     }
                 }
 
@@ -108,7 +102,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
@@ -125,7 +119,7 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 100", contact);
+                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 200", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
@@ -147,7 +141,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await DisplayAlert("App Error", ex.Message.ToString(), "ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
     }
