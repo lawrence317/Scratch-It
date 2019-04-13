@@ -35,7 +35,21 @@ namespace TBSMobile.View
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            FirstTimeSyncUser(host, database, contact, ipaddress);
+
+            var db = DependencyService.Get<ISQLiteDB>();
+            var conn = db.GetConnection();
+
+            var getData = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+            var resultCount = getData.Result.Count;
+
+            if(resultCount > 0)
+            {
+                SyncUserClientUpdate(host, database, contact, ipaddress);
+            }
+            else
+            {
+                FirstTimeSyncUser(host, database, contact, ipaddress);
+            }
         }
 
         public class UserData
