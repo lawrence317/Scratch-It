@@ -557,6 +557,8 @@ namespace TBSMobile.View
                 };
 
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                 if (response.IsSuccessStatusCode)
@@ -642,7 +644,7 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                     if (retry.Equals(true))
                     {

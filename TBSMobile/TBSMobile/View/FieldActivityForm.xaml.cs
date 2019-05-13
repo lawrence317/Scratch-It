@@ -1767,6 +1767,8 @@ namespace TBSMobile.View
                 };
 
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
                 var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                 if (response.IsSuccessStatusCode)
@@ -1815,8 +1817,7 @@ namespace TBSMobile.View
                                     };
                                 }
 
-                                HttpClient ph1client = new HttpClient();
-                                var ph1response = await ph1client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
+                                var ph1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
 
                                 if (ph1response.IsSuccessStatusCode)
                                 {
@@ -1863,9 +1864,8 @@ namespace TBSMobile.View
                                                         { "Path", File.ReadAllBytes(photo2url)}
                                                     };
                                                 }
-
-                                                HttpClient ph2client = new HttpClient();
-                                                var ph2response = await ph2client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
+                                                
+                                                var ph2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
 
                                                 if (ph2response.IsSuccessStatusCode)
                                                 {
@@ -1912,9 +1912,8 @@ namespace TBSMobile.View
                                                                         { "Path", File.ReadAllBytes(photo3url)}
                                                                     };
                                                                 }
-
-                                                                HttpClient ph3client = new HttpClient();
-                                                                var ph3response = await ph3client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
+                                                                
+                                                                var ph3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
 
                                                                 if (ph3response.IsSuccessStatusCode)
                                                                 {
@@ -1963,9 +1962,8 @@ namespace TBSMobile.View
                                                                                             { "Path", File.ReadAllBytes(videourl)}
                                                                                         };
                                                                                     }
-
-                                                                                    HttpClient vidclient = new HttpClient();
-                                                                                    var vidresponse = await vidclient.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
+                                                                                    
+                                                                                    var vidresponse = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
 
                                                                                     if (vidresponse.IsSuccessStatusCode)
                                                                                     {
@@ -2112,7 +2110,7 @@ namespace TBSMobile.View
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ vidresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                                                                         if (retry.Equals(true))
                                                                                         {
@@ -2260,7 +2258,7 @@ namespace TBSMobile.View
                                                                 }
                                                                 else
                                                                 {
-                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ ph3response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                                                     if (retry.Equals(true))
                                                                     {
@@ -2303,7 +2301,7 @@ namespace TBSMobile.View
                                                 }
                                                 else
                                                 {
-                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ ph2response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                                     if (retry.Equals(true))
                                                     {
@@ -2346,7 +2344,7 @@ namespace TBSMobile.View
                                 }
                                 else
                                 {
-                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ ph1response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                     if (retry.Equals(true))
                                     {
@@ -2389,7 +2387,7 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                     if (retry.Equals(true))
                     {

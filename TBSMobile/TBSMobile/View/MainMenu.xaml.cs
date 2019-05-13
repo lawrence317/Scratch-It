@@ -649,6 +649,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-contacts-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -807,7 +808,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -873,6 +874,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-contact-media-path-1-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -978,7 +980,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1044,6 +1046,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-contact-media-path-2-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1149,7 +1152,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1216,6 +1219,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-contact-media-path-3-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1321,7 +1325,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1387,6 +1391,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-contact-media-path-4-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1496,7 +1501,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1563,6 +1568,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-retailer-outlet-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1687,7 +1693,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1753,6 +1759,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1873,7 +1880,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -1936,6 +1943,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-media-path-1-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2043,7 +2051,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2109,6 +2117,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-media-path-2-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2215,7 +2224,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2281,6 +2290,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-media-path-3-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2386,7 +2396,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2452,6 +2462,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-media-path-4-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2562,7 +2573,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2628,6 +2639,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-caf-activity-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2727,7 +2739,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2793,6 +2805,7 @@ namespace TBSMobile.View
 
                 string apifile = "sync-email-recipient-client-update-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2892,7 +2905,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -2965,6 +2978,7 @@ namespace TBSMobile.View
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
                     HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
 
                     var datachanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = datachanges.Result.Count;
@@ -3060,7 +3074,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -3128,6 +3142,7 @@ namespace TBSMobile.View
 
                 string apifile = "resync-contacts-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3224,7 +3239,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -3290,6 +3305,7 @@ namespace TBSMobile.View
 
                 string apifile = "resync-reatiler-outlet-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3386,7 +3402,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -3452,6 +3468,7 @@ namespace TBSMobile.View
 
                 string apifile = "resync-caf-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3548,7 +3565,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -3614,6 +3631,7 @@ namespace TBSMobile.View
 
                 string apifile = "resync-caf-activity-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3718,7 +3736,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {
@@ -3784,6 +3802,7 @@ namespace TBSMobile.View
 
                 string apifile = "resync-email-recipient-api.php";
                 HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3880,7 +3899,7 @@ namespace TBSMobile.View
                             }
                             else
                             {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
                                 if (retry.Equals(true))
                                 {

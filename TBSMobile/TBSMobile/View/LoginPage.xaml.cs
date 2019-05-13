@@ -155,8 +155,6 @@ namespace TBSMobile.View
                 var password = entPassword.Text;
                 var ipaddress = entIPAddress.Text;
 
-
-
                 //Check if hostname, database, userName, password is not empty
                 if (string.IsNullOrEmpty(hostName) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(ipaddress) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
                 {
@@ -199,6 +197,8 @@ namespace TBSMobile.View
                         };
 
                         HttpClient client = new HttpClient();
+                        client.DefaultRequestHeaders.ConnectionClose = true;
+
                         var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
@@ -285,8 +285,7 @@ namespace TBSMobile.View
                                                 { "Username", userName}
                                             };
 
-                                            HttpClient trialclient = new HttpClient();
-                                            var trialresponse = await trialclient.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
+                                            var trialresponse = await client.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
 
                                             if (trialresponse.IsSuccessStatusCode)
                                             {
@@ -417,7 +416,7 @@ namespace TBSMobile.View
                         }
                         else
                         {
-                            var retry = await DisplayAlert("Application Error", "Login failed. Server is unreachable. Do you want to retry?", "Yes", "No");
+                            var retry = await DisplayAlert("Application Error", "Login failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode +" Do you want to retry?", "Yes", "No");
                             if (retry.Equals(true))
                             {
                                 Login();
