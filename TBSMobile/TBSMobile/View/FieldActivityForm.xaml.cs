@@ -156,7 +156,7 @@ namespace TBSMobile.View
             try
             {
                 var locator = CrossGeolocator.Current;
-                locator.DesiredAccuracy = 100;
+                locator.DesiredAccuracy = 200;
 
                 if (!locator.IsGeolocationAvailable)
                 {
