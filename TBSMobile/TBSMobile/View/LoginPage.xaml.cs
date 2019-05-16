@@ -58,18 +58,10 @@ namespace TBSMobile.View
 
         void Init() 
         {
-            var ipaddress = Preferences.Get("ipaddress", String.Empty, "private_prefs");
-            if (string.IsNullOrEmpty(ipaddress))
-            {
-                entIPAddress.Text = Constants.server_ip;
-            }
-            else
-            {
-                entIPAddress.Text = ipaddress;
-            }
+            entIPAddress.Text = "122.3.194.11";
 
             var host = Preferences.Get("host", String.Empty, "private_prefs");
-            if (string.IsNullOrEmpty(ipaddress))
+            if (string.IsNullOrEmpty(host))
             {
                 entHost.Text = Constants.hostname;
             }
@@ -79,7 +71,7 @@ namespace TBSMobile.View
             }
 
             var database = Preferences.Get("database", String.Empty, "private_prefs");
-            if (string.IsNullOrEmpty(ipaddress))
+            if (string.IsNullOrEmpty(database))
             {
                 entDatabase.Text = Constants.database;
             }
