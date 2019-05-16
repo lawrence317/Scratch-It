@@ -60,6 +60,7 @@ namespace TBSMobile.View
         {
             entIPAddress.Text = "122.3.194.11";
 
+
             var host = Preferences.Get("host", String.Empty, "private_prefs");
             if (string.IsNullOrEmpty(host))
             {
