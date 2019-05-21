@@ -31,7 +31,7 @@
                     <Frame StyleClass="loginframe" CornerRadius="5" BorderColor="Transparent" HasShadow="False">
                         <StackLayout>
                             <StackLayout x:Name="connectstack" IsVisible="False">
-                                <Label Text="Server IP Address" StyleClass="lbl-login">
+                                <Label Text="Server Domain/IP" StyleClass="lbl-login">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">
                                             <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>

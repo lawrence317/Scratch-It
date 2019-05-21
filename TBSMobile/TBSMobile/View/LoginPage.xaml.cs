@@ -58,8 +58,7 @@ namespace TBSMobile.View
 
         void Init() 
         {
-            entIPAddress.Text = "122.3.194.11";
-
+            entIPAddress.Text = "tbs.scratchit.ph";
 
             var host = Preferences.Get("host", String.Empty, "private_prefs");
             if (string.IsNullOrEmpty(host))
