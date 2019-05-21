@@ -3141,20 +3141,16 @@ namespace TBSMobile.View
                 lblStatus.Text = "Checking internet connection";
 
                 string apifile = "resync-contacts-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    lblStatus.Text = "Initializing contacts re-sync";
-
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
                     var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ?", 0);
+
+                    int count = 1;
 
                     var settings = new JsonSerializerSettings
                     {
@@ -3162,109 +3158,64 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    if (changesresultCount > 0)
+                    lblStatus.Text = "Getting contact data from the server";
+
+                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int clientupdate = 1;
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Checking contacts to server " + clientupdate + " out of " + changesresultCount;
+                            var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
+                            var datacount = dataresult.Count;
 
-                            var result = datachanges.Result[i];
-                            var contactID = result.ContactID;
-
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                            for (int i = 0; i < datacount; i++)
                             {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contactID }
-                            };
+                                lblStatus.Text = "Checking contacts " + count + " out of " + datacount;
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                var item = dataresult[i];
+                                var contactID = item.ContactID;
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var content = await response.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(content))
-                                {
-                                    try
-                                    {
-                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE ContactID = ?", 1, contactID);
 
-                                        var dataitem = dataresult[0];
-                                        var datamessage = dataitem.Message;
-
-                                        if (datamessage.Equals("Existed"))
-                                        {
-                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Checked = ? WHERE ContactID = ?", 1, contactID);
-
-                                            clientupdate++;
-                                        }
-                                        else if (datamessage.Equals("Not Existed"))
-                                        {
-                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ?, Checked = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), 1, contactID);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                ReSyncContacts(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            ReSyncContacts(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
+                                count++;
                             }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncContacts(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
+                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
                         }
-
-                        synccount += "Total synced client contacts update: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Re-synced data (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                        else
+                        {
+                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                        }
                     }
                     else
                     {
-                        ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncContacts(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
                     }
                 }
                 else
@@ -3296,28 +3247,24 @@ namespace TBSMobile.View
                 };
             }
         }
-        
+
         public async void ReSyncRetailerOutlet(string host, string database, string contact, string ipaddress)
         {
             try
             {
                 lblStatus.Text = "Checking internet connection";
 
-                string apifile = "resync-reatiler-outlet-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                string apifile = "resync-retailer-outlet-api.php";
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    lblStatus.Text = "Initializing retailer outlet re-sync";
-
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
                     var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ?", 0);
+
+                    int count = 1;
 
                     var settings = new JsonSerializerSettings
                     {
@@ -3325,109 +3272,64 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    if (changesresultCount > 0)
+                    lblStatus.Text = "Getting retailer outlet data from the server";
+
+                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int clientupdate = 1;
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Checking retailer outlet to server " + clientupdate + " out of " + changesresultCount;
+                            var dataresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
+                            var datacount = dataresult.Count;
 
-                            var result = datachanges.Result[i];
-                            var retailerCode = result.RetailerCode;
-
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                            for (int i = 0; i < datacount; i++)
                             {
-                                { "Host", host },
-                                { "Database", database },
-                                { "RetailerCode", retailerCode }
-                            };
+                                lblStatus.Text = "Checking retailer outlet " + count + " out of " + datacount;
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                var item = dataresult[i];
+                                var retailerCode = item.RetailerCode;
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var content = await response.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(content))
-                                {
-                                    try
-                                    {
-                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                                await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ? WHERE RetailerCode = ?", 1, retailerCode);
 
-                                        var dataitem = dataresult[0];
-                                        var datamessage = dataitem.Message;
-
-                                        if (datamessage.Equals("Existed"))
-                                        {
-                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE RetailerCode = ?", 1, retailerCode);
-                                            
-                                            clientupdate++;
-                                        }
-                                        else if (datamessage.Equals("Not Existed"))
-                                        {
-                                            await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ?, Checked = ? WHERE RetailerCode = ?", DateTime.Parse(default_datetime), 1, retailerCode);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                ReSyncRetailerOutlet(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
+                                count++;
                             }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
+                            await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncCAF(host, database, contact, ipaddress);
                         }
-
-                        synccount += "Total synced client retailer outlet update: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Re-synced data (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        ReSyncCAF(host, database, contact, ipaddress);
+                        else
+                        {
+                            ReSyncCAF(host, database, contact, ipaddress);
+                        }
                     }
                     else
                     {
-                        ReSyncCAF(host, database, contact, ipaddress);
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
                     }
                 }
                 else
@@ -3467,20 +3369,16 @@ namespace TBSMobile.View
                 lblStatus.Text = "Checking internet connection";
 
                 string apifile = "resync-caf-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    lblStatus.Text = "Initializing caf re-sync";
-
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND (Checked = '0' OR Checked = '')", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
                     var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ?", 0);
+
+                    int count = 1;
 
                     var settings = new JsonSerializerSettings
                     {
@@ -3488,109 +3386,64 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    if (changesresultCount > 0)
+                    lblStatus.Text = "Getting caf data from the server";
+
+                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int clientupdate = 1;
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Checking caf to server " + clientupdate + " out of " + changesresultCount;
+                            var dataresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
+                            var datacount = dataresult.Count;
 
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                            for (int i = 0; i < datacount; i++)
                             {
-                                { "Host", host },
-                                { "Database", database },
-                                { "CAFNo", cafNo }
-                            };
+                                lblStatus.Text = "Checking caf " + count + " out of " + datacount;
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                var item = dataresult[i];
+                                var cafNo = item.CAFNo;
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var content = await response.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(content))
-                                {
-                                    try
-                                    {
-                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                                await conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ? WHERE CAFNo = ?", 1, cafNo);
 
-                                        var dataitem = dataresult[0];
-                                        var datamessage = dataitem.Message;
-
-                                        if (datamessage.Equals("Existed"))
-                                        {
-                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
-
-                                            clientupdate++;
-                                        }
-                                        else if (datamessage.Equals("Not Existed"))
-                                        {
-                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ?, Checked = ? WHERE CAFNo = ?", DateTime.Parse(default_datetime), 1, cafNo);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                ReSyncCAF(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            ReSyncCAF(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
+                                count++;
                             }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncCAF(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
+                            await conn.QueryAsync<CAFData>("UPDATE tblCaf SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncCAFActivity(host, database, contact, ipaddress);
                         }
-
-                        synccount += "Total synced client caf update: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Re-synced data (<b>CAF</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        ReSyncCAFActivity(host, database, contact, ipaddress);
+                        else
+                        {
+                            ReSyncCAFActivity(host, database, contact, ipaddress);
+                        }
                     }
                     else
                     {
-                        ReSyncCAFActivity(host, database, contact, ipaddress);
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncCAF(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
                     }
                 }
                 else
@@ -3630,20 +3483,16 @@ namespace TBSMobile.View
                 lblStatus.Text = "Checking internet connection";
 
                 string apifile = "resync-caf-activity-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
-                    lblStatus.Text = "Initializing caf activity re-sync";
-
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
                     var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ?", 0);
+
+                    int count = 1;
 
                     var settings = new JsonSerializerSettings
                     {
@@ -3651,117 +3500,65 @@ namespace TBSMobile.View
                         MissingMemberHandling = MissingMemberHandling.Ignore
                     };
 
-                    if (changesresultCount > 0)
+                    lblStatus.Text = "Getting caf activity data from the server";
+
+                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
                     {
-                        int clientupdate = 1;
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
 
-                        for (int i = 0; i < changesresultCount; i++)
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            lblStatus.Text = "Checking caf activity to server " + clientupdate + " out of " + changesresultCount;
+                            var dataresult = JsonConvert.DeserializeObject<List<ActivityData>>(content, settings);
+                            var datacount = dataresult.Count;
 
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-                            var activityID = result.ActivityID;
-
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
+                            for (int i = 0; i < datacount; i++)
                             {
-                                { "Host", host },
-                                { "Database", database },
-                                { "CAFNo", cafNo },
-                                { "ContactID", contact },
-                                { "ActivityID", activityID }
-                            };
+                                lblStatus.Text = "Checking caf activity " + count + " out of " + datacount;
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                                var item = dataresult[i];
+                                var cafNo = item.CAFNo;
+                                var act = item.ActivityID;
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var content = await response.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(content))
-                                {
-                                    try
-                                    {
-                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                                await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ? WHERE CAFNo = ? AND ActivityID = ?", 1, cafNo, act);
 
-                                        var dataitem = dataresult[0];
-                                        var datamessage = dataitem.Message;
-
-                                        if (datamessage.Equals("Existed"))
-                                        {
-                                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE CAFNo = ?", 1, cafNo);
-
-                                            clientupdate++;
-                                        }
-                                        else if (datamessage.Equals("Not Existed"))
-                                        {
-                                            await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ?, Checked = ? WHERE CAFNo = ?", DateTime.Parse(default_datetime), 1, cafNo);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                ReSyncCAFActivity(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            ReSyncCAFActivity(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    lblStatus.Text = "Syncing failed. Failed to send the data.";
-                                    OnSyncFailed();
-                                }
+                                count++;
                             }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
 
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncCAFActivity(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
+                            await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
                         }
-
-                        synccount += "Total synced client caf activity update: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Re-synced data (<b>CAF Activity</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        ReSyncEmailRecipient(host, database, contact, ipaddress);
+                        else
+                        {
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                        }
                     }
                     else
                     {
-                        ReSyncEmailRecipient(host, database, contact, ipaddress);
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncCAFActivity(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
                     }
                 }
                 else
@@ -3786,169 +3583,6 @@ namespace TBSMobile.View
                 if (retry.Equals(true))
                 {
                     ReSyncCAFActivity(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void ReSyncEmailRecipient(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "resync-email-recipient-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing email recipient re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var default_datetime = "0001-01-01 00:00:00";
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Checking email recipient to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var contactsID = result.ContactID;
-
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                            string contentType = "application/json";
-                            JObject json = new JObject
-                            {
-                                { "Host", host },
-                                { "Database", database },
-                                { "ContactID", contactsID }
-                            };
-
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                            if (response.IsSuccessStatusCode)
-                            {
-                                var content = await response.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(content))
-                                {
-                                    try
-                                    {
-                                        var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                                        var dataitem = dataresult[0];
-                                        var datamessage = dataitem.Message;
-
-                                        if (datamessage.Equals("Existed"))
-                                        {
-                                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 1, contactsID);
-
-                                            clientupdate++;
-                                        }
-                                        else if (datamessage.Equals("Not Existed"))
-                                        {
-                                            await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ?, Checked = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), 1, contactsID);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                ReSyncEmailRecipient(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            ReSyncEmailRecipient(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncEmailRecipient(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced client email recipient update: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Re-synced data (<b>Email Recipient</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncContactsClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncContactsClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        ReSyncEmailRecipient(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    ReSyncEmailRecipient(host, database, contact, ipaddress);
                 }
                 else
                 {

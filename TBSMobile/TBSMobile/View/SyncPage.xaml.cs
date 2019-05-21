@@ -1275,7 +1275,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        ReSyncContacts(host, database, contact, ipaddress);
+                        SyncContactsClientUpdate(host, database, contact, ipaddress);
                     }
                 }
                 else
@@ -1304,140 +1304,6 @@ namespace TBSMobile.View
                 else
                 {
                     First_Time_OnSyncFailed();
-                };
-            }
-        }
-
-        public async void ReSyncContacts(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                syncStatus.Text = "Checking internet connection";
-
-                string apifile = "check-contacts-api.php";
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    syncStatus.Text = "Initializing contacts re-sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var default_datetime = "0001-01-01 00:00:00";
-                    int count = 1;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
-                    string contentType = "application/json";
-                    JObject json = new JObject
-                    {
-                        { "Host", host },
-                        { "Database", database },
-                        { "ContactID", contact }
-                    };
-
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
-
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            try
-                            {
-                                var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
-                                var datacount = dataresult.Count;
-
-                                for (int i = 0; i < datacount; i++)
-                                {
-                                    syncStatus.Text = "Checking contacts " + count + " out of " + datacount;
-
-                                    var item = dataresult[i];
-                                    var contactsID = item.ContactID;
-
-                                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(default_datetime), contactsID);
-
-                                    count++;
-                                }
-
-                                synccount += "Total checked contacts: " + count + "\n";
-
-                                var logType = "App Log";
-                                var log = "Initialized re-sync (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-
-                                SyncContactsClientUpdate(host, database, contact, ipaddress);
-                            }
-                            catch
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    ReSyncContacts(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            SyncContactsClientUpdate(host, database, contact, ipaddress);
-                        }
-                    }
-                    else
-                    {
-                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
-
-                        if (retry.Equals(true))
-                        {
-                            ReSyncContacts(host, database, contact, ipaddress);
-                        }
-                        else
-                        {
-                            OnSyncFailed();
-                        }
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        ReSyncContacts(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    ReSyncContacts(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
                 };
             }
         }
