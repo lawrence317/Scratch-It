@@ -717,7 +717,7 @@ namespace TBSMobile.View
                             var deleted = result.Deleted;
                             var lastUpdated = result.LastUpdated;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -904,7 +904,7 @@ namespace TBSMobile.View
                             var contactID = result.ContactID;
                             var media = result.MobilePhoto1;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -1076,7 +1076,7 @@ namespace TBSMobile.View
                             var contactID = result.ContactID;
                             var media = result.MobilePhoto2;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -1249,7 +1249,7 @@ namespace TBSMobile.View
                             var contactID = result.ContactID;
                             var media = result.MobilePhoto3;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -1423,7 +1423,7 @@ namespace TBSMobile.View
                             var contactID = result.ContactID;
                             var media = result.MobileVideo;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -1616,7 +1616,7 @@ namespace TBSMobile.View
                             var deleted = result.Deleted;
                             var lastUpdated = result.LastUpdated;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -1805,7 +1805,7 @@ namespace TBSMobile.View
                             var deleted = result.Deleted;
                             var lastUpdated = result.LastUpdated;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -1974,7 +1974,7 @@ namespace TBSMobile.View
                             var cafNo = result.CAFNo;
                             var media = result.MobilePhoto1;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -2148,7 +2148,7 @@ namespace TBSMobile.View
                             var cafNo = result.CAFNo;
                             var media = result.MobilePhoto2;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -2320,7 +2320,7 @@ namespace TBSMobile.View
                             var cafNo = result.CAFNo;
                             var media = result.MobilePhoto3;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -2494,7 +2494,7 @@ namespace TBSMobile.View
                             var cafNo = result.CAFNo;
                             var media = result.MobileVideo;
 
-                            var pathlink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string pathcontentType = "application/json";
 
                             JObject pathjson;
@@ -2675,7 +2675,7 @@ namespace TBSMobile.View
                             var lastupdated = result.LastUpdated;
                             var deleted = result.Deleted;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -2841,7 +2841,7 @@ namespace TBSMobile.View
                             var lastupdated = result.LastUpdated;
                             var deleted = result.Deleted;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -3009,7 +3009,7 @@ namespace TBSMobile.View
                             var lastupdated = result.LastUpdated;
                             var deleted = result.Deleted;
 
-                            var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                            var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                             string contentType = "application/json";
                             JObject json = new JObject
                             {
@@ -3160,7 +3160,7 @@ namespace TBSMobile.View
 
                     lblStatus.Text = "Getting contact data from the server";
 
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
                     {
@@ -3274,7 +3274,7 @@ namespace TBSMobile.View
 
                     lblStatus.Text = "Getting retailer outlet data from the server";
 
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
                     {
@@ -3388,7 +3388,7 @@ namespace TBSMobile.View
 
                     lblStatus.Text = "Getting caf data from the server";
 
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
                     {
@@ -3502,7 +3502,7 @@ namespace TBSMobile.View
 
                     lblStatus.Text = "Getting caf activity data from the server";
 
-                    var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                     string contentType = "application/json";
                     JObject json = new JObject
                     {

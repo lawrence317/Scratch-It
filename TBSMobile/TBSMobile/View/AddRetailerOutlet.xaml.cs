@@ -530,7 +530,7 @@ namespace TBSMobile.View
                 
                 string pathfile = "sync-retailer-outlet-client-update-api.php";
 
-                var url = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + pathfile;
+                var url = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {

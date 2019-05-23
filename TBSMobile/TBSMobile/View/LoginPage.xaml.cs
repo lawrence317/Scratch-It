@@ -177,7 +177,7 @@ namespace TBSMobile.View
                     {
                         string apifile = "login-api.php";
 
-                        var link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + apifile;
+                        var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
                         string contentType = "application/json";
                         JObject json = new JObject
                         {
@@ -266,7 +266,7 @@ namespace TBSMobile.View
 
                                             string trialapifile = "activate-trial-api.php";
 
-                                            var triallink = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + trialapifile;
+                                            var triallink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + trialapifile;
                                             string trialcontentType = "application/json";
                                             JObject trialjson = new JObject
                                             {

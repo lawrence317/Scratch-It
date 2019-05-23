@@ -1727,7 +1727,7 @@ namespace TBSMobile.View
                 
                 string pathfile = "sync-caf-directly-api.php";
 
-                var url = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + pathfile;
+                var url = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + pathfile;
                 string contentType = "application/json";
                 JObject json = new JObject
                 {
@@ -1790,7 +1790,7 @@ namespace TBSMobile.View
 
                                 string path1file = "sync-caf-media-path-1-client-update-api.php";
 
-                                var path1link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path1file;
+                                var path1link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + path1file;
                                 string ph1contentType = "application/json";
 
                                 JObject path1json;
@@ -1838,7 +1838,7 @@ namespace TBSMobile.View
 
                                                 string path2file = "sync-caf-media-path-2-client-update-api.php";
 
-                                                var path2link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path2file;
+                                                var path2link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + path2file;
                                                 string ph2contentType = "application/json";
 
                                                 JObject path2json;
@@ -1886,7 +1886,7 @@ namespace TBSMobile.View
 
                                                                 string path3file = "sync-caf-media-path-3-client-update-api.php";
 
-                                                                var path3link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path3file;
+                                                                var path3link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + path3file;
                                                                 string ph3contentType = "application/json";
 
                                                                 JObject path3json;
@@ -1936,7 +1936,7 @@ namespace TBSMobile.View
 
                                                                                     string path4file = "sync-caf-media-path-4-client-update-api.php";
 
-                                                                                    var path4link = "http://" + ipaddress + ":" + Constants.port + "/" + Constants.apifolder + "/api/" + path4file;
+                                                                                    var path4link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + path4file;
                                                                                     string vidcontentType = "application/json";
 
                                                                                     JObject path4json;
