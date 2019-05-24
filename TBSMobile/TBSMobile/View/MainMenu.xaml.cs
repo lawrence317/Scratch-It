@@ -3648,80 +3648,20 @@ namespace TBSMobile.View
 
                 lblStatus.Text = "Initializing data sync";
                 lblStatus.BackgroundColor = Color.FromHex("#27ae60");
-                
-                var checkcontactresult = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
-                var checkcontactcount = checkcontactresult.Result.Count;
-                
-                var checkretaileroutletresult = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND (Checked = '0' OR Checked = '')", contact);
-                var checkretaileroutletcount = checkretaileroutletresult.Result.Count;
-                
-                var checkcafresult = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND (Checked = '0' OR Checked = '')", contact);
-                var checkcafcount = checkcafresult.Result.Count;
-                
-                var checkactresult = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
-                var checkactcount = checkactresult.Result.Count;
-                
-                var checkemailresult = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND (Checked = '0' OR Checked = '')", contact);
-                var checkemailcount = checkemailresult.Result.Count;
 
-                if (checkcontactcount > 0 || checkretaileroutletcount > 0 || checkcafcount > 0 || checkactcount  > 0|| checkemailcount > 0)
-                {
-                    var action = await DisplayActionSheet("Resync Data", "Cancel", null, "Resync Unchecked Data", "Resync All Data");
+                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
+                await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
 
-                    if(action == "Resync Unchecked Data")
-                    {
-                        btnFAF.IsEnabled = false;
-                        btnAH.IsEnabled = false;
-                        btnLogout.IsEnabled = false;
-                        btnUI.IsEnabled = false;
-                        btnPR.IsEnabled = false;
-                        btnRetailer.IsEnabled = false;
-                        btnResend.IsEnabled = false;
+                btnFAF.IsEnabled = false;
+                btnAH.IsEnabled = false;
+                btnLogout.IsEnabled = false;
+                btnUI.IsEnabled = false;
+                btnPR.IsEnabled = false;
+                btnRetailer.IsEnabled = false;
+                btnResend.IsEnabled = false;
 
-                        ReSyncContacts(host, database, contact, ipaddress);
-                    }
-                    else if(action == "Resync All Data")
-                    {
-                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET  Checked = ? WHERE Supervisor = ?", 0, contact);
-                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE Supervisor = ?", 0, contact);
-                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE EmployeeID = ?", 0, contact);
-                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE ContactID = ?", 0, contact);
-                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 0, contact);
-
-                        btnFAF.IsEnabled = false;
-                        btnAH.IsEnabled = false;
-                        btnLogout.IsEnabled = false;
-                        btnUI.IsEnabled = false;
-                        btnPR.IsEnabled = false;
-                        btnRetailer.IsEnabled = false;
-                        btnResend.IsEnabled = false;
-
-                        ReSyncContacts(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var action = await DisplayActionSheet("Resync Data", "Cancel", null, "Resync All Data");
-
-                    if (action == "Resync All Data")
-                    {
-                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET  Checked = ? WHERE Supervisor = ?", 0, contact);
-                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Checked = ? WHERE Supervisor = ?", 0, contact);
-                        await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Checked = ? WHERE EmployeeID = ?", 0, contact);
-                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Checked = ? WHERE ContactID = ?", 0, contact);
-                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET Checked = ? WHERE ContactID = ?", 0, contact);
-
-                        btnFAF.IsEnabled = false;
-                        btnAH.IsEnabled = false;
-                        btnLogout.IsEnabled = false;
-                        btnUI.IsEnabled = false;
-                        btnPR.IsEnabled = false;
-                        btnRetailer.IsEnabled = false;
-                        btnResend.IsEnabled = false;
-
-                        ReSyncContacts(host, database, contact, ipaddress);
-                    }
-                }
+                ReSyncContacts(host, database, contact, ipaddress);
             }
             else
             {
