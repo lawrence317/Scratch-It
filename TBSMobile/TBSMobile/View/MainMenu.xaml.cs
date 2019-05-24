@@ -24,7 +24,7 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        string synccount;
+        string synccount = "Sync Summary: \n\n";
 
         public MainMenu(string host, string database, string contact, string ipaddress)
         {
@@ -3132,6 +3132,465 @@ namespace TBSMobile.View
             }
         }
 
+        // ------------------------------ Re-Sync All Function ------------------------------ //
+
+        public async void ReSyncAllContacts(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-contacts-api.php";
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ?", 0);
+
+                    int count = 1;
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    lblStatus.Text = "Getting contact data from the server";
+
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            var dataresult = JsonConvert.DeserializeObject<List<ContactsData>>(content, settings);
+                            var datacount = dataresult.Count;
+
+                            for (int i = 0; i < datacount; i++)
+                            {
+                                lblStatus.Text = "Checking contacts " + count + " out of " + datacount;
+
+                                var item = dataresult[i];
+                                var contactID = item.ContactID;
+
+                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE ContactID = ?", 1, contactID);
+
+                                count++;
+                            }
+
+                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncAllRetailerOutlet(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            ReSyncAllRetailerOutlet(host, database, contact, ipaddress);
+                        }
+                    }
+                    else
+                    {
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncAllContacts(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncAllContacts(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncAllContacts(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        public async void ReSyncAllRetailerOutlet(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-retailer-outlet-api.php";
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ?", 0);
+
+                    int count = 1;
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    lblStatus.Text = "Getting retailer outlet data from the server";
+
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            var dataresult = JsonConvert.DeserializeObject<List<RetailerGroupData>>(content, settings);
+                            var datacount = dataresult.Count;
+
+                            for (int i = 0; i < datacount; i++)
+                            {
+                                lblStatus.Text = "Checking retailer outlet " + count + " out of " + datacount;
+
+                                var item = dataresult[i];
+                                var retailerCode = item.RetailerCode;
+
+                                await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ? WHERE RetailerCode = ?", 1, retailerCode);
+
+                                count++;
+                            }
+
+                            await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncAllCAF(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            ReSyncAllCAF(host, database, contact, ipaddress);
+                        }
+                    }
+                    else
+                    {
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncAllRetailerOutlet(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncAllRetailerOutlet(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncAllRetailerOutlet(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        public async void ReSyncAllCAF(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-caf-api.php";
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ?", 0);
+
+                    int count = 1;
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    lblStatus.Text = "Getting caf data from the server";
+
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            var dataresult = JsonConvert.DeserializeObject<List<CAFData>>(content, settings);
+                            var datacount = dataresult.Count;
+
+                            for (int i = 0; i < datacount; i++)
+                            {
+                                lblStatus.Text = "Checking caf " + count + " out of " + datacount;
+
+                                var item = dataresult[i];
+                                var cafNo = item.CAFNo;
+
+                                await conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ? WHERE CAFNo = ?", 1, cafNo);
+
+                                count++;
+                            }
+
+                            await conn.QueryAsync<CAFData>("UPDATE tblCaf SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            ReSyncAllCAFActivity(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            ReSyncAllCAFActivity(host, database, contact, ipaddress);
+                        }
+                    }
+                    else
+                    {
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncAllCAF(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncAllCAF(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncAllCAF(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
+        public async void ReSyncAllCAFActivity(string host, string database, string contact, string ipaddress)
+        {
+            try
+            {
+                lblStatus.Text = "Checking internet connection";
+
+                string apifile = "resync-caf-activity-api.php";
+
+                if (CrossConnectivity.Current.IsConnected)
+                {
+                    var db = DependencyService.Get<ISQLiteDB>();
+                    var conn = db.GetConnection();
+                    var default_datetime = "0001-01-01 00:00:00";
+
+                    await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ?", 0);
+
+                    int count = 1;
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    };
+
+                    lblStatus.Text = "Getting caf activity data from the server";
+
+                    var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
+                    string contentType = "application/json";
+                    JObject json = new JObject
+                    {
+                        { "Host", host },
+                        { "Database", database },
+                        { "ContactID", contact }
+                    };
+
+                    HttpClient client = new HttpClient();
+                    client.DefaultRequestHeaders.ConnectionClose = true;
+
+                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            var dataresult = JsonConvert.DeserializeObject<List<ActivityData>>(content, settings);
+                            var datacount = dataresult.Count;
+
+                            for (int i = 0; i < datacount; i++)
+                            {
+                                lblStatus.Text = "Checking caf activity " + count + " out of " + datacount;
+
+                                var item = dataresult[i];
+                                var cafNo = item.CAFNo;
+                                var act = item.ActivityID;
+
+                                await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ? WHERE CAFNo = ? AND ActivityID = ?", 1, cafNo, act);
+
+                                count++;
+                            }
+
+                            await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
+
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                        }
+                    }
+                    else
+                    {
+                        var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                        if (retry.Equals(true))
+                        {
+                            ReSyncAllCAFActivity(host, database, contact, ipaddress);
+                        }
+                        else
+                        {
+                            OnSyncFailed();
+                        }
+                    }
+                }
+                else
+                {
+                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry.Equals(true))
+                    {
+                        ReSyncAllCAFActivity(host, database, contact, ipaddress);
+                    }
+                    else
+                    {
+                        OnSyncFailed();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
+
+                if (retry.Equals(true))
+                {
+                    ReSyncAllCAFActivity(host, database, contact, ipaddress);
+                }
+                else
+                {
+                    OnSyncFailed();
+                };
+            }
+        }
+
         // ------------------------------ Re-Sync Function ------------------------------ //
 
         public async void ReSyncContacts(string host, string database, string contact, string ipaddress)
@@ -3197,11 +3656,11 @@ namespace TBSMobile.View
 
                             await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
 
-                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
                         }
                         else
                         {
-                            ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                            SyncContactsClientUpdate(host, database, contact, ipaddress);
                         }
                     }
                     else
@@ -3311,11 +3770,11 @@ namespace TBSMobile.View
 
                             await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
 
-                            ReSyncCAF(host, database, contact, ipaddress);
+                            SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
                         }
                         else
                         {
-                            ReSyncCAF(host, database, contact, ipaddress);
+                            SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
                         }
                     }
                     else
@@ -3425,11 +3884,11 @@ namespace TBSMobile.View
 
                             await conn.QueryAsync<CAFData>("UPDATE tblCaf SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
 
-                            ReSyncCAFActivity(host, database, contact, ipaddress);
+                            SyncCAFClientUpdate(host, database, contact, ipaddress);
                         }
                         else
                         {
-                            ReSyncCAFActivity(host, database, contact, ipaddress);
+                            SyncCAFClientUpdate(host, database, contact, ipaddress);
                         }
                     }
                     else
@@ -3540,11 +3999,11 @@ namespace TBSMobile.View
 
                             await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
 
-                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                            SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
                         }
                         else
                         {
-                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                            SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
                         }
                     }
                     else
@@ -3595,7 +4054,15 @@ namespace TBSMobile.View
         {
             if (CrossConnectivity.Current.IsConnected)
             {
-                DisplayAlert("Sync Completed", "Sync Summary: \n\n" + synccount, "Ok");
+                if (synccount == "Sync Summary: \n\n")
+                {
+                    DisplayAlert("Sync Completed", "Data has been synced successfully", "Ok");
+                }
+                else
+                {
+                    DisplayAlert("Sync Completed", synccount, "Ok");
+                }
+                
                 synccount = "";
                 lblStatus.Text = "Online - Connected to server";
                 lblStatus.BackgroundColor = Color.FromHex("#2ecc71");
@@ -3646,22 +4113,46 @@ namespace TBSMobile.View
                 var db = DependencyService.Get<ISQLiteDB>();
                 var conn = db.GetConnection();
 
-                lblStatus.Text = "Initializing data sync";
-                lblStatus.BackgroundColor = Color.FromHex("#27ae60");
+                string action = await DisplayActionSheet("What data do you want to sync?", "Cancel", null, "All Data", "Retailer Data", "Retailer Outlet Data", "CAF Data", "CAF Activity Data");
 
-                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
-                await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
-                await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
+                if(action == "All Data")
+                {
+                    Disable_ui();
+                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                    await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
+                    await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
 
-                btnFAF.IsEnabled = false;
-                btnAH.IsEnabled = false;
-                btnLogout.IsEnabled = false;
-                btnUI.IsEnabled = false;
-                btnPR.IsEnabled = false;
-                btnRetailer.IsEnabled = false;
-                btnResend.IsEnabled = false;
+                    ReSyncAllContacts(host, database, contact, ipaddress);
+                }
+                else if(action == "Retailer Data")
+                {
+                    Disable_ui();
+                    await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
 
-                ReSyncContacts(host, database, contact, ipaddress);
+                    ReSyncContacts(host, database, contact, ipaddress);
+                }
+                else if (action == "Retailer Outlet Data")
+                {
+                    Disable_ui();
+                    await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
+
+                    ReSyncRetailerOutlet(host, database, contact, ipaddress);
+                }
+                else if (action == "CAF Data")
+                {
+                    Disable_ui();
+                    await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
+
+                    ReSyncCAF(host, database, contact, ipaddress);
+                }
+                else if (action == "CAF Activity Data")
+                {
+                    Disable_ui();
+                    await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
+
+                    ReSyncCAFActivity(host, database, contact, ipaddress);
+                }
             }
             else
             {
@@ -3689,6 +4180,20 @@ namespace TBSMobile.View
             };
 
             await conn.InsertOrReplaceAsync(logs_insert);
+        }
+
+        public void Disable_ui()
+        {
+            lblStatus.Text = "Initializing data sync";
+            lblStatus.BackgroundColor = Color.FromHex("#27ae60");
+
+            btnFAF.IsEnabled = false;
+            btnAH.IsEnabled = false;
+            btnLogout.IsEnabled = false;
+            btnUI.IsEnabled = false;
+            btnPR.IsEnabled = false;
+            btnRetailer.IsEnabled = false;
+            btnResend.IsEnabled = false;
         }
     }
 }
