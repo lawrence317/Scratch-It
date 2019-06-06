@@ -29,8 +29,7 @@ namespace TBSMobile.Droid
             LoadApplication(new App());
 
             AppCenter.Start("423c8020-f1af-4fba-b62f-c07e1fb382b6", typeof(Analytics), typeof(Crashes), typeof(Distribute));
-
-
+            
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
             {
                 if (CheckSelfPermission(Manifest.Permission.AccessCoarseLocation) != (int)Permission.Granted)
