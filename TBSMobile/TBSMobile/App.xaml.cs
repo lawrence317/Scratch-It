@@ -22,11 +22,11 @@ namespace TBSMobile
 
 		protected override void OnStart ()
 		{
+            Distribute.ReleaseAvailable = OnReleaseAvailable;
+
             AppCenter.Start("android=423c8020-f1af-4fba-b62f-c07e1fb382b6;", typeof(Analytics), typeof(Crashes), typeof(Distribute));
             Analytics.SetEnabledAsync(true);
             Distribute.SetEnabledAsync(true);
-
-            Distribute.ReleaseAvailable = OnReleaseAvailable;
         }
 
         bool OnReleaseAvailable(ReleaseDetails releaseDetails)
