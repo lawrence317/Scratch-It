@@ -27,7 +27,6 @@ namespace TBSMobile.View
         protected async override void OnAppearing()
         {
             base.OnAppearing();
-            //CreateTableAsync();
             var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
             if (string.IsNullOrEmpty(appdate))
@@ -58,6 +57,7 @@ namespace TBSMobile.View
 
         void Init() 
         {
+            CreateTableAsync();
             entIPAddress.Text = "tbs.scratchit.ph";
 
             var host = Preferences.Get("host", String.Empty, "private_prefs");
@@ -482,7 +482,7 @@ namespace TBSMobile.View
 
                         Preferences.Set("latestversion", message, "private_prefs");
 
-                        if (!message.Equals(Constants.appversion))
+                        if (!message.Equals(VersionTracking.CurrentVersion))
                         {
                             var answer = await DisplayAlert("Application Error", "Your application is out-of-date, please download the new version to continue", "Donwload and Install", "Cancel");
                             if (answer.Equals(true))
@@ -501,7 +501,7 @@ namespace TBSMobile.View
             {
                 var latestversion = Preferences.Get("latestversion", String.Empty, "private_prefs");
 
-                if (!latestversion.Equals(Constants.appversion))
+                if (!latestversion.Equals(VersionTracking.CurrentVersion))
                 {
                     var answer = await DisplayAlert("Application Error", "Your application is out-of-date, please download the new version to continue", "Donwload and Install", "Cancel");
                     if (answer.Equals(true))
