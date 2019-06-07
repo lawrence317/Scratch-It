@@ -9,7 +9,7 @@ namespace TBSMobile.Data
     public class Constants
     {
         public static string hostname = "LOCALHOST";
-        public static string database = "DEMO";
+        public static string database = "LIVE";
         public static string port = "7777";
         public static string apifolder = "TBSApp";
 
