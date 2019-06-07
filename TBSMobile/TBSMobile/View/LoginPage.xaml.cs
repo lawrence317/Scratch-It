@@ -27,7 +27,7 @@ namespace TBSMobile.View
         protected async override void OnAppearing()
         {
             base.OnAppearing();
-            CreateTableAsync();
+            //CreateTableAsync();
             var appdate = Preferences.Get("appdatetime", String.Empty, "private_prefs");
 
             if (string.IsNullOrEmpty(appdate))
@@ -44,7 +44,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                        btnLogin.IsEnabled = false;
+                       btnLogin.IsEnabled = false;
                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                     }
                 }
@@ -87,7 +87,7 @@ namespace TBSMobile.View
             entPassword.Text = password;
 
             entUser.Completed += (s, e) => entPassword.Focus();
-            entPassword.Completed += (s, e) => Login();
+            entPassword.Completed += (s, e) => Check_Version();
             lblVersion.Text = Constants.appversion;
             lblRegistrationCode.Text = "Device ID: " + CrossDeviceInfo.Current.Id;
         }
@@ -440,6 +440,82 @@ namespace TBSMobile.View
                 };
             }
         }
+        
+        public async void Check_Version()
+        {
+            if (CrossConnectivity.Current.IsConnected)
+            {
+                string apifile = "check-version-api.php";
+
+                var hostName = entHost.Text;
+                var database = entDatabase.Text;
+                var ipaddress = entIPAddress.Text;
+
+                var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
+                string contentType = "application/json";
+                JObject json = new JObject
+                {
+                    { "Host", hostName },
+                    { "Database", database }
+                };
+
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
+                var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+
+                        var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+
+                        var item = loginresult[0];
+                        var message = item.Message;
+
+                        Preferences.Set("latestversion", message, "private_prefs");
+
+                        if (!message.Equals(Constants.appversion))
+                        {
+                            var answer = await DisplayAlert("Application Error", "Your application is out-of-date, please download the new version to continue", "Donwload and Install", "Cancel");
+                            if (answer.Equals(true))
+                            {
+                                Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
+                            }
+                        }
+                        else
+                        {
+                            Login();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var latestversion = Preferences.Get("latestversion", String.Empty, "private_prefs");
+
+                if (!latestversion.Equals(Constants.appversion))
+                {
+                    var answer = await DisplayAlert("Application Error", "Your application is out-of-date, please download the new version to continue", "Donwload and Install", "Cancel");
+                    if (answer.Equals(true))
+                    {
+                        Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
+                    }
+                }
+                else
+                {
+                    Login();
+                }
+                
+            }
+        }
 
         public async void Offline_Login()
         {
@@ -691,7 +767,7 @@ namespace TBSMobile.View
 
         private void btnLogin_Clicked(object sender, EventArgs e)
         {
-            Login();
+            Check_Version();
         }
 
         private void entUser_Unfocused(object sender, FocusEventArgs e)
