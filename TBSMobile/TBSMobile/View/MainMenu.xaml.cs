@@ -775,7 +775,340 @@ namespace TBSMobile.View
 
                                         if (datamessage.Equals("Inserted"))
                                         {
-                                            clientupdate++;
+                                            string apifile1 = "sync-contact-media-path-1-client-update-api.php";
+
+                                            var path1link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile1;
+
+                                            JObject path1json;
+                                            bool path1doesExist = File.Exists(mobilePhoto1);
+
+                                            if (!path1doesExist || string.IsNullOrEmpty(mobilePhoto1))
+                                            {
+                                                path1json = new JObject
+                                                {
+                                                    { "Host", host },
+                                                    { "Database", database },
+                                                    { "MediaID", contactID},
+                                                    { "Path", ""}
+                                                };
+                                            }
+                                            else
+                                            {
+                                                path1json = new JObject
+                                                {
+                                                    { "Host", host },
+                                                    { "Database", database },
+                                                    { "MediaID", contactID},
+                                                    { "Path", File.ReadAllBytes(mobilePhoto1)}
+                                                };
+                                            }
+
+                                            var path1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
+
+                                            if (path1response.IsSuccessStatusCode)
+                                            {
+                                                var path1content = await path1response.Content.ReadAsStringAsync();
+                                                if (!string.IsNullOrEmpty(path1content))
+                                                {
+                                                    try
+                                                    {
+                                                        var path1result = JsonConvert.DeserializeObject<List<ServerMessage>>(path1content, settings);
+
+                                                        var path1item = path1result[0];
+                                                        var path1message = path1item.Message;
+
+                                                        if (path1message.Equals("Inserted"))
+                                                        {
+                                                            string apifile2 = "sync-contact-media-path-2-client-update-api.php";
+
+                                                            var path2link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile2;
+
+                                                            JObject path2json;
+                                                            bool path2doesExist = File.Exists(mobilePhoto2);
+
+                                                            if (!path2doesExist || string.IsNullOrEmpty(mobilePhoto2))
+                                                            {
+                                                                path2json = new JObject
+                                                                {
+                                                                    { "Host", host },
+                                                                    { "Database", database },
+                                                                    { "MediaID", contactID},
+                                                                    { "Path", ""}
+                                                                };
+                                                            }
+                                                            else
+                                                            {
+                                                                path2json = new JObject
+                                                                {
+                                                                    { "Host", host },
+                                                                    { "Database", database },
+                                                                    { "MediaID", contactID},
+                                                                    { "Path", File.ReadAllBytes(mobilePhoto2)}
+                                                                };
+                                                            }
+
+                                                            var path2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
+
+                                                            if (path2response.IsSuccessStatusCode)
+                                                            {
+                                                                var path2content = await path2response.Content.ReadAsStringAsync();
+                                                                if (!string.IsNullOrEmpty(path2content))
+                                                                {
+                                                                    try
+                                                                    {
+                                                                        var path2result = JsonConvert.DeserializeObject<List<ServerMessage>>(path2content, settings);
+
+                                                                        var path2item = path2result[0];
+                                                                        var path2message = path2item.Message;
+
+                                                                        if (path2message.Equals("Inserted"))
+                                                                        {
+                                                                            string apifile3 = "sync-contact-media-path-3-client-update-api.php";
+
+                                                                            var path3link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile3;
+
+                                                                            JObject path3json;
+                                                                            bool path3doesExist = File.Exists(mobilePhoto3);
+
+                                                                            if (!path3doesExist || string.IsNullOrEmpty(mobilePhoto3))
+                                                                            {
+                                                                                path3json = new JObject
+                                                                                {
+                                                                                    { "Host", host },
+                                                                                    { "Database", database },
+                                                                                    { "MediaID", contactID},
+                                                                                    { "Path", ""}
+                                                                                };
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                path3json = new JObject
+                                                                                {
+                                                                                    { "Host", host },
+                                                                                    { "Database", database },
+                                                                                    { "MediaID", contactID},
+                                                                                    { "Path", File.ReadAllBytes(mobilePhoto3)}
+                                                                                };
+                                                                            }
+
+                                                                            var path3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
+
+                                                                            if (path3response.IsSuccessStatusCode)
+                                                                            {
+                                                                                var path3content = await path3response.Content.ReadAsStringAsync();
+                                                                                if (!string.IsNullOrEmpty(path3content))
+                                                                                {
+                                                                                    try
+                                                                                    {
+                                                                                        var path3result = JsonConvert.DeserializeObject<List<ServerMessage>>(path3content, settings);
+
+                                                                                        var path3item = path3result[0];
+                                                                                        var path3message = path3item.Message;
+
+                                                                                        if (path3message.Equals("Inserted"))
+                                                                                        {
+                                                                                            if (String.IsNullOrEmpty(mobileVideo))
+                                                                                            {
+                                                                                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
+
+                                                                                                clientupdate++;
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                string apifile4 = "sync-contact-media-path-4-client-update-api.php";
+
+                                                                                                var path4link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile4;
+
+                                                                                                JObject path4json;
+                                                                                                bool path4doesExist = File.Exists(mobileVideo);
+
+                                                                                                if (!path4doesExist || string.IsNullOrEmpty(mobileVideo))
+                                                                                                {
+                                                                                                    path4json = new JObject
+                                                                                                    {
+                                                                                                        { "Host", host },
+                                                                                                        { "Database", database },
+                                                                                                        { "MediaID", contactID},
+                                                                                                        { "Path", ""}
+                                                                                                    };
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    path4json = new JObject
+                                                                                                    {
+                                                                                                        { "Host", host },
+                                                                                                        { "Database", database },
+                                                                                                        { "MediaID", contactID},
+                                                                                                        { "Path", File.ReadAllBytes(mobileVideo)}
+                                                                                                    };
+                                                                                                }
+
+                                                                                                var path4response = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
+
+                                                                                                if (path4response.IsSuccessStatusCode)
+                                                                                                {
+                                                                                                    var path4content = await path4response.Content.ReadAsStringAsync();
+                                                                                                    if (!string.IsNullOrEmpty(path4content))
+                                                                                                    {
+                                                                                                        try
+                                                                                                        {
+                                                                                                            var path4result = JsonConvert.DeserializeObject<List<ServerMessage>>(path4content, settings);
+
+                                                                                                            var path4item = path4result[0];
+                                                                                                            var path4message = path4item.Message;
+
+                                                                                                            if (path4message.Equals("Inserted"))
+                                                                                                            {
+                                                                                                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
+
+                                                                                                                clientupdate++;
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path4message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                                if (retry.Equals(true))
+                                                                                                                {
+                                                                                                                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                                                }
+                                                                                                                else
+                                                                                                                {
+                                                                                                                    OnSyncFailed();
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                        catch
+                                                                                                        {
+                                                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path4content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                            if (retry.Equals(true))
+                                                                                                            {
+                                                                                                                SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                OnSyncFailed();
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path3message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                    if (retry.Equals(true))
+                                                                                                    {
+                                                                                                        SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        OnSyncFailed();
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path3message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                            if (retry.Equals(true))
+                                                                                            {
+                                                                                                SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                OnSyncFailed();
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    catch
+                                                                                    {
+                                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path3content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                        if (retry.Equals(true))
+                                                                                        {
+                                                                                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            OnSyncFailed();
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path2message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                if (retry.Equals(true))
+                                                                                {
+                                                                                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    OnSyncFailed();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    catch
+                                                                    {
+                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path2content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                        if (retry.Equals(true))
+                                                                        {
+                                                                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            OnSyncFailed();
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path1message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                if (retry.Equals(true))
+                                                                {
+                                                                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                                }
+                                                                else
+                                                                {
+                                                                    OnSyncFailed();
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    catch
+                                                    {
+                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path1content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                        if (retry.Equals(true))
+                                                        {
+                                                            SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                        }
+                                                        else
+                                                        {
+                                                            OnSyncFailed();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + path1response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                                                if (retry.Equals(true))
+                                                {
+                                                    SyncContactsClientUpdate(host, database, contact, ipaddress);
+                                                }
+                                                else
+                                                {
+                                                    OnSyncFailed();
+                                                }
+                                            }
                                         }
                                         else
                                         {
@@ -829,11 +1162,11 @@ namespace TBSMobile.View
 
                         Save_Logs(contact, logType, log, database, logdeleted);
 
-                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
                     }
                     else
                     {
-                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
+                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
                     }
                 }
                 else
@@ -858,700 +1191,6 @@ namespace TBSMobile.View
                 if (retry.Equals(true))
                 {
                     SyncContactsClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncContactsMedia1ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-contact-media-path-1-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing contacts image 1 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending contacts image 1 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var contactID = result.ContactID;
-                            var media = result.MobilePhoto1;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced contacts image 1: " + (clientupdate - 1) + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncContactsMedia1ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncContactsMedia2ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-contact-media-path-2-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing contacts image 2 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending contacts media 2 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var contactID = result.ContactID;
-                            var media = result.MobilePhoto2;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced contacts image 2: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-
-                    }
-                    else
-                    {
-                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncContactsMedia2ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncContactsMedia3ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-contact-media-path-3-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing contacts image 3 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending contacts image 3 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var contactID = result.ContactID;
-                            var media = result.MobilePhoto3;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced contacts image 3: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Image 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncContactsMedia3ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncContactsMedia4ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-contact-media-path-4-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing contacts video changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending contacts video to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var contactID = result.ContactID;
-                            var media = result.MobileVideo;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", contactID},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactID);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced contacts video: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>Contacts Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
-
-                    }
-                    else
-                    {
-                        SyncRetailerOutletClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncContactsMedia4ClientUpdate(host, database, contact, ipaddress);
                 }
                 else
                 {
@@ -1847,7 +1486,370 @@ namespace TBSMobile.View
 
                                         if (datamessage.Equals("Inserted"))
                                         {
-                                            clientupdate++;
+                                            string apifile1 = "sync-caf-media-path-1-client-update-api.php";
+
+                                            var path1link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile1;
+
+                                            JObject path1json;
+                                            bool path1doesExist = File.Exists(mobilePhoto1);
+
+                                            if (!path1doesExist || string.IsNullOrEmpty(mobilePhoto1))
+                                            {
+                                                path1json = new JObject
+                                                {
+                                                    { "Host", host },
+                                                    { "Database", database },
+                                                    { "MediaID", cafNo},
+                                                    { "Path", ""}
+                                                };
+                                            }
+                                            else
+                                            {
+                                                path1json = new JObject
+                                                {
+                                                    { "Host", host },
+                                                    { "Database", database },
+                                                    { "MediaID", cafNo},
+                                                    { "Path", File.ReadAllBytes(mobilePhoto1)}
+                                                };
+                                            }
+
+                                            var path1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
+
+                                            if (path1response.IsSuccessStatusCode)
+                                            {
+                                                var path1content = await path1response.Content.ReadAsStringAsync();
+                                                if (!string.IsNullOrEmpty(path1content))
+                                                {
+                                                    try
+                                                    {
+                                                        var path1result = JsonConvert.DeserializeObject<List<ServerMessage>>(path1content, settings);
+
+                                                        var path1item = path1result[0];
+                                                        var path1message = path1item.Message;
+
+                                                        if (path1message.Equals("Inserted"))
+                                                        {
+                                                            string apifile2 = "sync-caf-media-path-2-client-update-api.php";
+
+                                                            var path2link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile2;
+
+                                                            JObject path2json;
+                                                            bool path2doesExist = File.Exists(mobilePhoto2);
+
+                                                            if (!path2doesExist || string.IsNullOrEmpty(mobilePhoto2))
+                                                            {
+                                                                path2json = new JObject
+                                                                {
+                                                                    { "Host", host },
+                                                                    { "Database", database },
+                                                                    { "MediaID", cafNo},
+                                                                    { "Path", ""}
+                                                                };
+                                                            }
+                                                            else
+                                                            {
+                                                                path2json = new JObject
+                                                                {
+                                                                    { "Host", host },
+                                                                    { "Database", database },
+                                                                    { "MediaID", cafNo},
+                                                                    { "Path", File.ReadAllBytes(mobilePhoto2)}
+                                                                };
+                                                            }
+
+                                                            var path2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
+
+                                                            if (path2response.IsSuccessStatusCode)
+                                                            {
+                                                                var path2content = await path2response.Content.ReadAsStringAsync();
+                                                                if (!string.IsNullOrEmpty(path2content))
+                                                                {
+                                                                    try
+                                                                    {
+                                                                        var path2result = JsonConvert.DeserializeObject<List<ServerMessage>>(path2content, settings);
+
+                                                                        var path2item = path2result[0];
+                                                                        var path2message = path2item.Message;
+
+                                                                        if (path2message.Equals("Inserted"))
+                                                                        {
+                                                                            string apifile3 = "sync-caf-media-path-3-client-update-api.php";
+
+                                                                            var path3link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile3;
+
+                                                                            JObject path3json;
+                                                                            bool path3doesExist = File.Exists(mobilePhoto3);
+
+                                                                            if (!path3doesExist || string.IsNullOrEmpty(mobilePhoto3))
+                                                                            {
+                                                                                path3json = new JObject
+                                                                                {
+                                                                                    { "Host", host },
+                                                                                    { "Database", database },
+                                                                                    { "MediaID", cafNo},
+                                                                                    { "Path", ""}
+                                                                                };
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                path3json = new JObject
+                                                                                {
+                                                                                    { "Host", host },
+                                                                                    { "Database", database },
+                                                                                    { "MediaID", cafNo},
+                                                                                    { "Path", File.ReadAllBytes(mobilePhoto3)}
+                                                                                };
+                                                                            }
+
+                                                                            var path3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
+
+                                                                            if (path3response.IsSuccessStatusCode)
+                                                                            {
+                                                                                var path3content = await path3response.Content.ReadAsStringAsync();
+                                                                                if (!string.IsNullOrEmpty(path3content))
+                                                                                {
+                                                                                    try
+                                                                                    {
+                                                                                        var path3result = JsonConvert.DeserializeObject<List<ServerMessage>>(path3content, settings);
+
+                                                                                        var path3item = path3result[0];
+                                                                                        var path3message = path3item.Message;
+
+                                                                                        if (path3message.Equals("Inserted"))
+                                                                                        {
+                                                                                            if (String.IsNullOrEmpty(mobileVideo))
+                                                                                            {
+                                                                                                await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
+
+                                                                                                clientupdate++;
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                string apifile4 = "sync-caf-media-path-4-client-update-api.php";
+
+                                                                                                var path4link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile4;
+
+                                                                                                JObject path4json;
+                                                                                                bool path4doesExist = File.Exists(mobileVideo);
+
+                                                                                                if (!path4doesExist || string.IsNullOrEmpty(mobileVideo))
+                                                                                                {
+                                                                                                    path4json = new JObject
+                                                                                                    {
+                                                                                                        { "Host", host },
+                                                                                                        { "Database", database },
+                                                                                                        { "MediaID", cafNo},
+                                                                                                        { "Path", ""}
+                                                                                                    };
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    path4json = new JObject
+                                                                                                    {
+                                                                                                        { "Host", host },
+                                                                                                        { "Database", database },
+                                                                                                        { "MediaID", cafNo},
+                                                                                                        { "Path", File.ReadAllBytes(mobileVideo)}
+                                                                                                    };
+                                                                                                }
+
+                                                                                                var path4response = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
+
+                                                                                                if (path4response.IsSuccessStatusCode)
+                                                                                                {
+                                                                                                    var path4content = await path4response.Content.ReadAsStringAsync();
+                                                                                                    if (!string.IsNullOrEmpty(path4content))
+                                                                                                    {
+                                                                                                        try
+                                                                                                        {
+                                                                                                            var path4result = JsonConvert.DeserializeObject<List<ServerMessage>>(path4content, settings);
+
+                                                                                                            var path4item = path4result[0];
+                                                                                                            var path4message = path4item.Message;
+
+                                                                                                            if (path4message.Equals("Inserted"))
+                                                                                                            {
+                                                                                                                await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
+
+                                                                                                                clientupdate++;
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path4message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                                if (retry.Equals(true))
+                                                                                                                {
+                                                                                                                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                                                }
+                                                                                                                else
+                                                                                                                {
+                                                                                                                    OnSyncFailed();
+                                                                                                                };
+                                                                                                            }
+
+                                                                                                        }
+                                                                                                        catch
+                                                                                                        {
+                                                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path4content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                                            if (retry.Equals(true))
+                                                                                                            {
+                                                                                                                SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                OnSyncFailed();
+                                                                                                            };
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + path3response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                                                                                                    if (retry.Equals(true))
+                                                                                                    {
+                                                                                                        SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                                    }
+                                                                                                    else
+                                                                                                    {
+                                                                                                        OnSyncFailed();
+                                                                                                    };
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path3message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                            if (retry.Equals(true))
+                                                                                            {
+                                                                                                SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                OnSyncFailed();
+                                                                                            };
+                                                                                        }
+
+                                                                                    }
+                                                                                    catch
+                                                                                    {
+                                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path3content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                                        if (retry.Equals(true))
+                                                                                        {
+                                                                                            SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            OnSyncFailed();
+                                                                                        };
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + path3response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                                                                                if (retry.Equals(true))
+                                                                                {
+                                                                                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    OnSyncFailed();
+                                                                                };
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path2message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                            if (retry.Equals(true))
+                                                                            {
+                                                                                SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                OnSyncFailed();
+                                                                            };
+                                                                        }
+
+                                                                    }
+                                                                    catch
+                                                                    {
+                                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path2content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                                        if (retry.Equals(true))
+                                                                        {
+                                                                            SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            OnSyncFailed();
+                                                                        };
+                                                                    }
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + path2response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                                                                if (retry.Equals(true))
+                                                                {
+                                                                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                                }
+                                                                else
+                                                                {
+                                                                    OnSyncFailed();
+                                                                };
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path1message + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                            if (retry.Equals(true))
+                                                            {
+                                                                SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                            }
+                                                            else
+                                                            {
+                                                                OnSyncFailed();
+                                                            };
+                                                        }
+
+                                                    }
+                                                    catch
+                                                    {
+                                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + path1content + "\n\n Do you want to retry?", "Yes", "No");
+
+                                                        if (retry.Equals(true))
+                                                        {
+                                                            SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                        }
+                                                        else
+                                                        {
+                                                            OnSyncFailed();
+                                                        };
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n" + path1response.StatusCode + " Do you want to retry?", "Yes", "No");
+
+                                                if (retry.Equals(true))
+                                                {
+                                                    SyncCAFClientUpdate(host, database, contact, ipaddress);
+                                                }
+                                                else
+                                                {
+                                                    OnSyncFailed();
+                                                };
+                                            }
                                         }
                                         else
                                         {
@@ -1902,7 +1904,7 @@ namespace TBSMobile.View
                         Save_Logs(contact, logType, log, database, logdeleted);
                     }
 
-                    SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
+                    SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
                 }
                 else
                 {
@@ -1927,702 +1929,6 @@ namespace TBSMobile.View
                 if (retry.Equals(true))
                 {
                     SyncCAFClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncCafMedia1ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-caf-media-path-1-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf image 1 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending caf image 1 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-                            var media = result.MobilePhoto1;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced caf image 1: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncCafMedia1ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncCafMedia2ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-caf-media-path-2-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf image 2 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending caf image 2 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-                            var media = result.MobilePhoto2;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced caf image 2: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncCafMedia2ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncCafMedia3ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-caf-media-path-3-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf image 3 changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending caf image 3 to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-                            var media = result.MobilePhoto3;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced caf image 3: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Image 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncCafMedia3ClientUpdate(host, database, contact, ipaddress);
-                }
-                else
-                {
-                    OnSyncFailed();
-                };
-            }
-        }
-
-        public async void SyncCafMedia4ClientUpdate(string host, string database, string contact, string ipaddress)
-        {
-            try
-            {
-                lblStatus.Text = "Checking internet connection";
-
-                string apifile = "sync-caf-media-path-4-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    lblStatus.Text = "Initializing caf video changes sync";
-
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
-                    var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-                    var changesresultCount = datachanges.Result.Count;
-
-                    var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    };
-
-                    if (changesresultCount > 0)
-                    {
-                        int clientupdate = 1;
-
-                        for (int i = 0; i < changesresultCount; i++)
-                        {
-                            lblStatus.Text = "Sending caf video to server " + clientupdate + " out of " + changesresultCount;
-
-                            var result = datachanges.Result[i];
-                            var cafNo = result.CAFNo;
-                            var media = result.MobileVideo;
-
-                            var pathlink = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                            string pathcontentType = "application/json";
-
-                            JObject pathjson;
-                            bool pathdoesExist = File.Exists(media);
-
-                            if (!pathdoesExist || string.IsNullOrEmpty(media))
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", ""}
-                                };
-                            }
-                            else
-                            {
-                                pathjson = new JObject
-                                {
-                                    { "Host", host },
-                                    { "Database", database },
-                                    { "MediaID", cafNo},
-                                    { "Path", File.ReadAllBytes(media)}
-                                };
-                            }
-
-                            var pathresponse = await client.PostAsync(pathlink, new StringContent(pathjson.ToString(), Encoding.UTF8, pathcontentType));
-
-                            if (pathresponse.IsSuccessStatusCode)
-                            {
-                                var pathcontent = await pathresponse.Content.ReadAsStringAsync();
-                                if (!string.IsNullOrEmpty(pathcontent))
-                                {
-                                    try
-                                    {
-                                        var pathresult = JsonConvert.DeserializeObject<List<ServerMessage>>(pathcontent, settings);
-
-                                        var pathitem = pathresult[0];
-                                        var pathmessage = pathitem.Message;
-
-                                        if (pathmessage.Equals("Inserted"))
-                                        {
-                                            await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
-
-                                            clientupdate++;
-                                        }
-                                        else
-                                        {
-                                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathmessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                            if (retry.Equals(true))
-                                            {
-                                                SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                                            }
-                                            else
-                                            {
-                                                OnSyncFailed();
-                                            };
-                                        }
-
-                                    }
-                                    catch
-                                    {
-                                        var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + pathcontent + "\n\n Do you want to retry?", "Yes", "No");
-
-                                        if (retry.Equals(true))
-                                        {
-                                            SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                                        }
-                                        else
-                                        {
-                                            OnSyncFailed();
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ pathresponse.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                                }
-                                else
-                                {
-                                    OnSyncFailed();
-                                }
-                            }
-                        }
-
-                        synccount += "Total synced caf video: " + clientupdate + "\n";
-
-                        var logType = "App Log";
-                        var log = "Sent client updates to the server (<b>CAF Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                        int logdeleted = 0;
-
-                        Save_Logs(contact, logType, log, database, logdeleted);
-
-                        SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        SyncCAFActivityClientUpdate(host, database, contact, ipaddress);
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
-                    }
-                    else
-                    {
-                        OnSyncFailed();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    SyncCafMedia4ClientUpdate(host, database, contact, ipaddress);
                 }
                 else
                 {
