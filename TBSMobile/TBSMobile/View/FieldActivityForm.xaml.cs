@@ -29,8 +29,6 @@ namespace TBSMobile.View
         string host;
         string database;
         string ipaddress;
-        
-
         public FieldActivityForm(string host, string database, string contact, string ipaddress)
         {
             InitializeComponent();
@@ -1766,10 +1764,10 @@ namespace TBSMobile.View
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
 
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                var response = await Constants.client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1817,7 +1815,7 @@ namespace TBSMobile.View
                                     };
                                 }
 
-                                var ph1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
+                                var ph1response = await Constants.client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, ph1contentType));
 
                                 if (ph1response.IsSuccessStatusCode)
                                 {
@@ -1865,7 +1863,7 @@ namespace TBSMobile.View
                                                     };
                                                 }
                                                 
-                                                var ph2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
+                                                var ph2response = await Constants.client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, ph2contentType));
 
                                                 if (ph2response.IsSuccessStatusCode)
                                                 {
@@ -1913,7 +1911,7 @@ namespace TBSMobile.View
                                                                     };
                                                                 }
                                                                 
-                                                                var ph3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
+                                                                var ph3response = await Constants.client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, ph3contentType));
 
                                                                 if (ph3response.IsSuccessStatusCode)
                                                                 {
@@ -1963,7 +1961,7 @@ namespace TBSMobile.View
                                                                                         };
                                                                                     }
                                                                                     
-                                                                                    var vidresponse = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
+                                                                                    var vidresponse = await Constants.client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, vidcontentType));
 
                                                                                     if (vidresponse.IsSuccessStatusCode)
                                                                                     {
@@ -2555,7 +2553,7 @@ namespace TBSMobile.View
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+            await conn.InsertAsync(logs_insert);
 
             Analytics.TrackEvent("Sent Field Activity Form");
 
@@ -2842,7 +2840,7 @@ namespace TBSMobile.View
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+            await conn.InsertAsync(logs_insert);
         }
     }
 }

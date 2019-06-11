@@ -188,10 +188,10 @@ namespace TBSMobile.View
                             { "RegistrationCode", Constants.deviceID }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -277,7 +277,7 @@ namespace TBSMobile.View
                                                 { "Username", userName}
                                             };
 
-                                            var trialresponse = await client.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
+                                            var trialresponse = await Constants.client.PostAsync(triallink, new StringContent(trialjson.ToString(), Encoding.UTF8, trialcontentType));
 
                                             if (trialresponse.IsSuccessStatusCode)
                                             {
@@ -452,17 +452,16 @@ namespace TBSMobile.View
                 var ipaddress = entIPAddress.Text;
 
                 var link = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + apifile;
-                string contentType = "application/json";
+
                 JObject json = new JObject
                 {
                     { "Host", hostName },
                     { "Database", database }
                 };
+                
+                Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
-
-                var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -695,7 +694,7 @@ namespace TBSMobile.View
                                 LastUpdated = DateTime.Parse(current_datetime)
                             };
 
-                            await conn.InsertOrReplaceAsync(logs_insert);
+                            await conn.InsertAsync(logs_insert);
 
                             Preferences.Set("username", userName, "private_prefs");
                             Preferences.Set("ipaddress", ipaddress, "private_prefs");
@@ -741,7 +740,7 @@ namespace TBSMobile.View
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+            await conn.InsertAsync(logs_insert);
         }
 
         public void Send_Email(string username)

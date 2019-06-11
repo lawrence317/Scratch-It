@@ -279,10 +279,9 @@ namespace TBSMobile.View
                             { "ContactID", contact }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -414,8 +413,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-user-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -467,7 +466,7 @@ namespace TBSMobile.View
                                 { "Deleted", deleted }
                             };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -613,10 +612,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -779,10 +778,10 @@ namespace TBSMobile.View
                             { "RegistrationCode", Constants.deviceID }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -948,10 +947,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -1116,11 +1115,10 @@ namespace TBSMobile.View
                             { "Database", database },
                             { "ContactID", contact }
                         };
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
-
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -1315,8 +1313,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
 
                 string apifile = "sync-contacts-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -1426,7 +1424,7 @@ namespace TBSMobile.View
                                 { "LastUpdated", lastUpdated }
                             };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -1470,7 +1468,7 @@ namespace TBSMobile.View
                                                 };
                                             }
 
-                                            var path1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
+                                            var path1response = await Constants.client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
 
                                             if (path1response.IsSuccessStatusCode)
                                             {
@@ -1514,7 +1512,7 @@ namespace TBSMobile.View
                                                                 };
                                                             }
 
-                                                            var path2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
+                                                            var path2response = await Constants.client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
 
                                                             if (path2response.IsSuccessStatusCode)
                                                             {
@@ -1558,7 +1556,7 @@ namespace TBSMobile.View
                                                                                 };
                                                                             }
 
-                                                                            var path3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
+                                                                            var path3response = await Constants.client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
 
                                                                             if (path3response.IsSuccessStatusCode)
                                                                             {
@@ -1610,7 +1608,7 @@ namespace TBSMobile.View
                                                                                                     };
                                                                                                 }
 
-                                                                                                var path4response = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
+                                                                                                var path4response = await Constants.client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
 
                                                                                                 if (path4response.IsSuccessStatusCode)
                                                                                                 {
@@ -1903,10 +1901,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -2131,10 +2129,10 @@ namespace TBSMobile.View
                             { "ContactID", contact }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -2290,8 +2288,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-retailer-outlet-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2365,7 +2363,7 @@ namespace TBSMobile.View
                                 { "LastUpdated", lastUpdated }
                             };
                             
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
                             
                             if (response.IsSuccessStatusCode)
                             {
@@ -2511,10 +2509,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -2699,10 +2697,10 @@ namespace TBSMobile.View
                             { "ContactID", contact }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -2861,8 +2859,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
 
                 string apifile = "sync-caf-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -2933,7 +2931,7 @@ namespace TBSMobile.View
                             };
 
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -2978,7 +2976,7 @@ namespace TBSMobile.View
                                                 };
                                             }
 
-                                            var path1response = await client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
+                                            var path1response = await Constants.client.PostAsync(path1link, new StringContent(path1json.ToString(), Encoding.UTF8, contentType));
 
                                             if (path1response.IsSuccessStatusCode)
                                             {
@@ -3022,7 +3020,7 @@ namespace TBSMobile.View
                                                                 };
                                                             }
 
-                                                            var path2response = await client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
+                                                            var path2response = await Constants.client.PostAsync(path2link, new StringContent(path2json.ToString(), Encoding.UTF8, contentType));
 
                                                             if (path2response.IsSuccessStatusCode)
                                                             {
@@ -3066,7 +3064,7 @@ namespace TBSMobile.View
                                                                                 };
                                                                             }
 
-                                                                            var path3response = await client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
+                                                                            var path3response = await Constants.client.PostAsync(path3link, new StringContent(path3json.ToString(), Encoding.UTF8, contentType));
 
                                                                             if (path3response.IsSuccessStatusCode)
                                                                             {
@@ -3118,7 +3116,7 @@ namespace TBSMobile.View
                                                                                                     };
                                                                                                 }
 
-                                                                                                var path4response = await client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
+                                                                                                var path4response = await Constants.client.PostAsync(path4link, new StringContent(path4json.ToString(), Encoding.UTF8, contentType));
 
                                                                                                 if (path4response.IsSuccessStatusCode)
                                                                                                 {
@@ -3438,10 +3436,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -3614,10 +3612,10 @@ namespace TBSMobile.View
                             { "ContactID", contact }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -3745,8 +3743,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-caf-activity-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -3795,7 +3793,7 @@ namespace TBSMobile.View
                                 { "Deleted", deleted }
                             };
                             
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -3941,10 +3939,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -4103,10 +4101,10 @@ namespace TBSMobile.View
                             { "ContactID", contact }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -4235,8 +4233,8 @@ namespace TBSMobile.View
                 syncStatus.Text = "Checking internet connection";
                 
                 string apifile = "sync-email-recipient-client-update-api.php";
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                
+                 Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                 if (CrossConnectivity.Current.IsConnected)
                 {
@@ -4285,7 +4283,7 @@ namespace TBSMobile.View
                                 { "Deleted", deleted }
                             };
 
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -4431,10 +4429,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -4592,10 +4590,10 @@ namespace TBSMobile.View
                             { "Database", database }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -4751,10 +4749,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -4910,10 +4908,10 @@ namespace TBSMobile.View
                             { "Database", database }
                         };
 
-                        HttpClient client = new HttpClient();
-                        client.DefaultRequestHeaders.ConnectionClose = true;
+                        
+                         Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                        var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                        var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -5071,10 +5069,10 @@ namespace TBSMobile.View
                         { "LastChecked", lastchecked }
                     };
 
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                    var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                    var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -5207,8 +5205,8 @@ namespace TBSMobile.View
 
                     var db = DependencyService.Get<ISQLiteDB>();
                     var conn = db.GetConnection();
-                    HttpClient client = new HttpClient();
-                    client.DefaultRequestHeaders.ConnectionClose = true;
+                    
+                     Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
                     var datachanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                     var changesresultCount = datachanges.Result.Count;
@@ -5253,7 +5251,7 @@ namespace TBSMobile.View
                                 { "Deleted", deleted }
                             };
                             
-                            var response = await client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                            var response = await Constants.client.PostAsync(link, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                             if (response.IsSuccessStatusCode)
                             {
@@ -5418,7 +5416,7 @@ namespace TBSMobile.View
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+            await conn.InsertAsync(logs_insert);
         }
 
         protected override bool OnBackButtonPressed()

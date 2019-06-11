@@ -1,7 +1,5 @@
 ﻿using Plugin.DeviceInfo;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Net.Http;
 using Xamarin.Essentials;
 
 namespace TBSMobile.Data
@@ -13,12 +11,16 @@ namespace TBSMobile.Data
         public static string port = "7777";
         public static string apifolder = "TBSApp";
 
-        public static string server_ip = "192.168.0.8";
-
         public static string deviceID = CrossDeviceInfo.Current.Id;
         public static string appversion = "App Version: " + VersionTracking.CurrentVersion;
         public static string email = "lawrenceagulto.317@gmail.com";
+        public static HttpClient client = new HttpClient();
 
         public static string requestUrl = ":7777/TBSApp/mobile-api-new.php?";
+
+        public class connections
+        {
+            HttpClient client = new HttpClient();
+        }
     }
 }

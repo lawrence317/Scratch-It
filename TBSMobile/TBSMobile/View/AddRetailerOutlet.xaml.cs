@@ -556,10 +556,9 @@ namespace TBSMobile.View
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
 
-                HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+                Constants.client.DefaultRequestHeaders.ConnectionClose = false;
 
-                var response = await client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
+                var response = await Constants.client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -743,7 +742,7 @@ namespace TBSMobile.View
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(logs_insert);
+                await conn.InsertAsync(logs_insert);
 
                 Analytics.TrackEvent("Sent Prospect Retailer");
 
@@ -973,7 +972,7 @@ namespace TBSMobile.View
                 LastUpdated = DateTime.Parse(current_datetime)
             };
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+            await conn.InsertAsync(logs_insert);
         }
     }
 }
