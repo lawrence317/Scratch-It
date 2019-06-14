@@ -239,24 +239,24 @@ namespace TBSMobile.Rest_Service
             return restService.SendCAFDirectly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
         }
 
-        public Task SendCAFMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string photourl)
+        public Task SendCAFMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
-            return restService.SendCAFMedia1Directly(host, database, domain, contact, SyncStatus, caf, photourl);
+            return restService.SendCAFMedia1Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
         }
 
-        public Task SendCAFMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string photourl)
+        public Task SendCAFMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
-            return restService.SendCAFMedia2Directly(host, database, domain, contact, SyncStatus, caf, photourl);
+            return restService.SendCAFMedia2Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
         }
 
-        public Task SendCAFMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string photourl)
+        public Task SendCAFMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
-            return restService.SendCAFMedia3Directly(host, database, domain, contact, SyncStatus, caf, photourl);
+            return restService.SendCAFMedia3Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
         }
 
-        public Task SendCAFMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string videourl)
+        public Task SendCAFMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
-            return restService.SendCAFMedia4Directly(host, database, domain, contact, SyncStatus, caf, videourl);
+            return restService.SendCAFMedia4Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
         }
 
         public Task OnSendComplete(string host, string database, string domain, string contact)
@@ -289,24 +289,24 @@ namespace TBSMobile.Rest_Service
             return restService.SendProspectRetailerDirectly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
         }
 
-        public Task SendProspectRetailerMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string photourl)
+        public Task SendProspectRetailerMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
-            return restService.SendProspectRetailerMedia1Directly(host, database, domain, contact, SyncStatus, id, photourl);
+            return restService.SendProspectRetailerMedia1Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
         }
 
-        public Task SendProspectRetailerMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string photourl)
+        public Task SendProspectRetailerMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
-            return restService.SendProspectRetailerMedia2Directly(host, database, domain, contact, SyncStatus, id, photourl);
+            return restService.SendProspectRetailerMedia2Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
         }
 
-        public Task SendProspectRetailerMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string photourl)
+        public Task SendProspectRetailerMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
-            return restService.SendProspectRetailerMedia3Directly(host, database, domain, contact, SyncStatus, id, photourl);
+            return restService.SendProspectRetailerMedia3Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
         }
 
-        public Task SendProspectRetailerMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string photourl)
+        public Task SendProspectRetailerMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
-            return restService.SendProspectRetailerMedia4Directly(host, database, domain, contact, SyncStatus, id, photourl);
+            return restService.SendProspectRetailerMedia4Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
         }
 
         public Task SaveProspectRetailerToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)

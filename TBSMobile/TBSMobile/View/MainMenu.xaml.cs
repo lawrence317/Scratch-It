@@ -47,6 +47,11 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
 
                         var isfirsttimesync = Preferences.Get("isfirsttimesync", String.Empty, "private_prefs");
                         if (isfirsttimesync == "1")
@@ -66,11 +71,6 @@ namespace TBSMobile.View
 
                                 Disable_UI();
 
-                                await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                                await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                                await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                                await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                                await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
                                 await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
 
                                 Online_Text();
@@ -78,7 +78,6 @@ namespace TBSMobile.View
                             }
                             else
                             {
-
                                 Offline_Text();
                                 Enable_UI();
                             }
@@ -258,18 +257,19 @@ namespace TBSMobile.View
         {
             CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
             {
+                await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
+                await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
+                await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
+                await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
+                await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
+
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     Online_Text();
 
                     Disable_UI();
-
-                    await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
-                     await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                    
+                    await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
 
                     Online_Text();
 
