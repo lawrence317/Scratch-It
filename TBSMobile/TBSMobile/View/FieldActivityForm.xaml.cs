@@ -1837,7 +1837,7 @@ namespace TBSMobile.View
 
                 if (emailMessenger.CanSendEmail)
                 {
-                    if (string.IsNullOrEmpty(videourl))
+                    if (!string.IsNullOrEmpty(videourl))
                     {
                         var emailsend = new EmailMessageBuilder()
                         .To(f)
