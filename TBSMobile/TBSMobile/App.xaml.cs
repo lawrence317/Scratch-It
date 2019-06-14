@@ -7,16 +7,19 @@ using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.AppCenter.Distribute;
 using System.Threading.Tasks;
+using TBSMobile.Rest_Service;
 
 [assembly: XamlCompilation (XamlCompilationOptions.Compile)]
 namespace TBSMobile
 {
 	public partial class App : Application
 	{
-		public App ()
+        public static MethodManager TodoManager { get; private set; }
+
+        public App ()
 		{
 			InitializeComponent();
-
+            TodoManager = new MethodManager(new RestServices());
             MainPage = new NavigationPage(new LoginPage());
         }
 

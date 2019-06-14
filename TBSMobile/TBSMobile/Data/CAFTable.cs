@@ -37,6 +37,11 @@ namespace TBSMobile.Data
         public DateTime LastUpdated { get; set; }
         public int Existed { get; set; }
         public int Deleted { get; set; }
+        public int ThisSynced { get; set; }
+        public int Media1Synced { get; set; }
+        public int Media2Synced { get; set; }
+        public int Media3Synced { get; set; }
+        public int Media4Synced { get; set; }
         public string ActNumber
         {
             get

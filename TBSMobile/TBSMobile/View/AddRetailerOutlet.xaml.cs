@@ -131,6 +131,31 @@ namespace TBSMobile.View
                             districtvalidator.IsVisible = false;
                             countryvalidator.IsVisible = false;
 
+                            var db = DependencyService.Get<ISQLiteDB>();
+                            var conn = db.GetConnection();
+
+                            var id = entContact.Text;
+                            var retailerCode = entRetailerCode.Text;
+                            var street = entStreet.Text;
+                            var barangay = entBarangay.Text;
+                            var town = entTownCode.Text;
+                            var province = entProvinceCode.Text;
+                            var district = entDistrict.Text;
+                            var country = entCountry.Text;
+                            var landmark = entLandmark.Text;
+                            var mobile = entMobile.Text;
+                            var telephone1 = entTelephone1.Text;
+                            var telephone2 = entTelephone2.Text;
+                            var email = entEmail.Text;
+                            var location = entLocation.Text;
+                            var deleted = "0";
+                            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+                            var crresult = getUsername.Result[0];
+                            var username = crresult.UserID;
+                            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
+
                             fafPage3.IsVisible = false;
                             sendstatusform.IsVisible = true;
 
@@ -138,17 +163,19 @@ namespace TBSMobile.View
 
                             if (CrossConnectivity.Current.IsConnected)
                             {
-                                Send_online();
+                                await App.TodoManager.SendRetailerOutletDirectly(host, database, ipaddress, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
                             }
                             else
                             {
-                                Send_offline();
+                                await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
                             }
                         }
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -485,277 +512,6 @@ namespace TBSMobile.View
             }
         }
 
-        public class ServerMessage
-        {
-            public string Message { get; set; }
-        }
-
-        public async void Send_online()
-        {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var settings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            };
-
-            var id = entContact.Text;
-            var retailerCode = entRetailerCode.Text;
-            var street = entStreet.Text;
-            var barangay = entBarangay.Text;
-            var town = entTownCode.Text;
-            var province = entProvinceCode.Text;
-            var district = entDistrict.Text;
-            var country = entCountry.Text;
-            var landmark = entLandmark.Text;
-            var mobile = entMobile.Text;
-            var telephone1 = entTelephone1.Text;
-            var telephone2 = entTelephone2.Text;
-            var email = entEmail.Text;
-            var location = entLocation.Text;
-            var deleted = "0";
-            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
-            var crresult = getUsername.Result[0];
-            var username = crresult.UserID;
-            var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
-            var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
-
-            try
-            {
-                sendStatus.Text = "Sending retailer outlet to server";
-                
-                string pathfile = "sync-retailer-outlet-client-update-api.php";
-
-                var url = "http://" + ipaddress + "/" + Constants.apifolder + "/api/" + pathfile;
-                string contentType = "application/json";
-                JObject json = new JObject
-                {
-                    { "Host", host },
-                    { "Database", database },
-                    { "ContactID", id },
-                    { "RetailerCode", retailerCode },
-                    { "PresStreet", street },
-                    { "PresBarangay", barangay },
-                    { "PresDistrict", district },
-                    { "PresTown", town },
-                    { "PresProvince", province },
-                    { "PresCountry", country },
-                    { "Landmark", landmark },
-                    { "Telephone1", telephone1 },
-                    { "Telephone2", telephone2 },
-                    { "Mobile", mobile },
-                    { "Email", email },
-                    { "GPSCoordinates", location },
-                    { "Supervisor", contact },
-                    { "Deleted", deleted },
-                    { "RecordLog", contact },
-                    { "LastUpdated", DateTime.Parse(current_datetime) }
-                };
-
-                Constants.client.DefaultRequestHeaders.ConnectionClose = false;
-
-                var response = await Constants.client.PostAsync(url, new StringContent(json.ToString(), Encoding.UTF8, contentType));
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    if (!string.IsNullOrEmpty(content))
-                    {
-                        try
-                        {
-                            var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
-
-                            var dataitem = dataresult[0];
-                            var datamessage = dataitem.Message;
-
-                            if (datamessage.Equals("Inserted"))
-                            {
-                                sendStatus.Text = "Saving retailer outlet to the device";
-
-                                var retailer_group_insert = new RetailerGroupTable
-                                {
-                                    ContactID = id,
-                                    RetailerCode = retailerCode,
-                                    PresStreet = street,
-                                    PresBarangay = barangay,
-                                    PresDistrict = district,
-                                    PresTown = town,
-                                    PresProvince = province,
-                                    PresCountry = country,
-                                    Landmark = landmark,
-                                    Telephone1 = telephone1,
-                                    Telephone2 = telephone2,
-                                    Mobile = mobile,
-                                    Email = email,
-                                    GPSCoordinates = location,
-                                    Supervisor = contact,
-                                    RecordLog = recordlog,
-                                    Deleted = Convert.ToInt32(deleted),
-                                    LastSync = DateTime.Parse(current_datetime),
-                                    LastUpdated = DateTime.Parse(current_datetime)
-                                };
-
-                                await conn.InsertAsync(retailer_group_insert);
-
-                                Analytics.TrackEvent("Sent Retailer Outlet");
-
-                                var logType = "App Log";
-                                var log = "Sent prospect retailer to the server (<b>" + id + "/b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int logdeleted = 0;
-
-                                Save_Logs(contact, logType, log, database, logdeleted);
-
-                                await DisplayAlert("Data Sent", "Retailer outlet has been sent to the server", "Ok");
-                                await Application.Current.MainPage.Navigation.PopModalAsync();
-                            }
-                            else
-                            {
-                                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
-
-                                if (retry.Equals(true))
-                                {
-                                    Send_online();
-                                }
-                                else
-                                {
-                                    Send_offline();
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
-
-                            if (retry.Equals(true))
-                            {
-                                Send_online();
-                            }
-                            else
-                            {
-                                Send_offline();
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    var retry = await DisplayAlert("Application Error", "Syncing failed. Server is unreachable.\n\n Error:\n\n"+ response.StatusCode +" Do you want to retry?", "Yes", "No");
-
-                    if (retry.Equals(true))
-                    {
-                        Send_online();
-                    }
-                    else
-                    {
-                        Send_offline();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                var retry = await DisplayAlert("Application Error", "Syncing failed. Failed to send the data.\n\n Error:\n\n" + ex.Message.ToString() + "\n\n Do you want to retry?", "Yes", "No");
-
-                if (retry.Equals(true))
-                {
-                    Send_online();
-                }
-                else
-                {
-                    Send_offline();
-                };
-            }
-        }
-
-        public async void Send_offline()
-        {
-            try
-            {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var id = entContact.Text;
-                var retailerCode = entRetailerCode.Text;
-                var street = entStreet.Text;
-                var barangay = entBarangay.Text;
-                var town = entTownCode.Text;
-                var province = entProvinceCode.Text;
-                var district = entDistrict.Text;
-                var country = entCountry.Text;
-                var landmark = entLandmark.Text;
-                var mobile = entMobile.Text;
-                var telephone1 = entTelephone1.Text;
-                var telephone2 = entTelephone2.Text;
-                var email = entEmail.Text;
-                var location = entLocation.Text;
-                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
-                var crresult = getUsername.Result[0];
-                var username = crresult.UserID;
-                var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
-                var editrecordlog = "EB :" + username + "->" + contact + " " + current_datetime;
-
-                sendStatus.Text = "Saving retailer outlet to the device";
-
-                var retailer_group_insert = new RetailerGroupTable
-                {
-                    ContactID = id,
-                    RetailerCode = retailerCode,
-                    PresStreet = street,
-                    PresBarangay = barangay,
-                    PresDistrict = district,
-                    PresTown = town,
-                    PresProvince = province,
-                    PresCountry = country,
-                    Landmark = landmark,
-                    Telephone1 = telephone1,
-                    Telephone2 = telephone2,
-                    Mobile = mobile,
-                    Email = email,
-                    GPSCoordinates = location,
-                    Supervisor = contact,
-                    RecordLog = recordlog,
-                    LastUpdated = DateTime.Parse(current_datetime)
-                };
-
-                await conn.InsertOrReplaceAsync(retailer_group_insert);
-
-                var logtype = "Mobile Log";
-                var log = "Added retailer outlet (<b>" + retailerCode + "</b>)" + "App Version: <b>" + Constants.appversion + "</b> Device ID: <b>" + CrossDeviceInfo.Current.Id + "</b>";
-                int deleted = 0;
-
-                sendStatus.Text = "Saving user logs to the device";
-
-                var logs_insert = new UserLogsTable
-                {
-                    ContactID = id,
-                    LogType = logtype,
-                    Log = log,
-                    LogDate = DateTime.Parse(current_datetime),
-                    DatabaseName = database,
-                    Deleted = deleted,
-                    LastUpdated = DateTime.Parse(current_datetime)
-                };
-
-                await conn.InsertAsync(logs_insert);
-
-                Analytics.TrackEvent("Sent Prospect Retailer");
-
-                await DisplayAlert("Offline Save", "Retailer outlet has been saved offline. Connect to the server to sync your data", "Ok");
-                await Application.Current.MainPage.Navigation.PopModalAsync();
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
-            }
-        }
-
         private async void BtnGotoPage2_Clicked(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(entContact.Text) || string.IsNullOrEmpty(entRetailerCode.Text) || string.IsNullOrEmpty(entLandmark.Text))
@@ -954,25 +710,11 @@ namespace TBSMobile.View
             }
         }
 
-        public async void Save_Logs(string contactID, string logType, string log, string database, int deleted)
+        private void SyncStatus(string status)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            var logs_insert = new UserLogsTable
-            {
-                ContactID = contactID,
-                LogType = logType,
-                Log = log,
-                LogDate = DateTime.Parse(current_datetime),
-                DatabaseName = database,
-                Deleted = deleted,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
-
-            await conn.InsertAsync(logs_insert);
+            Device.BeginInvokeOnMainThread(() => {
+                sendStatus.Text = status;
+            });
         }
     }
 }

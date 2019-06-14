@@ -714,14 +714,6 @@
                                         </local:CustomEntry.FontFamily>
                                     </local:CustomEntry>
                                 </Frame>
-                                <Label Text="Fill-up Another Form" StyleClass="lbl-fieldform">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
-                                <Switch x:Name="swFillup"/>
                                 <StackLayout>
                                     <Grid ColumnSpacing="10" RowSpacing="0">
                                         <Button Grid.Row="0" Grid.Column="0" BorderRadius="6" Clicked="BtnGoBacktoPage6_Clicked"  StyleClass="btn-nav" x:Name="btnGoBacktoPage6" Text="Back">
