@@ -64,10 +64,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getRetailer = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Supervisor=? ORDER BY FileAs ASC LIMIT 50", contact);
+                var getRetailer = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Supervisor=? ORDER BY FileAs ASC LIMIT 50", contact);
                 var resultCount = getRetailer.Result.Count;
 
                 if (resultCount > 0)
@@ -87,12 +84,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -106,7 +100,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -118,7 +112,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -130,7 +124,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -142,7 +136,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -154,7 +148,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -166,7 +160,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -178,7 +172,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -188,7 +182,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -247,12 +240,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresStreet ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresStreet ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -266,7 +256,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -278,7 +268,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -290,7 +280,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -302,7 +292,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -314,7 +304,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -326,7 +316,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -338,7 +328,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY PresStreet ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -348,7 +338,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -361,12 +350,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresBarangay ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresBarangay ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -380,7 +366,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -392,7 +378,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -404,7 +390,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -416,7 +402,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -428,7 +414,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -440,7 +426,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -452,7 +438,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY PresBarangay ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -462,7 +448,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -475,12 +460,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresDistrict ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresDistrict ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -494,7 +476,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -506,7 +488,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -518,7 +500,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -530,7 +512,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -542,7 +524,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -554,7 +536,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -566,7 +548,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY PresDistrict ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -576,7 +558,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -589,12 +570,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresTown ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresTown ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -608,7 +586,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -620,7 +598,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -632,7 +610,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -644,7 +622,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -656,7 +634,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -668,7 +646,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -680,7 +658,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY PresTown ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -690,7 +668,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -703,12 +680,9 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresProvince ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY PresProvince ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -722,7 +696,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -734,7 +708,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -746,7 +720,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -758,7 +732,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -770,7 +744,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -782,7 +756,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -794,7 +768,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY PresProvince ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -804,7 +778,6 @@ namespace TBSMobile.View
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -817,13 +790,9 @@ namespace TBSMobile.View
         {
             try
             {
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -837,7 +806,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -849,7 +818,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -861,7 +830,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -873,7 +842,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -885,7 +854,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -897,7 +866,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -909,7 +878,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -931,13 +900,9 @@ namespace TBSMobile.View
         {
             try
             {
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 if (string.IsNullOrEmpty(Search.Text))
                 {
-                    var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
+                    var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' ORDER BY FileAs ASC LIMIT 50");
                     var resultCount = getProspect.Result.Count;
 
                     if (resultCount > 0)
@@ -951,7 +916,7 @@ namespace TBSMobile.View
                     if (searchCategory.SelectedItem.ToString() == "Retailer Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND FileAs LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -963,7 +928,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Outlet Name")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND Landmark LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -975,7 +940,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Street")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresStreet LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -987,7 +952,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Barangay")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresBarangay LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -999,7 +964,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "District")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresDistrict LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -1011,7 +976,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "City")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresTown LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)
@@ -1023,7 +988,7 @@ namespace TBSMobile.View
                     else if (searchCategory.SelectedItem.ToString() == "Province")
                     {
                         var sql = "SELECT * FROM tblContacts WHERE RetailerType != 'RT00004' AND PresProvince LIKE '%" + Search.Text + "%' ORDER BY FileAs ASC LIMIT 50";
-                        var getProspect = conn.QueryAsync<ContactsTable>(sql);
+                        var getProspect = Constants.conn.QueryAsync<ContactsTable>(sql);
                         var resultCount = getProspect.Result.Count;
 
                         if (resultCount > 0)

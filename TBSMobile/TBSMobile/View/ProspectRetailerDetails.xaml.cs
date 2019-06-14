@@ -36,7 +36,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -48,21 +48,18 @@ namespace TBSMobile.View
             }
         }
 
-        public void GetContactDetails(string contact)
+        public async void GetContactDetails(string contact)
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getContact = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID=?", contact);
+                var getContact = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ContactID=?", contact);
                 var contactResultCount = getContact.Result.Count;
 
                 if (contactResultCount > 0)
                 {
                     var contactResult = getContact.Result[0];
 
-                    var getProvince = conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince WHERE ProvinceID=?", contactResult.PresProvince);
+                    var getProvince = Constants.conn.QueryAsync<ProvinceTable>("SELECT * FROM tblProvince WHERE ProvinceID=?", contactResult.PresProvince);
                     var getProvinceResultCount = getProvince.Result.Count;
 
                     var province = "";
@@ -79,7 +76,7 @@ namespace TBSMobile.View
 
                     var town = "";
 
-                    var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
+                    var getTown = Constants.conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE TownID=?", contactResult.PresTown);
                     var getTownResultCount = getTown.Result.Count;
                     if (getTownResultCount > 0)
                     {
@@ -109,7 +106,7 @@ namespace TBSMobile.View
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
     }

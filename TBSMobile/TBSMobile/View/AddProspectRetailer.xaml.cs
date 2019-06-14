@@ -376,9 +376,6 @@ namespace TBSMobile.View
                                 acPage4.IsVisible = false;
                                 sendstatusform.IsVisible = true;
 
-                                var db = DependencyService.Get<ISQLiteDB>();
-                                var conn = db.GetConnection();
-
                                 var id = entTempID.Text;
                                 var firstName = entFirstName.Text;
                                 var middleName = entMiddleName.Text;
@@ -409,7 +406,7 @@ namespace TBSMobile.View
                                 int deleted = 0;
                                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                                var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+                                var getUsername = Constants.conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
                                 var crresult = getUsername.Result[0];
                                 var username = crresult.UserID;
                                 var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
@@ -749,11 +746,8 @@ namespace TBSMobile.View
                 {
                     lstProvince.IsVisible = true;
 
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
                     var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' AND Deleted != '1' ORDER BY Province LIMIT 3";
-                    var getProvince = conn.QueryAsync<ProvinceTable>(sql);
+                    var getProvince = Constants.conn.QueryAsync<ProvinceTable>(sql);
                     var resultCount = getProvince.Result.Count;
 
                     if (resultCount > 0)
@@ -816,10 +810,7 @@ namespace TBSMobile.View
                 entProvinceCode.Text = item.ProvinceID;
                 lstProvince.IsVisible = false;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=? AND Deleted != '1'", item.ProvinceID).Result;
+                var getTown = Constants.conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=? AND Deleted != '1'", item.ProvinceID).Result;
 
                 if (getTown != null && getTown.Count > 0)
                 {

@@ -57,11 +57,8 @@ namespace TBSMobile.View
                         {
                             entContact.Text = selected;
 
-                            var db = DependencyService.Get<ISQLiteDB>();
-                            var conn = db.GetConnection();
-
                             string sql = "SELECT * FROM tblContacts WHERE ContactID = '" + selected + "' AND Deleted != '1'";
-                            var getContact = conn.QueryAsync<ContactsTable>(sql);
+                            var getContact = Constants.conn.QueryAsync<ContactsTable>(sql);
                             var resultCount = getContact.Result.Count;
 
                             if (resultCount > 0)
@@ -75,7 +72,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -131,9 +128,6 @@ namespace TBSMobile.View
                             districtvalidator.IsVisible = false;
                             countryvalidator.IsVisible = false;
 
-                            var db = DependencyService.Get<ISQLiteDB>();
-                            var conn = db.GetConnection();
-
                             var id = entContact.Text;
                             var retailerCode = entRetailerCode.Text;
                             var street = entStreet.Text;
@@ -151,7 +145,7 @@ namespace TBSMobile.View
                             var deleted = "0";
                             var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                            var getUsername = conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
+                            var getUsername = Constants.conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
                             var crresult = getUsername.Result[0];
                             var username = crresult.UserID;
                             var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
@@ -241,10 +235,7 @@ namespace TBSMobile.View
                 NameSearch.Text = item.FileAs;
                 lstName.IsVisible = false;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getCode = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE FileAs=?", NameSearch.Text);
+                var getCode = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE FileAs=?", NameSearch.Text);
                 var resultCount = getCode.Result.Count;
 
                 if (resultCount > 0)
@@ -278,11 +269,8 @@ namespace TBSMobile.View
                 {
                     lstName.IsVisible = true;
 
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
                     string sql = "SELECT * FROM tblContacts WHERE FileAs LIKE '%" + keyword + "%' AND RetailerType != 'RT00004' AND Deleted != '1' AND Supervisor='" + contact + "' ORDER BY FileAs LIMIT 3";
-                    var getUser = conn.QueryAsync<ContactsTable>(sql);
+                    var getUser = Constants.conn.QueryAsync<ContactsTable>(sql);
                     var resultCount = getUser.Result.Count;
 
                     if (resultCount > 0)
@@ -414,11 +402,8 @@ namespace TBSMobile.View
                 {
                     lstProvince.IsVisible = true;
 
-                    var db = DependencyService.Get<ISQLiteDB>();
-                    var conn = db.GetConnection();
-
                     var sql = "SELECT * FROM tblProvince WHERE Province LIKE '%" + keyword + "%' AND Deleted != '1' ORDER BY Province LIMIT 3";
-                    var getProvince = conn.QueryAsync<ProvinceTable>(sql);
+                    var getProvince = Constants.conn.QueryAsync<ProvinceTable>(sql);
                     var resultCount = getProvince.Result.Count;
 
                     if (resultCount > 0)
@@ -481,10 +466,7 @@ namespace TBSMobile.View
                 entProvinceCode.Text = item.ProvinceID;
                 lstProvince.IsVisible = false;
 
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getTown = conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=? AND Deleted != '1'", item.ProvinceID).Result;
+                var getTown = Constants.conn.QueryAsync<TownTable>("SELECT * FROM tblTown WHERE ProvinceID=? AND Deleted != '1'", item.ProvinceID).Result;
 
                 if (getTown != null && getTown.Count > 0)
                 {

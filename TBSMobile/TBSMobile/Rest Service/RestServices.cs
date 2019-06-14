@@ -246,12 +246,14 @@ namespace TBSMobile.Rest_Service
                             var item = loginresult[0];
                             var message = item.Message;
 
-                            Preferences.Set("latestversion", message, "private_prefs");
-
                             if (!message.Equals(VersionTracking.CurrentVersion))
                             {
-                                var answer = await App.Current.MainPage.DisplayAlert("Application Error", "Your application is out-of-date, please download the new version to continue", "Download", "Cancel");
-                                if (answer.Equals(true))
+                                var answer = await App.Current.MainPage.DisplayAlert("Application Out-Of-Date", "Your application is out-of-date, please download the new version (" + message + ") to continue.", "Download And Install", "Cancel");
+                                if (answer)
+                                {
+                                    Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
+                                }
+                                else
                                 {
                                     Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
                                 }
@@ -441,10 +443,7 @@ namespace TBSMobile.Rest_Service
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getUser = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UsrPassword = ? AND UserStatus='Active'", username, password);
+                var getUser = Constants.conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE UserID = ? AND UsrPassword = ? AND UserStatus='Active'", username, password);
                 var result = getUser.Result.Count;
 
                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -458,7 +457,7 @@ namespace TBSMobile.Rest_Service
                     var item = getUser.Result[0];
                     var contactID = item.ContactID;
 
-                    var getSubscription = conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                    var getSubscription = Constants.conn.QueryAsync<SubscriptionTable>("SELECT * FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                     var subresult = getSubscription.Result.Count;
 
                     //Check if the device is registered
@@ -516,7 +515,7 @@ namespace TBSMobile.Rest_Service
                                     emailMessenger.SendEmail(emailsend);
                                 }
 
-                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                                await Constants.conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                             }
                             else
                             {
@@ -550,7 +549,7 @@ namespace TBSMobile.Rest_Service
                                     emailMessenger.SendEmail(emailsend);
                                 }
 
-                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                                await Constants.conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                             }
                             else
                             {
@@ -584,7 +583,7 @@ namespace TBSMobile.Rest_Service
                                     emailMessenger.SendEmail(emailsend);
                                 }
 
-                                await conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
+                                await Constants.conn.QueryAsync<SubscriptionTable>("DELETE FROM tblSubscription WHERE SerialNumber = ? AND ContactID = ?", Constants.deviceID, contactID);
                             }
                             else
                             {
@@ -609,7 +608,7 @@ namespace TBSMobile.Rest_Service
                                 LastUpdated = DateTime.Parse(current_datetime)
                             };
 
-                            await conn.InsertOrReplaceAsync(logs_insert);
+                            await Constants.conn.InsertOrReplaceAsync(logs_insert);
 
                             Preferences.Set("username", username, "private_prefs");
                             Preferences.Set("domain", domain, "private_prefs");
@@ -620,7 +619,7 @@ namespace TBSMobile.Rest_Service
                             await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
                         }
                     }
-                }
+                }                
             }
             catch(Exception ex)
             {
@@ -700,23 +699,28 @@ namespace TBSMobile.Rest_Service
 
         public async Task Save_Logs(string contactID, string logType, string log, string databasename, int deleted)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            var logs_insert = new UserLogsTable
+            try
             {
-                ContactID = contactID,
-                LogType = logType,
-                Log = log,
-                LogDate = DateTime.Parse(current_datetime),
-                DatabaseName = databasename,
-                Deleted = deleted,
-                LastUpdated = DateTime.Parse(current_datetime)
-            };
+                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-            await conn.InsertOrReplaceAsync(logs_insert);
+                var logs_insert = new UserLogsTable
+                {
+                    ContactID = contactID,
+                    LogType = logType,
+                    Log = log,
+                    LogDate = DateTime.Parse(current_datetime),
+                    DatabaseName = databasename,
+                    Deleted = deleted,
+                    LastUpdated = DateTime.Parse(current_datetime)
+                };
+
+                await Constants.conn.InsertOrReplaceAsync(logs_insert);
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await App.Current.MainPage.DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
         }
 
         /* SYNC REST */
@@ -730,9 +734,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-user-api.php";
                 int count = 0;
 
@@ -778,7 +779,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -843,9 +844,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-system-serial-api.php";
                 int count = 0;
 
@@ -894,7 +892,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -959,9 +957,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-contacts-api.php";
                 int count = 0;
 
@@ -1070,7 +1065,7 @@ namespace TBSMobile.Rest_Service
                                     LastUpdated = lastUpdated
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1135,9 +1130,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-retailer-outlet-api.php";
                 int count = 0;
 
@@ -1206,7 +1198,7 @@ namespace TBSMobile.Rest_Service
                                     LastUpdated = lastUpdated
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1271,9 +1263,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-caf-api.php";
                 int count = 0;
 
@@ -1346,7 +1335,7 @@ namespace TBSMobile.Rest_Service
                                     LastUpdated = lastUpdated
                                 };
 
-                                await conn.InsertOrReplaceAsync(inserdata);
+                                await Constants.conn.InsertOrReplaceAsync(inserdata);
 
                                 count++;
                             }
@@ -1411,9 +1400,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-caf-activity-api.php";
                 int count = 0;
 
@@ -1454,7 +1440,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1519,9 +1505,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-email-recipient-api.php";
                 int count = 0;
 
@@ -1564,7 +1547,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1629,9 +1612,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-province-api.php";
                 int count = 0;
 
@@ -1672,7 +1652,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1737,9 +1717,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "first-time-sync-town-api.php";
                 int count = 0;
 
@@ -1782,7 +1759,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -1847,17 +1824,14 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Initiating client update user uync");
             SyncStatus("Checking connection to server");
-
+            
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-user-client-update-api.php";
 
                 SyncStatus("Checking user data from local database");
 
-                var datachanges = conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var datachanges = Constants.conn.QueryAsync<UserTable>("SELECT * FROM tblUser WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -1906,7 +1880,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<UserTable>("UPDATE tblUsers SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
+                                        await Constants.conn.QueryAsync<UserTable>("UPDATE tblUsers SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contact);
 
                                         clientupdate++;
                                     }
@@ -1979,11 +1953,8 @@ namespace TBSMobile.Rest_Service
 
         public async Task UpdateContacts(string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            await conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
-            await conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
+            await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
         }
 
         public async Task SyncContactsClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
@@ -1993,14 +1964,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contacts-client-update-api.php";
 
                 SyncStatus("Checking retailer data from local database");
 
-                var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ThisSynced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE ThisSynced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2107,7 +2075,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET ThisSynced = ? WHERE ContactID = ?", 1, contactID);
+                                        await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET ThisSynced = ? WHERE ContactID = ?", 1, contactID);
 
                                         clientupdate++;
                                     }
@@ -2185,14 +2153,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contact-media-path-1-client-update-api.php";
 
                 SyncStatus("Checking retailer photo 1 data from local database");
 
-                var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media1Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media1Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2245,7 +2210,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media1Synced = ? WHERE ContactID = ?", 1, contactID);
+                                        await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media1Synced = ? WHERE ContactID = ?", 1, contactID);
 
                                         clientupdate++;
                                     }
@@ -2323,14 +2288,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contact-media-path-2-client-update-api.php";
 
                 SyncStatus("Checking retailer photo 2 data from local database");
 
-                var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media2Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media2Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2383,7 +2345,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media2Synced = ? WHERE ContactID = ?", 1, contactID);
+                                        await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media2Synced = ? WHERE ContactID = ?", 1, contactID);
 
                                         clientupdate++;
                                     }
@@ -2461,14 +2423,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contact-media-path-3-client-update-api.php";
 
                 SyncStatus("Checking data from local database");
 
-                var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media3Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media3Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2521,7 +2480,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media3Synced = ? WHERE ContactID = ?", 1, contactID);
+                                        await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Media3Synced = ? WHERE ContactID = ?", 1, contactID);
 
                                         clientupdate++;
                                     }
@@ -2599,14 +2558,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contact-media-path-4-client-update-api.php";
 
                 SyncStatus("Checking retaile video data from local database");
 
-                var datachanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media4Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Media4Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2659,7 +2615,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ?, Media4Synced = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), 1,contactID);
+                                        await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ?, Media4Synced = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), 1,contactID);
 
                                         clientupdate++;
                                     }
@@ -2737,14 +2693,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-retailer-outlet-client-update-api.php";
 
                 SyncStatus("Checking retailer outlet data from local database");
 
-                var datachanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var datachanges = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2815,7 +2768,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), retailerCode);
+                                        await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET LastSync = ? WHERE RetailerCode = ?", DateTime.Parse(current_datetime), retailerCode);
 
                                         clientupdate++;
                                     }
@@ -2888,11 +2841,8 @@ namespace TBSMobile.Rest_Service
 
         public async Task UpdateCAF(string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            await conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
-            await conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
+            await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
         }
 
         public async Task SyncCAFClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
@@ -2902,14 +2852,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-client-update-api.php";
 
                 SyncStatus("Checking coordinator activty form data from local database");
 
-                var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE ThisSynced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE ThisSynced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -2976,7 +2923,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET ThisSynced = ? WHERE CAFNo = ?", 1, cafNo);
+                                        await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCAF SET ThisSynced = ? WHERE CAFNo = ?", 1, cafNo);
 
                                         clientupdate++;
                                     }
@@ -3054,14 +3001,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-media-path-1-client-update-api.php";
 
                 SyncStatus("Checking coordinator activity from photo 1 data from local database");
 
-                var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media1Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media1Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3114,7 +3058,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media1Synced = ? WHERE CAFNo = ?", 1, cafNo);
+                                        await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media1Synced = ? WHERE CAFNo = ?", 1, cafNo);
 
                                         clientupdate++;
                                     }
@@ -3192,14 +3136,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-media-path-2-client-update-api.php";
 
                 SyncStatus("Checking coordinator activity form photo 2 data from local database");
 
-                var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media2Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media2Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3252,7 +3193,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media2Synced = ? WHERE CAFNo = ?", 1, cafNo);
+                                        await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media2Synced = ? WHERE CAFNo = ?", 1, cafNo);
 
                                         clientupdate++;
                                     }
@@ -3330,14 +3271,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-media-path-3-client-update-api.php";
 
                 SyncStatus("Checking coordinator activity form photo 3 data from local database");
 
-                var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media3Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media3Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3390,7 +3328,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media3Synced = ? WHERE CAFNo = ?", 1, cafNo);
+                                        await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCAF SET Media3Synced = ? WHERE CAFNo = ?", 1, cafNo);
 
                                         clientupdate++;
                                     }
@@ -3468,14 +3406,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-media-path-4-client-update-api.php";
 
                 SyncStatus("Checking coordinator activity form video data from local database");
 
-                var datachanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media4Synced = '0'", contact);
+                var datachanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCAF WHERE Media4Synced = '0'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3528,7 +3463,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ?, Media4Synced = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), 1, cafNo);
+                                        await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCAF SET LastSync = ?, Media4Synced = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), 1, cafNo);
 
                                         clientupdate++;
                                     }
@@ -3606,14 +3541,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-caf-activity-client-update-api.php";
 
                 SyncStatus("Checking data from local database");
 
-                var datachanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var datachanges = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3659,7 +3591,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
+                                        await Constants.conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET LastSync = ? WHERE CAFNo = ?", DateTime.Parse(current_datetime), cafNo);
 
                                         clientupdate++;
                                     }
@@ -3737,14 +3669,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-email-recipient-client-update-api.php";
 
                 SyncStatus("Checking email recipient data from local database");
 
-                var datachanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var datachanges = Constants.conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3790,7 +3719,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactsID);
+                                        await Constants.conn.QueryAsync<UserEmailTable>("UPDATE tblUserEmail SET LastSync = ? WHERE ContactID = ?", DateTime.Parse(current_datetime), contactsID);
 
                                         clientupdate++;
                                     }
@@ -3868,14 +3797,11 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-user-logs-client-update-api.php";
 
                 SyncStatus("Checking user logs data from local database");
 
-                var datachanges = conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var datachanges = Constants.conn.QueryAsync<UserLogsTable>("SELECT * FROM tblUserLogs WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
                 var changesresultCount = datachanges.Result.Count;
 
                 if (changesresultCount > 0)
@@ -3924,7 +3850,7 @@ namespace TBSMobile.Rest_Service
 
                                     if (datamessage.Equals("Inserted"))
                                     {
-                                        await conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", DateTime.Parse(current_datetime), contactsID, logtype, logs, logDate, database);
+                                        await Constants.conn.QueryAsync<UserLogsTable>("UPDATE tblUserLogs SET LastSync = ? WHERE ContactID = ? AND LogType = ? AND Log = ? AND LogDate = ? AND DatabaseName = ?", DateTime.Parse(current_datetime), contactsID, logtype, logs, logDate, database);
 
                                         clientupdate++;
                                     }
@@ -3988,9 +3914,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-user-server-update-api.php";
                 var lastchecked = Preferences.Get("userchangeslastcheck", String.Empty, "private_prefs");
 
@@ -4038,7 +3961,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4103,9 +4026,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-system-serial-server-update-api.php";
                 var lastchecked = Preferences.Get("systemserialchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
@@ -4155,7 +4075,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4220,9 +4140,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-contacts-server-update-api.php";
                 var lastchecked = Preferences.Get("contactschangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
@@ -4332,7 +4249,7 @@ namespace TBSMobile.Rest_Service
                                     LastUpdated = lastUpdated
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4397,9 +4314,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-retailer-outlet-server-update-api.php";
                 var lastchecked = Preferences.Get("retaileroutletchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
@@ -4469,7 +4383,7 @@ namespace TBSMobile.Rest_Service
                                     LastUpdated = lastUpdated
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4534,9 +4448,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-province-server-update-api.php";
                 var lastchecked = Preferences.Get("provincechangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
@@ -4578,7 +4489,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4643,9 +4554,6 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "sync-town-server-update-api.php";
                 var lastchecked = Preferences.Get("townchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
@@ -4689,7 +4597,7 @@ namespace TBSMobile.Rest_Service
                                     Deleted = deleted
                                 };
 
-                                await conn.InsertOrReplaceAsync(insertdata);
+                                await Constants.conn.InsertOrReplaceAsync(insertdata);
 
                                 count++;
                             }
@@ -4756,10 +4664,7 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
 
                 string apifile = "resync-contacts-api.php";
                 int count = 0;
@@ -4788,7 +4693,7 @@ namespace TBSMobile.Rest_Service
                                 var item = dataresult[i];
                                 var contactID = item.ContactID;
 
-                                await conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE ContactID = ?", 1, contactID);
+                                await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE ContactID = ?", 1, contactID);
 
                                 count++;
                             }
@@ -4833,13 +4738,10 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "resync-retailer-outlet-api.php";
                 int count = 0;
 
-                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
 
                 var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
@@ -4865,7 +4767,7 @@ namespace TBSMobile.Rest_Service
                                 var item = dataresult[i];
                                 var retailerCode = item.RetailerCode;
 
-                                await conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ? WHERE RetailerCode = ?", 1, retailerCode);
+                                await Constants.conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ? WHERE RetailerCode = ?", 1, retailerCode);
 
                                 count++;
                             }                            
@@ -4910,13 +4812,10 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "resync-caf-api.php";
                 int count = 0;
 
-                await conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
+                await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
 
                 var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
@@ -4942,7 +4841,7 @@ namespace TBSMobile.Rest_Service
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
 
-                                await conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ? WHERE CAFNo = ?", 1, cafNo);
+                                await Constants.conn.QueryAsync<CAFData>("UPDATE tblCaf SET Existed = ? WHERE CAFNo = ?", 1, cafNo);
 
                                 count++;
                             }
@@ -4987,13 +4886,10 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
                 string apifile = "resync-caf-activity-api.php";
                 int count = 0;
 
-                await conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
+                await Constants.conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
 
                 var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
@@ -5020,7 +4916,7 @@ namespace TBSMobile.Rest_Service
                                 var cafNo = item.CAFNo;
                                 var act = item.ActivityID;
 
-                                await conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ? WHERE CAFNo = ? AND ActivityID = ?", 1, cafNo, act);
+                                await Constants.conn.QueryAsync<ActivityData>("UPDATE tblActivity SET Existed = ? WHERE CAFNo = ? AND ActivityID = ?", 1, cafNo, act);
 
                                 count++;
                             }
@@ -5061,10 +4957,7 @@ namespace TBSMobile.Rest_Service
             /* CHECK AUTO SYNC FUNCTION  */
         public async Task CheckContactsData(string host, string database, string domain, string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-            
-            var getcontactschanges = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+            var getcontactschanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var contactchangesresultCount = getcontactschanges.Result.Count;
 
             Preferences.Set("contactschanges", contactchangesresultCount.ToString(), "private_prefs");
@@ -5072,10 +4965,7 @@ namespace TBSMobile.Rest_Service
 
         public async Task CheckRetailerOutletData(string host, string database, string domain, string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-            
-            var getretaileroutletchanges = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+            var getretaileroutletchanges = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
 
             Preferences.Set("retaileroutletchanges", retaileroutletchangesresultCount.ToString(), "private_prefs");
@@ -5083,10 +4973,7 @@ namespace TBSMobile.Rest_Service
 
         public async Task CheckCAFData(string host, string database, string domain, string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-            
-            var getcafchanges = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+            var getcafchanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var cafchangesresultCount = getcafchanges.Result.Count;
 
             Preferences.Set("cafchanges", cafchangesresultCount.ToString(), "private_prefs");
@@ -5094,21 +4981,15 @@ namespace TBSMobile.Rest_Service
 
         public async Task CheckCAFActivityData(string host, string database, string domain, string contact)
         {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
-            var getactchanges = conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+            var getactchanges = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var actchangesresultCount = getactchanges.Result.Count;
 
             Preferences.Set("cafactivitychanges", actchangesresultCount.ToString(), "private_prefs");
         }
 
         public async Task CheckEmailRecipientData(string host, string database, string domain, string contact)
-        {
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-            
-            var getemailchanges = conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+        {            
+            var getemailchanges = Constants.conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var emailchangesresultCount = getemailchanges.Result.Count;
 
             Preferences.Set("emailrecipientchanges", emailchangesresultCount.ToString(), "private_prefs");
@@ -5151,9 +5032,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendCAFDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             string apifile = "sync-caf-directly-api.php";
 
@@ -5285,9 +5163,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Sending coordinator activity form photo 1 to server");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-caf-media-path-1-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -5382,9 +5257,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Sending coordinator activity form photo 2 to server");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-caf-media-path-2-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -5477,9 +5349,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendCAFMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form photo 3 to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             string apifile = "sync-caf-media-path-3-client-update-api.php";
 
@@ -5574,9 +5443,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Sending coordinator activity form video to server");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -5669,9 +5535,6 @@ namespace TBSMobile.Rest_Service
         public async Task SaveCAFToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
             
             try
             {
@@ -5699,7 +5562,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(caf_insert);
+                await Constants.conn.InsertOrReplaceAsync(caf_insert);
             }
             catch (Exception ex)
             {
@@ -5716,13 +5579,10 @@ namespace TBSMobile.Rest_Service
         public async Task SaveRetailerOutletToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet update to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
+            
             try
             {
-                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, recordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailercode);
+                await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ?, LastSync = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, recordlog, DateTime.Parse(current_datetime), DateTime.Parse(current_datetime), retailercode);
             }
             catch (Exception ex)
             {
@@ -5743,16 +5603,13 @@ namespace TBSMobile.Rest_Service
         public async Task SaveCAFActivityToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Saving coordinator activity to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
+            
             try
             {
                 if (!String.IsNullOrEmpty(rekorida))
                 {
 
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00001'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00001'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5763,16 +5620,17 @@ namespace TBSMobile.Rest_Service
                             ContactID = employeenumber,
                             ActivityID = "ACT00001",
                             RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(rekorida_insert);
+                        await Constants.conn.InsertOrReplaceAsync(rekorida_insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(merchandizing))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00002'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00002'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5783,16 +5641,17 @@ namespace TBSMobile.Rest_Service
                             ContactID = employeenumber,
                             ActivityID = "ACT00002",
                             RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(merchandizing_insert);
+                        await Constants.conn.InsertOrReplaceAsync(merchandizing_insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(tradecheck))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00003'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00003'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5803,16 +5662,17 @@ namespace TBSMobile.Rest_Service
                             ContactID = employeenumber,
                             ActivityID = "ACT00003",
                             RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(trade_check_insert);
+                        await Constants.conn.InsertOrReplaceAsync(trade_check_insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(others))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5823,10 +5683,11 @@ namespace TBSMobile.Rest_Service
                             ContactID = employeenumber,
                             ActivityID = "ACT00004",
                             RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(others_insert);
+                        await Constants.conn.InsertOrReplaceAsync(others_insert);
                     }
                 }
             }
@@ -5845,10 +5706,7 @@ namespace TBSMobile.Rest_Service
         public async Task SaveCAFToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
+            
             try
             {
                 var caf_insert = new CAFTable
@@ -5874,7 +5732,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(caf_insert);
+                await Constants.conn.InsertOrReplaceAsync(caf_insert);
             }
             catch (Exception ex)
             {
@@ -5886,18 +5744,17 @@ namespace TBSMobile.Rest_Service
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
                 }
             }
+
+            
         }
 
         public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet update to local database");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             try
             {
-                await conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, recordlog, DateTime.Parse(current_datetime), retailercode);
+                await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET PresStreet = ?, PresBarangay = ?, PresTown = ?, PresProvince = ?, PresCountry = ?, PresDistrict= ?, Landmark = ?, Telephone1 = ?, Telephone2 = ?, Mobile = ?, Email = ?, GPSCoordinates = ?, RecordLog = ?, LastUpdated = ? WHERE RetailerCode = ?", street, barangay, town, province, country, district, landmark, telephone1, telephone2, mobile, email, location, recordlog, DateTime.Parse(current_datetime), retailercode);
             }
             catch (Exception ex)
             {
@@ -5915,15 +5772,12 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Saving coordinator activity to local database");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             try
             {
                 if (!String.IsNullOrEmpty(rekorida))
                 {
 
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00001'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00001'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if(result == 0)
@@ -5937,13 +5791,13 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(rekorida_insert);
+                        await Constants.conn.InsertOrReplaceAsync(rekorida_insert);
                     }                   
                 }
 
                 if (!String.IsNullOrEmpty(merchandizing))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00002'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00002'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5957,13 +5811,13 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(merchandizing_insert);
+                        await Constants.conn.InsertOrReplaceAsync(merchandizing_insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(tradecheck))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00003'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00003'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5977,13 +5831,13 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(trade_check_insert);
+                        await Constants.conn.InsertOrReplaceAsync(trade_check_insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(others))
                 {
-                    var getCount = conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
@@ -5997,7 +5851,7 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await conn.InsertOrReplaceAsync(others_insert);
+                        await Constants.conn.InsertOrReplaceAsync(others_insert);
                     }
                 }
             }
@@ -6018,9 +5872,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendProspectRetailerDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             string apifile = "sync-prospect-directly-api.php";
 
@@ -6069,6 +5920,7 @@ namespace TBSMobile.Rest_Service
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
+
                     if (!string.IsNullOrEmpty(content))
                     {
                         var dataresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
@@ -6136,15 +5988,13 @@ namespace TBSMobile.Rest_Service
                     await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
 
                 }
-            }
+            }            
         }
 
         public async Task SendProspectRetailerMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer photo 1 to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
+            
 
             string apifile = "sync-contact-media-path-1-client-update-api.php";
 
@@ -6233,10 +6083,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendProspectRetailerMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer photo 2 to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-contact-media-path-2-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -6325,9 +6171,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Sending prospect retailer photo 3 to server");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-contact-media-path-3-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -6415,10 +6258,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendProspectRetailerMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer video to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -6506,9 +6345,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Saving prospect retailer to local database");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             try
             {
                 var retailer = new ContactsTable
@@ -6551,7 +6387,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(retailer);
+                await Constants.conn.InsertOrReplaceAsync(retailer);
             }
             catch (Exception ex)
             {
@@ -6572,9 +6408,6 @@ namespace TBSMobile.Rest_Service
         public async Task SaveProspectRetailerToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Saving prospect retailer to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             try
             {
@@ -6617,7 +6450,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(retailer);
+                await Constants.conn.InsertOrReplaceAsync(retailer);
             }
             catch (Exception ex)
             {
@@ -6636,9 +6469,6 @@ namespace TBSMobile.Rest_Service
         public async Task SendRetailerOutletDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
         {
             SyncStatus("Sending retailer outlet to server");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             string apifile = "sync-retailer-outlet-client-update-api.php";
 
@@ -6746,9 +6576,6 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Saving retailer outlet to local database");
 
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
-
             try
             {
                 var retailer_group_insert = new RetailerGroupTable
@@ -6774,7 +6601,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(retailer_group_insert);
+                await Constants.conn.InsertOrReplaceAsync(retailer_group_insert);
             }
             catch (Exception ex)
             {
@@ -6795,9 +6622,6 @@ namespace TBSMobile.Rest_Service
         public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet to local database");
-
-            var db = DependencyService.Get<ISQLiteDB>();
-            var conn = db.GetConnection();
 
             try
             {
@@ -6823,7 +6647,7 @@ namespace TBSMobile.Rest_Service
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
 
-                await conn.InsertOrReplaceAsync(retailer_group_insert);
+                await Constants.conn.InsertOrReplaceAsync(retailer_group_insert);
             }
             catch (Exception ex)
             {

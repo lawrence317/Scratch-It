@@ -1,6 +1,7 @@
 ﻿using Plugin.DeviceInfo;
 using System.Net.Http;
 using Xamarin.Essentials;
+using Xamarin.Forms;
 
 namespace TBSMobile.Data
 {
@@ -13,11 +14,8 @@ namespace TBSMobile.Data
         public static string deviceID = CrossDeviceInfo.Current.Id;
         public static string appversion = "App Version: " + VersionTracking.CurrentVersion;
         public static string email = "lawrenceagulto.317@gmail.com";
-        public static HttpClient client = new HttpClient();
 
-        public class connections
-        {
-            HttpClient client = new HttpClient();
-        }
+        public static readonly ISQLiteDB db = DependencyService.Get<ISQLiteDB>();
+        public static readonly SQLite.SQLiteAsyncConnection conn = Constants.db.GetConnection();
     }
 }

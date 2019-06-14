@@ -65,10 +65,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var getRetailer = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
                 var resultCount = getRetailer.Result.Count;
 
                 if (resultCount > 0)
@@ -96,10 +93,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate DESC, StartTime DESC", contact);
+                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate DESC, StartTime DESC", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
@@ -115,7 +109,6 @@ namespace TBSMobile.View
                     lstActivity.IsVisible = false;
                     activityIndicator.IsVisible = true;
                 }
-
             }
             catch (Exception ex)
             {
@@ -128,11 +121,7 @@ namespace TBSMobile.View
         {
             try
             {
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)
@@ -211,11 +200,7 @@ namespace TBSMobile.View
         {
             try
             {
-
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getActivity = conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate, StartTime DESC LIMIT 50", contact);
+                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastUpdated > LastSync ORDER BY CAFDate, StartTime DESC LIMIT 50", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
@@ -296,10 +281,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getProspect = conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 200", contact);
+                var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 200", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)
@@ -317,7 +299,6 @@ namespace TBSMobile.View
                 }
 
                 lstProspect.EndRefresh();
-
             }
             catch (Exception ex)
             {
@@ -380,10 +361,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                var getRetailer = conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
+                var getRetailer = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor=? AND LastUpdated > LastSync ORDER BY RetailerCode ASC", contact);
                 var resultCount = getRetailer.Result.Count;
 
                 if (resultCount > 0)
@@ -401,7 +379,6 @@ namespace TBSMobile.View
                 }
 
                 lstRetailerGroup.EndRefresh();
-
             }
             catch (Exception ex)
             {

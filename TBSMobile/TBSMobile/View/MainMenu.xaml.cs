@@ -47,6 +47,7 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
+
                         await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
                         await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
                         await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
@@ -68,7 +69,6 @@ namespace TBSMobile.View
                             if (CrossConnectivity.Current.IsConnected)
                             {
                                 Online_Text();
-
                                 Disable_UI();
 
                                 await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
@@ -253,34 +253,41 @@ namespace TBSMobile.View
             }
         }
 
-        public void CheckConnectionContinuously()
+        public async void CheckConnectionContinuously()
         {
-            CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
+            try
             {
-                await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
-
-                if (CrossConnectivity.Current.IsConnected)
+                CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
                 {
-                    Online_Text();
+                    await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
+                    await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
+                    await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
+                    await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
+                    await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
 
-                    Disable_UI();
-                    
-                    await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                    if (CrossConnectivity.Current.IsConnected)
+                    {
+                        Online_Text();
+                        Disable_UI();
 
-                    Online_Text();
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
 
-                    Enable_UI();
-                }
-                else
-                {
-                    Offline_Text();
-                    Enable_UI();
-                }
-            };
+                        Online_Text();
+                        Enable_UI();
+                    }
+                    else
+                    {
+                        Offline_Text();
+                        Enable_UI();
+                    }
+                };
+            }
+            catch(Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+
         }
 
         private async void btnUI_Clicked(object sender, EventArgs e)
@@ -350,74 +357,79 @@ namespace TBSMobile.View
 
         private async void BtnResend_Clicked(object sender, EventArgs e)
         {
-            if (CrossConnectivity.Current.IsConnected)
+            try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                string action = await DisplayActionSheet("What data do you want to re-sync?", "Cancel", null, "All Data", "Retailer Data Only", "Retailer Outlet Data Only", "CAF Data Only", "CAF Activity Data Only");
-
-                if(action == "All Data")
+                if (CrossConnectivity.Current.IsConnected)
                 {
-                    Disable_UI();
+                    string action = await DisplayActionSheet("What data do you want to re-sync?", "Cancel", null, "All Data", "Retailer Data Only", "Retailer Outlet Data Only", "CAF Data Only", "CAF Activity Data Only");
 
-                    await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                    if (action == "All Data")
+                    {
+                        Disable_UI();
 
-                    Enable_UI();
+                        await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+
+                        Enable_UI();
+                    }
+                    else if (action == "Retailer Data Only")
+                    {
+                        Disable_UI();
+
+                        await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+
+                        Enable_UI();
+                    }
+                    else if (action == "Retailer Outlet Data Only")
+                    {
+                        Disable_UI();
+
+                        await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+
+                        Enable_UI();
+                    }
+                    else if (action == "CAF Data Only")
+                    {
+                        Disable_UI();
+
+                        await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+
+                        Enable_UI();
+                    }
+                    else if (action == "CAF Activity Data Only")
+                    {
+                        Disable_UI();
+
+                        await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+
+                        Enable_UI();
+                    }
                 }
-                else if(action == "Retailer Data Only")
+                else
                 {
-                    Disable_UI();
-
-                    await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                     await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
-
-                    Enable_UI();
-                }
-                else if (action == "Retailer Outlet Data Only")
-                {
-                    Disable_UI();
-
-                    await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                     await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
-
-                    Enable_UI();
-                }
-                else if (action == "CAF Data Only")
-                {
-                    Disable_UI();
-
-                    await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                     await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
-
-                    Enable_UI();
-                }
-                else if (action == "CAF Activity Data Only")
-                {
-                    Disable_UI();
-
-                    await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
-                    await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                     await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
-
-                    Enable_UI();
+                    await DisplayAlert("Re-sync Data Error", "Re-sync failed. Please connect to the internet to re-sync your data", "Ok");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                await DisplayAlert("Re-sync Data Error", "Re-sync failed. Please connect to the internet to re-sync your data", "Ok");
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 

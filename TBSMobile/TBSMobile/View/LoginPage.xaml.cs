@@ -1,14 +1,7 @@
 ﻿using Microsoft.AppCenter.Crashes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using Plugin.DeviceInfo;
-using Plugin.Messaging;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -105,29 +98,29 @@ namespace TBSMobile.View
         {
             try
             {
-                var db = DependencyService.Get<ISQLiteDB>();
-                var conn = db.GetConnection();
-
-                if (conn != null)
+                if (Constants.conn != null)
                 {
                     try
                     {
-                        await conn.CreateTableAsync<UserTable>();
-                        await conn.CreateTableAsync<ContactsTable>();
-                        await conn.CreateTableAsync<ActivityTable>();
-                        await conn.CreateTableAsync<CAFTable>();
-                        await conn.CreateTableAsync<RetailerGroupTable>();
-                        await conn.CreateTableAsync<UserEmailTable>();
-                        await conn.CreateTableAsync<UserLogsTable>();
-                        await conn.CreateTableAsync<SubscriptionTable>();
-                        await conn.CreateTableAsync<ProvinceTable>();
-                        await conn.CreateTableAsync<TownTable>();
+                        await Constants.conn.CreateTableAsync<UserTable>();
+                        await Constants.conn.CreateTableAsync<ContactsTable>();
+                        await Constants.conn.CreateTableAsync<ActivityTable>();
+                        await Constants.conn.CreateTableAsync<CAFTable>();
+                        await Constants.conn.CreateTableAsync<RetailerGroupTable>();
+                        await Constants.conn.CreateTableAsync<UserEmailTable>();
+                        await Constants.conn.CreateTableAsync<UserLogsTable>();
+                        await Constants.conn.CreateTableAsync<SubscriptionTable>();
+                        await Constants.conn.CreateTableAsync<ProvinceTable>();
+                        await Constants.conn.CreateTableAsync<TownTable>();
                     }
                     catch (Exception ex)
                     {
+                        Crashes.TrackError(ex);
                         Console.Write("Creating table error " + ex.Message);
                     }
                 }
+
+                
             }
             catch (Exception ex)
             {
