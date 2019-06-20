@@ -16,6 +16,6 @@ namespace TBSMobile.Data
         public static string email = "lawrenceagulto.317@gmail.com";
 
         public static readonly ISQLiteDB db = DependencyService.Get<ISQLiteDB>();
-        public static readonly SQLite.SQLiteAsyncConnection conn = Constants.db.GetConnection();
+        public static readonly SQLite.SQLiteAsyncConnection conn = db.GetConnection();
     }
 }

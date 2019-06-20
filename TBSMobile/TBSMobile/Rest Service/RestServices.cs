@@ -27,6 +27,7 @@ namespace TBSMobile.Rest_Service
             MissingMemberHandling = MissingMemberHandling.Ignore
         };
 
+        string default_datetime = "0001-01-01 00:00:00";
         string current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         
         string contentType = "application/json";
@@ -394,8 +395,9 @@ namespace TBSMobile.Rest_Service
                                 var log = "Logged in (<b>" + username + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                                 int deleted = 0;
 
+                                await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contactID, logType, log, DateTime.Parse(current_datetime), database, deleted, DateTime.Parse(current_datetime));
+
                                 Save_Preferences(username, password, contactID);
-                                await Save_Logs(contactID, logType, log, database, deleted);
 
                                 await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
                             }
@@ -655,7 +657,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Activated Trial (<b>" + username + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int deleted = 0;
 
-                            await Save_Logs(trialcontactid, logType, log, database, deleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", trialcontactid, logType, log, DateTime.Parse(current_datetime), database, deleted, DateTime.Parse(current_datetime));
 
                             await App.Current.MainPage.DisplayAlert("Trial Activated", "You activated trial for 30 days", "Ok");
                         }
@@ -697,32 +699,6 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("contactid", contactID, "private_prefs");
         }
 
-        public async Task Save_Logs(string contactID, string logType, string log, string databasename, int deleted)
-        {
-            try
-            {
-                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-                var logs_insert = new UserLogsTable
-                {
-                    ContactID = contactID,
-                    LogType = logType,
-                    Log = log,
-                    LogDate = DateTime.Parse(current_datetime),
-                    DatabaseName = databasename,
-                    Deleted = deleted,
-                    LastUpdated = DateTime.Parse(current_datetime)
-                };
-
-                await Constants.conn.InsertOrReplaceAsync(logs_insert);
-            }
-            catch (Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await App.Current.MainPage.DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
-            }
-        }
-
         /* SYNC REST */
 
            /* FIRST-TIME SYNC REST */
@@ -756,7 +732,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving user data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving user data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var userid = item.UserID;
@@ -788,7 +764,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>User</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
                         }
@@ -866,7 +842,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving system serial data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving system serial data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var serialNumber = item.SerialNumber;
@@ -901,7 +877,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>System Serial</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -979,7 +955,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving retailer data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving retailer data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var contactID = item.ContactID;
@@ -1074,7 +1050,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1152,7 +1128,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving retailer outlet data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving retailer outlet data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var retailerCode = item.RetailerCode;
@@ -1207,7 +1183,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1285,7 +1261,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving coordinator activity form data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving coordinator activity form data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
@@ -1344,7 +1320,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>CAF</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("cafchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1422,7 +1398,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving coordinator activity data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving coordinator activity data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
@@ -1449,7 +1425,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>CAF Activity</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("cafactivitychangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1527,7 +1503,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving email recipient data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving email recipient data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var contactsID = item.ContactID;
@@ -1556,7 +1532,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>Email Recipient</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("emailrecipientchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1634,7 +1610,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving province data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving province data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var provinceID = item.ProvinceID;
@@ -1661,7 +1637,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>Province</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
                         }
@@ -1739,7 +1715,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving town data to local database (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Saving town data to local database\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var townID = item.TownID;
@@ -1768,7 +1744,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Initialized first-time sync (<b>Town</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
@@ -1840,7 +1816,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending user changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending user changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -1933,7 +1909,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>User</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -1977,7 +1953,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2128,7 +2104,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2166,7 +2142,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer photo 1 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2263,7 +2239,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Contacts Photo 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2301,7 +2277,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer photo 2 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2398,7 +2374,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Contacts Photo 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2436,7 +2412,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer photo 3 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2533,7 +2509,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Contacts Photo 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2571,7 +2547,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer video changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2668,7 +2644,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Contacts Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2706,7 +2682,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending retailer outlet changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending retailer outlet changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2821,7 +2797,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -2865,7 +2841,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity form changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity form changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -2976,7 +2952,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3014,7 +2990,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity form photo 1 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity form photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3111,7 +3087,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF Photo 1</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3149,7 +3125,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity form photo 2 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity form photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3246,7 +3222,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF Photo 2</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3284,7 +3260,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity form photo 3 changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity form photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3381,7 +3357,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF Photo 3</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3419,7 +3395,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity form video changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity form video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3516,7 +3492,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF Video</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3554,7 +3530,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending coordinator activity changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending coordinator activity changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3644,7 +3620,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>CAF Activity</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3682,7 +3658,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending email recipient changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending email recipient changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3772,7 +3748,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>Email Recipient</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3810,7 +3786,7 @@ namespace TBSMobile.Rest_Service
 
                     for (int i = 0; i < changesresultCount; i++)
                     {
-                        SyncStatus("Sending user logs changes to server (" + clientupdate + " out of " + changesresultCount + ")");
+                        SyncStatus("Sending user logs changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
                         var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
@@ -3891,7 +3867,7 @@ namespace TBSMobile.Rest_Service
                     var log = "Sent client updates to the server (<b>User Logs</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                     int logdeleted = 0;
 
-                    await Save_Logs(contact, logType, log, database, logdeleted);
+                    await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
                 }
             }
             else
@@ -3938,7 +3914,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving user server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving user server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var userid = item.UserID;
@@ -3970,7 +3946,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>User</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
                         }
@@ -4049,7 +4025,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving system serial server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving system serial server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var serialNumber = item.SerialNumber;
@@ -4084,7 +4060,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>System Serial</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -4163,7 +4139,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving retailer server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving retailer server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var contactID = item.ContactID;
@@ -4258,7 +4234,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>Contacts</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
                         }
@@ -4337,7 +4313,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving retailer outlet server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving retailer outlet server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var retailerCode = item.RetailerCode;
@@ -4392,7 +4368,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>Retailer Outlet</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -4471,7 +4447,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving province server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving province server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var provinceID = item.ProvinceID;
@@ -4498,7 +4474,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>Province</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
                         }
@@ -4577,7 +4553,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Saving town server update to local database (" + (count + 1) + " out of " + dataresult.Count + ")");
+                                SyncStatus("Saving town server update to local database\n (" + (count + 1) + " out of " + dataresult.Count + ")");
 
                                 var item = dataresult[i];
                                 var townID = item.TownID;
@@ -4606,7 +4582,7 @@ namespace TBSMobile.Rest_Service
                             var log = "Checked server updates (<b>Town</b>)  <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
                             int logdeleted = 0;
 
-                            await Save_Logs(contact, logType, log, database, logdeleted);
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
                         }
@@ -4688,7 +4664,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Checking retailer (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Checking retailer\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var contactID = item.ContactID;
@@ -4697,6 +4673,8 @@ namespace TBSMobile.Rest_Service
 
                                 count++;
                             }
+
+                            await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
                         }
                     }
                     else
@@ -4762,7 +4740,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Checking retailer outlet (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Checking retailer outlet\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var retailerCode = item.RetailerCode;
@@ -4770,12 +4748,14 @@ namespace TBSMobile.Rest_Service
                                 await Constants.conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET Existed = ? WHERE RetailerCode = ?", 1, retailerCode);
 
                                 count++;
-                            }                            
+                            }
+
+                            await Constants.conn.QueryAsync<RetailerGroupData>("UPDATE tblRetailerGroup SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-snc Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4786,7 +4766,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-snc Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4796,7 +4776,7 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-snc Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
                 if (retry)
                 {
@@ -4836,7 +4816,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Checking coordinator activity form (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Checking coordinator activity form\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
@@ -4845,11 +4825,13 @@ namespace TBSMobile.Rest_Service
 
                                 count++;
                             }
+
+                            await Constants.conn.QueryAsync<CAFData>("UPDATE tblCaf SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4860,7 +4842,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4870,7 +4852,7 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
                 if (retry)
                 {
@@ -4910,7 +4892,7 @@ namespace TBSMobile.Rest_Service
 
                             for (int i = 0; i < datacount; i++)
                             {
-                                SyncStatus("Checking coordinator activity (" + (count + 1) + " out of " + datacount + ")");
+                                SyncStatus("Checking coordinator activity\n (" + (count + 1) + " out of " + datacount + ")");
 
                                 var item = dataresult[i];
                                 var cafNo = item.CAFNo;
@@ -4920,11 +4902,13 @@ namespace TBSMobile.Rest_Service
 
                                 count++;
                             }
+
+                            await Constants.conn.QueryAsync<ActivityData>("UPDATE tblActivity SET LastSync = ? WHERE Existed = ?", DateTime.Parse(default_datetime), 0);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Activity Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4935,7 +4919,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4945,7 +4929,7 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-snc CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
                 if (retry)
                 {
@@ -5744,8 +5728,6 @@ namespace TBSMobile.Rest_Service
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
                 }
             }
-
-            
         }
 
         public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
