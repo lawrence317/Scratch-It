@@ -21,6 +21,7 @@ namespace TBSMobile.View
         public AddRetailerOutlet (string selected)
 		{
 			InitializeComponent ();
+            this.selected = selected;
 
             SetTempRetailerCode();
         }
