@@ -52,26 +52,47 @@ namespace TBSMobile.View
         void Init() 
         {
             CreateTableAsync();
-            entIPAddress.Text = "tbs.scratchit.ph";
+            
+            lblDomain.Text = Constants.domain;
+            lblHost.Text = Constants.hostname;
 
-            var host = Preferences.Get("host", String.Empty, "private_prefs");
-            if (string.IsNullOrEmpty(host))
-            {
-                entHost.Text = Constants.hostname;
-            }
-            else
-            {
-                entHost.Text = host;
-            }
+            Preferences.Set("domain", Constants.domain, "private_prefs");
+            Preferences.Set("host", Constants.hostname, "private_prefs");
 
-            var database = Preferences.Get("database", String.Empty, "private_prefs");
-            if (string.IsNullOrEmpty(database))
+            var server = Preferences.Get("server", String.Empty, "private_prefs");
+
+            if (String.IsNullOrEmpty(server))
             {
-                entDatabase.Text = Constants.database;
+                lblServer.Text = "Connected: Live Server";
+                serverPicker.SelectedIndex = 0;
+
+                lblDatabase.Text = Constants.livedatabase;
+                lblApi.Text = Constants.liveapifolder;
+
+                Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
             }
-            else
+            else if (server.Equals("Live Server"))
             {
-                entDatabase.Text = database;
+                lblServer.Text = "Connected: " + server;
+                serverPicker.SelectedIndex = 0;
+
+                lblDatabase.Text = Constants.livedatabase;
+                lblApi.Text = Constants.liveapifolder;
+
+                Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+            }
+            else if(server.Equals("Test Server"))
+            {
+                lblServer.Text = "Connected: " + server;
+                serverPicker.SelectedIndex = 1;
+
+                lblDatabase.Text = Constants.testdatabase;
+                lblApi.Text = Constants.testapifolder;
+
+                Preferences.Set("database", Constants.testdatabase, "private_prefs");
+                Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
             }
 
             var userName = Preferences.Get("username", String.Empty, "private_prefs");
@@ -82,15 +103,15 @@ namespace TBSMobile.View
 
             entUser.Completed += (s, e) => entPassword.Focus();
             entPassword.Completed += (s, e) => Check_Version();
+
             lblVersion.Text = Constants.appversion;
             lblRegistrationCode.Text = "Device ID: " + CrossDeviceInfo.Current.Id;
 
             var firstLaunch = VersionTracking.IsFirstLaunchEver;
 
-            if (firstLaunch == true)
+            if (firstLaunch)
             {
-                string firsttime = "1";
-                Preferences.Set("isfirsttimesync", firsttime, "private_prefs");
+                Preferences.Set("isfirsttimesync", "1", "private_prefs");
             }
         }
 
@@ -137,13 +158,16 @@ namespace TBSMobile.View
 
         public async void Check_Version()
         {
-            var hostName = entHost.Text;
-            var database = entDatabase.Text;
             var userName = entUser.Text;
             var password = entPassword.Text;
-            var ipaddress = entIPAddress.Text;
 
-            if (string.IsNullOrEmpty(hostName) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(ipaddress) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+            var host = Preferences.Get("host", String.Empty, "private_prefs");
+            var database = Preferences.Get("database", String.Empty, "private_prefs");
+            var domain = Preferences.Get("domain", String.Empty, "private_prefs");
+            var apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+            string apifile = "check-version-api.php";
+
+            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
             {
                 if (string.IsNullOrEmpty(userName))
                 {
@@ -163,13 +187,11 @@ namespace TBSMobile.View
                     passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
                 }
 
-                await DisplayAlert("Login Error", "Please fill-up the form", "Ok");
+                await DisplayAlert("Login Error", "Please enter your username and password", "Ok");
             }
             else
             {
-                string apifile = "check-version-api.php";
-
-                await App.TodoManager.CheckVersion(hostName, database, ipaddress, apifile, userName, password);
+                await App.TodoManager.CheckVersion(host, database, domain, apifolder, apifile, userName, password);
             }
         }
 
@@ -204,77 +226,62 @@ namespace TBSMobile.View
 
         private void BtnConnect_Clicked(object sender, EventArgs e)
         {
-            Connect();
+            Save();
         }
 
-        private void BtnChange_Clicked(object sender, EventArgs e)
+        public async void Save()
+        {
+            var picker = serverPicker;
+            int selectedIndex = picker.SelectedIndex;
+            string server = (string)picker.ItemsSource[selectedIndex];
+
+            Preferences.Set("server", server, "private_prefs");
+
+            lblServer.Text = "Connected: " + server;
+
+            if (selectedIndex == 0)
+            {
+                Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+            }
+            else if (selectedIndex == 1)
+            {
+                Preferences.Set("database", Constants.testdatabase, "private_prefs");
+                Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
+            }
+
+            if (!CrossConnectivity.Current.IsConnected)
+            {
+                await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
+            }
+
+            await DisplayAlert("Server Warning", "Warning:\nYou are now connected to " + server, "Ok");
+
+            connectstack.IsVisible = false;
+            loginstack.IsVisible = true;
+        }
+
+        private void ServerPicker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var picker = (Picker)sender;
+            int selectedIndex = picker.SelectedIndex;
+            
+            if(selectedIndex == 0)
+            {
+                lblDatabase.Text = Constants.livedatabase;
+                lblApi.Text = Constants.liveapifolder;
+            }
+            else if (selectedIndex == 1)
+            {
+                lblDatabase.Text = Constants.testdatabase;
+                lblApi.Text = Constants.testapifolder;
+            }
+        }
+
+        private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         {
             connectstack.IsVisible = true;
             loginstack.IsVisible = false;
-        }
-
-        public async void Connect()
-        {
-            var hostName = entHost.Text;
-            var database = entDatabase.Text;
-            var ipaddress = entIPAddress.Text;
-
-            if (String.IsNullOrEmpty(hostName) || String.IsNullOrEmpty(database) || String.IsNullOrEmpty(ipaddress))
-            {
-                if (string.IsNullOrEmpty(entHost.Text))
-                {
-                    hostFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    hostFrame.BorderColor = Color.FromHex("#f2f2f5");
-                }
-
-                if (string.IsNullOrEmpty(entDatabase.Text))
-                {
-                    databaseFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    databaseFrame.BorderColor = Color.FromHex("#f2f2f5");
-                }
-
-                if (string.IsNullOrEmpty(entIPAddress.Text))
-                {
-                    ipaddressFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    ipaddressFrame.BorderColor = Color.FromHex("#f2f2f5");
-                }
-
-                await DisplayAlert("Login Error", "Please fill-up the form", "Ok");
-            }
-            else
-            {
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    //Check if there is an internet connection
-                    connectstack.IsVisible = false;
-                    loginstack.IsVisible = true;
-
-                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
-                    Preferences.Set("host", hostName, "private_prefs");
-                    Preferences.Set("database", database, "private_prefs");
-                }
-                else
-                {
-                    //Check if there is an internet connection
-                    connectstack.IsVisible = false;
-                    loginstack.IsVisible = true;
-
-                    Preferences.Set("ipaddress", ipaddress, "private_prefs");
-                    Preferences.Set("host", hostName, "private_prefs");
-                    Preferences.Set("database", database, "private_prefs");
-
-                    await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
-                }
-            }
         }
     }
 }

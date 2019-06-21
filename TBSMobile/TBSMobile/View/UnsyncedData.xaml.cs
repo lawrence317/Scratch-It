@@ -10,19 +10,12 @@ namespace TBSMobile.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class UnsyncedData : CarouselPage
     {
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
-        
-        public UnsyncedData (string host, string database, string contact, string ipaddress)
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
+
+        public UnsyncedData ()
 		{
 			InitializeComponent ();
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#2ecc71");
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             GetRetailerGroup(contact);
             GetActivity(contact);
@@ -121,7 +114,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 100", contact);
+                var getProspect = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE RetailerType = 'RT00004' AND Supervisor=? AND LastUpdated > LastSync ORDER BY FileAs ASC LIMIT 50", contact);
                 var resultCount = getProspect.Result.Count;
 
                 if (resultCount > 0)

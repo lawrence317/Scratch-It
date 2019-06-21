@@ -10,18 +10,11 @@ namespace TBSMobile.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class RetailerList : ContentPage
 	{
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
 
-        public RetailerList (string host, string database, string contact, string ipaddress)
+        public RetailerList ()
 		{
 			InitializeComponent ();
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             GetRetailer();
             searchCategory.SelectedIndex = 0;
@@ -210,7 +203,7 @@ namespace TBSMobile.View
 
                             string selected = "";
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, selected))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(selected))
                             {
                                 BarBackgroundColor = Color.FromHex("#e67e22")
                             });
@@ -1029,7 +1022,7 @@ namespace TBSMobile.View
 
                             ContactsTable item = (ContactsTable)e.Item;
 
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item, host, database, contact, ipaddress))
+                            await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new RetailerGroupList(item))
                             {
                                 BarBackgroundColor = Color.FromHex("#e67e22")
                             });

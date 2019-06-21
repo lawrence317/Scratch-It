@@ -1,37 +1,27 @@
 ﻿using Microsoft.AppCenter.Crashes;
-using Microsoft.AppCenter.Analytics;
-using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using Newtonsoft.Json;
-using Plugin.DeviceInfo;
 
 namespace TBSMobile.View
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class AddRetailerOutlet : ContentPage
 	{
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
+        string host = Preferences.Get("host", String.Empty, "private_prefs");
+        string database = Preferences.Get("database", String.Empty, "private_prefs");
+        string domain = Preferences.Get("domain", String.Empty, "private_prefs");
+        string apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
         string selected;
 
-        public AddRetailerOutlet (string host, string database, string contact, string ipaddress, string selected)
+        public AddRetailerOutlet (string selected)
 		{
 			InitializeComponent ();
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
-            this.selected = selected;
+
             SetTempRetailerCode();
         }
 
@@ -154,16 +144,16 @@ namespace TBSMobile.View
                             sendstatusform.IsVisible = true;
 
                             sendStatus.Text = "Checking internet connection";
-
+                            
                             if (CrossConnectivity.Current.IsConnected)
                             {
-                                await App.TodoManager.SendRetailerOutletDirectly(host, database, ipaddress, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
-                                await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
+                                await App.TodoManager.SendRetailerOutletDirectly(host, database, domain, apifolder, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await App.TodoManager.OnSendCompleteModal(host, database, domain, contact);
                             }
                             else
                             {
-                                await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
-                                await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
+                                await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await App.TodoManager.OnSendCompleteModal(host, database, domain, contact);
                             }
                         }
                     }

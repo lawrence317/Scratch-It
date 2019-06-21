@@ -10,20 +10,12 @@ namespace TBSMobile.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class ActivityHistoryList : ContentPage
 	{
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
-        
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
 
-        public ActivityHistoryList (string host, string database, string contact, string ipaddress)
+        public ActivityHistoryList ()
 		{
 			InitializeComponent ();
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#f1c40f");
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             GetActivity(contact);
         }

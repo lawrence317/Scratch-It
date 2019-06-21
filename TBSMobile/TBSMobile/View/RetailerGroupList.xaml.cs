@@ -12,21 +12,11 @@ namespace TBSMobile.View
     public partial class RetailerGroupList : ContentPage
     {
         string contactID;
-        string Supervisor;
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
 
-        public RetailerGroupList(ContactsTable item, string host, string database, string contact, string ipaddress)
+        public RetailerGroupList(ContactsTable item)
         {
             InitializeComponent();
             this.contactID = item.ContactID;
-            this.Supervisor = item.Supervisor;
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             GetRetailerGroup(item.ContactID);
             searchCategory.SelectedIndex = 0;
@@ -1032,11 +1022,9 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        var selected = contactID;
-
                         Analytics.TrackEvent("Opened Add Retailer Outlet");
 
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, selected))
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(contactID))
                         {
                             BarBackgroundColor = Color.FromHex("#e67e22")
                         });

@@ -1,16 +1,8 @@
-﻿using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.AppCenter.Crashes;
 using Plugin.Connectivity;
-using Plugin.DeviceInfo;
 using Plugin.Media;
 using Plugin.Media.Abstractions;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -21,18 +13,15 @@ namespace TBSMobile.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class AddProspectRetailer : ContentPage
 	{
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
+        string host = Preferences.Get("host", String.Empty, "private_prefs");
+        string database = Preferences.Get("database", String.Empty, "private_prefs");
+        string domain = Preferences.Get("domain", String.Empty, "private_prefs");
+        string apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
 
-        public AddProspectRetailer (string host, string database, string contact, string ipaddress)
+        public AddProspectRetailer ()
 		{
 			InitializeComponent ();
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             SetTempId();
             Init();
@@ -412,20 +401,20 @@ namespace TBSMobile.View
                                 var recordlog = "AB :" + username + "->" + contact + " " + current_datetime;
 
                                 sendStatus.Text = "Checking internet connection";
-
+                                
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
-                                    await App.TodoManager.SendProspectRetailerDirectly(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.SendProspectRetailerMedia1Directly(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.SendProspectRetailerMedia2Directly(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.SendProspectRetailerMedia3Directly(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.SendProspectRetailerMedia4Directly(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
+                                    await App.TodoManager.SendProspectRetailerDirectly(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.SendProspectRetailerMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.SendProspectRetailerMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.SendProspectRetailerMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.SendProspectRetailerMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.OnSendCompleteModal(host, database, domain, contact);
                                 }
                                 else
                                 {
-                                    await App.TodoManager.SaveProspectRetailerToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
-                                    await App.TodoManager.OnSendCompleteModal(host, database, ipaddress, contact);
+                                    await App.TodoManager.SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstName, middleName, lastName, fileas, retailerType, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, startTime, endTime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                    await App.TodoManager.OnSendCompleteModal(host, database, domain, contact);
                                 }
                             }
                         }

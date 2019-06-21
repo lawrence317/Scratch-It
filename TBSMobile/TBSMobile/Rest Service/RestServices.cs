@@ -226,11 +226,11 @@ namespace TBSMobile.Rest_Service
 
         /* LOGIN REST */
 
-        public async Task CheckVersion(string host, string database, string domain, string apifile, string username, string password)
+        public async Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password)
         {
             if (CrossConnectivity.Current.IsConnected)
             {
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                 try
                 {
@@ -261,7 +261,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                await Login(host, database, domain, username, password);
+                                await Login(host, database, domain, apifolder, username, password);
                             }
                         }
                         else
@@ -282,16 +282,16 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                await Offline_Login(host, database, domain, username, password);
+                await Offline_Login(host, database, domain, apifolder, username, password);
             }
         }
 
-        public async Task Login(string host, string database, string domain, string username, string password)
+        public async Task Login(string host, string database, string domain, string apifolder, string username, string password)
         {
             try
             {
                 string login_apifile = "login-api.php";
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
                 
                 try
                 {
@@ -358,7 +358,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (trialsub == true)
                                 {
-                                    await Activate_Trial(host, database, domain, username, password);
+                                    await Activate_Trial(host, database, domain, apifolder, username, password);
                                 }
                                 else
                                 {
@@ -399,7 +399,7 @@ namespace TBSMobile.Rest_Service
 
                                 Save_Preferences(username, password, contactID);
 
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                             }
                             else if (message.Equals("Not Connected"))
                             {
@@ -410,11 +410,11 @@ namespace TBSMobile.Rest_Service
                                 var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
                                 if (retry)
                                 {
-                                    await Login(host, database, domain, username, password);
+                                    await Login(host, database, domain, apifolder, username, password);
                                 }
                                 else
                                 {
-                                    await Offline_Login(host, database, domain, username, password);
+                                    await Offline_Login(host, database, domain, apifolder, username, password);
                                 }
                             }
                         }
@@ -441,7 +441,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task Offline_Login(string host, string database, string domain, string username, string password)
+        public async Task Offline_Login(string host, string database, string domain, string apifolder, string username, string password)
         {
             try
             {
@@ -522,7 +522,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                             }
                         }
                         else if (Trials == "3")
@@ -556,7 +556,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                             }
                         }
                         else if (Trials == "4")
@@ -590,7 +590,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
+                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                             }
                         }
                         else
@@ -617,8 +617,9 @@ namespace TBSMobile.Rest_Service
                             Preferences.Set("host", host, "private_prefs");
                             Preferences.Set("database", database, "private_prefs");
                             Preferences.Set("password", password, "private_prefs");
+                            Preferences.Set("contact", contactID, "private_prefs");
 
-                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage(host, database, contactID, domain));
+                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                         }
                     }
                 }                
@@ -630,10 +631,10 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task Activate_Trial(string host, string database, string domain, string username, string password)
+        public async Task Activate_Trial(string host, string database, string domain, string apifolder, string username, string password)
         {
             string trialapifile = "activate-trial-api.php";
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + trialapifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + trialapifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&RegistrationCode=" + Constants.deviceID, string.Empty));
 
             try
             {
@@ -666,11 +667,11 @@ namespace TBSMobile.Rest_Service
                             var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
                             if (retry)
                             {
-                                await Login(host, database, domain, username, password);
+                                await Login(host, database, domain, apifolder, username, password);
                             }
                             else
                             {
-                                await Offline_Login(host, database, domain, username, password);
+                                await Offline_Login(host, database, domain, apifolder, username, password);
                             }
                         }
                     }
@@ -703,7 +704,7 @@ namespace TBSMobile.Rest_Service
 
            /* FIRST-TIME SYNC REST */
 
-        public async Task FirstTimeSyncUser(string host, string database, string domain, string contact, Action<string> SyncStatus)
+        public async Task FirstTimeSyncUser(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus)
         {
             SyncStatus("Initiating first-time user sync");
             SyncStatus("Checking connection to server");
@@ -713,7 +714,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-user-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -775,7 +776,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncUser(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -790,7 +791,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncUser(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -804,7 +805,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncUser(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -813,7 +814,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncSystemSerial(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncSystemSerial(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time system serial sync");
             SyncStatus("Checking connection to server");
@@ -823,7 +824,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-system-serial-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID, string.Empty));
 
                 try
                 {
@@ -888,7 +889,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncSystemSerial(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -903,7 +904,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncSystemSerial(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -917,7 +918,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncSystemSerial(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -926,7 +927,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncContacts(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncContacts(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time retailer sync");
             SyncStatus("Checking connection to server");
@@ -936,7 +937,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-contacts-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -1061,7 +1062,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncContacts(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1076,7 +1077,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncContacts(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1090,7 +1091,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncContacts(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1099,7 +1100,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncRetailerOutlet(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncRetailerOutlet(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time retailer outlet sync");
             SyncStatus("Checking connection to server");
@@ -1109,7 +1110,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-retailer-outlet-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -1194,7 +1195,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1209,7 +1210,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1223,7 +1224,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1232,7 +1233,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncCAF(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncCAF(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time coordinator activity form sync");
             SyncStatus("Checking connection to server");
@@ -1242,7 +1243,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-caf-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -1331,7 +1332,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncCAF(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1346,7 +1347,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncCAF(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1360,7 +1361,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncCAF(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1369,7 +1370,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncCAFActivity(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncCAFActivity(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time coordinator activity sync");
             SyncStatus("Checking connection to server");
@@ -1379,7 +1380,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-caf-activity-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -1436,7 +1437,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1451,7 +1452,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1465,7 +1466,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1474,7 +1475,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncEmailRecipient(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncEmailRecipient(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time email recipient sync");
             SyncStatus("Checking connection to server");
@@ -1484,7 +1485,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-email-recipient-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -1543,7 +1544,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncEmailRecipient(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1558,7 +1559,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncEmailRecipient(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1572,7 +1573,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncEmailRecipient(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1581,7 +1582,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncProvince(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncProvince(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time province Sync");
             SyncStatus("Checking connection to server");
@@ -1591,7 +1592,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-province-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                 try
                 {
@@ -1648,7 +1649,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncProvince(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1663,7 +1664,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncProvince(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1677,7 +1678,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncProvince(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1686,7 +1687,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task FirstTimeSyncTown(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task FirstTimeSyncTown(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating first-time town sync");
             SyncStatus("Checking connection to server");
@@ -1696,7 +1697,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-town-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                 try
                 {
@@ -1756,7 +1757,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await FirstTimeSyncTown(host, database, domain, contact, SyncStatus);
+                            await FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -1771,7 +1772,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await FirstTimeSyncTown(host, database, domain, contact, SyncStatus);
+                        await FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -1785,7 +1786,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await FirstTimeSyncTown(host, database, domain, contact, SyncStatus);
+                    await FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1796,7 +1797,7 @@ namespace TBSMobile.Rest_Service
 
            /* CLIENT UPDATE SYNC REST */
 
-        public async Task SyncUserClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncUserClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update user uync");
             SyncStatus("Checking connection to server");
@@ -1818,7 +1819,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending user changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -1866,7 +1867,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncUserClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -1881,7 +1882,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncUserClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -1896,7 +1897,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncUserClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -1918,7 +1919,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncUserClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -1933,7 +1934,7 @@ namespace TBSMobile.Rest_Service
             await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
         }
 
-        public async Task SyncContactsClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer sync");
             SyncStatus("Checking connection to server");
@@ -1955,7 +1956,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2061,7 +2062,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncContactsClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2076,7 +2077,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncContactsClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2091,7 +2092,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncContactsClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2113,7 +2114,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2122,7 +2123,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncContactsMedia1ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsMedia1ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer photo 1 sync");
             SyncStatus("Checking connection to server");
@@ -2144,7 +2145,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2196,7 +2197,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncContactsMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2211,7 +2212,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncContactsMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2226,7 +2227,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncContactsMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2248,7 +2249,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2257,7 +2258,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncContactsMedia2ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsMedia2ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer photo 2 Sync");
             SyncStatus("Checking connection to server");
@@ -2279,7 +2280,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2331,7 +2332,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncContactsMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2346,7 +2347,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncContactsMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2361,7 +2362,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncContactsMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2383,7 +2384,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2392,7 +2393,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncContactsMedia3ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsMedia3ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer photo 3 sync");
             SyncStatus("Checking connection to server");
@@ -2414,7 +2415,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2466,7 +2467,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncContactsMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2481,7 +2482,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncContactsMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2496,7 +2497,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncContactsMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2518,7 +2519,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2527,7 +2528,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncContactsMedia4ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsMedia4ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer video sync");
             SyncStatus("Checking connection to server");
@@ -2549,7 +2550,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2601,7 +2602,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncContactsMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2616,7 +2617,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncContactsMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2631,7 +2632,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncContactsMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2653,7 +2654,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2662,7 +2663,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncRetailerOutletClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncRetailerOutletClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update retailer outlet Sync");
             SyncStatus("Checking connection to server");
@@ -2684,7 +2685,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer outlet changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2754,7 +2755,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncRetailerOutletClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2769,7 +2770,7 @@ namespace TBSMobile.Rest_Service
                                 
                                 if (retry)
                                 {
-                                    await SyncRetailerOutletClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2784,7 +2785,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncRetailerOutletClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2806,7 +2807,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncRetailerOutletClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2821,7 +2822,7 @@ namespace TBSMobile.Rest_Service
             await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
         }
 
-        public async Task SyncCAFClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity form sync");
             SyncStatus("Checking connection to server");
@@ -2843,7 +2844,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -2909,7 +2910,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -2924,7 +2925,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -2939,7 +2940,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -2961,7 +2962,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -2970,7 +2971,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncCAFMedia1ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFMedia1ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity form photo 1 sync");
             SyncStatus("Checking connection to server");
@@ -2992,7 +2993,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3044,7 +3045,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3059,7 +3060,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3074,7 +3075,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3096,7 +3097,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFMedia1ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3105,7 +3106,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncCAFMedia2ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFMedia2ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity form photo 2 sync");
             SyncStatus("Checking connection to server");
@@ -3127,7 +3128,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3179,7 +3180,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3194,7 +3195,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3209,7 +3210,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3231,7 +3232,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFMedia2ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3240,7 +3241,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncCAFMedia3ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFMedia3ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity form photo 3 sync");
             SyncStatus("Checking connection to server");
@@ -3262,7 +3263,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3314,7 +3315,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3329,7 +3330,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3344,7 +3345,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3366,7 +3367,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFMedia3ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3375,7 +3376,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncCAFMedia4ClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFMedia4ClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity form video Sync");
             SyncStatus("Checking connection to server");
@@ -3397,7 +3398,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3449,7 +3450,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3464,7 +3465,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3479,7 +3480,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3501,7 +3502,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFMedia4ClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3510,7 +3511,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncCAFActivityClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncCAFActivityClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update coordinator activity sync");
             SyncStatus("Checking connection to server");
@@ -3532,7 +3533,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3577,7 +3578,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncCAFActivityClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3592,7 +3593,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncCAFActivityClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3607,7 +3608,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncCAFActivityClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3629,7 +3630,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncCAFActivityClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3638,7 +3639,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncEmailRecipientClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncEmailRecipientClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update email recipient sync");
             SyncStatus("Checking connection to server");
@@ -3660,7 +3661,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending email recipient changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3705,7 +3706,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncEmailRecipientClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                         else
                                         {
@@ -3720,7 +3721,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncEmailRecipientClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                                 else
                                 {
@@ -3735,7 +3736,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncEmailRecipientClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                             else
                             {
@@ -3757,7 +3758,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncEmailRecipientClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3766,7 +3767,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncUserLogsClientUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncUserLogsClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating client update user logs sync");
             SyncStatus("Checking connection to server");
@@ -3788,7 +3789,7 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending user logs changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
                         try
                         {
@@ -3836,7 +3837,7 @@ namespace TBSMobile.Rest_Service
 
                                         if (retry)
                                         {
-                                            await SyncUserLogsClientUpdate(host, database, domain, contact, SyncStatus);
+                                            await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                         }
                                     }
                                 }
@@ -3847,7 +3848,7 @@ namespace TBSMobile.Rest_Service
 
                                 if (retry)
                                 {
-                                    await SyncUserLogsClientUpdate(host, database, domain, contact, SyncStatus);
+                                    await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                                 }
                             }
                         }
@@ -3858,7 +3859,7 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SyncUserLogsClientUpdate(host, database, domain, contact, SyncStatus);
+                                await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                             }
                         }
                     }
@@ -3876,14 +3877,14 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncUserLogsClientUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
         }
 
             /* SERVER UPDATE SYNC REST */
 
-        public async Task SyncUserServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncUserServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update user sync");
             SyncStatus("Checking connection to server");
@@ -3895,7 +3896,7 @@ namespace TBSMobile.Rest_Service
 
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -3957,7 +3958,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncUserServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -3972,7 +3973,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncUserServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -3986,7 +3987,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncUserServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -3995,7 +3996,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncSystemSerialServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncSystemSerialServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update system serial sync");
             SyncStatus("Checking connection to server");
@@ -4006,7 +4007,7 @@ namespace TBSMobile.Rest_Service
                 var lastchecked = Preferences.Get("systemserialchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -4071,7 +4072,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncSystemSerialServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -4086,7 +4087,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncSystemSerialServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -4100,7 +4101,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncSystemSerialServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -4109,7 +4110,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncContactsServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncContactsServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update retailer sync");
             SyncStatus("Checking connection to server");
@@ -4120,7 +4121,7 @@ namespace TBSMobile.Rest_Service
                 var lastchecked = Preferences.Get("contactschangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -4245,7 +4246,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncContactsServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -4260,7 +4261,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncContactsServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -4274,7 +4275,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncContactsServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -4283,7 +4284,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncRetailerOutletServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncRetailerOutletServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update retailer outlet sync");
             SyncStatus("Checking connection to server");
@@ -4294,7 +4295,7 @@ namespace TBSMobile.Rest_Service
                 var lastchecked = Preferences.Get("retaileroutletchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -4379,7 +4380,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncRetailerOutletServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -4394,7 +4395,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncRetailerOutletServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -4408,7 +4409,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncRetailerOutletServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -4417,7 +4418,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncProvinceServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncProvinceServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update province Sync");
             SyncStatus("Checking connection to server");
@@ -4428,7 +4429,7 @@ namespace TBSMobile.Rest_Service
                 var lastchecked = Preferences.Get("provincechangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -4485,7 +4486,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncProvinceServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -4500,7 +4501,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncProvinceServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -4514,7 +4515,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncProvinceServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -4523,7 +4524,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SyncTownServerUpdate(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task SyncTownServerUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating server update town sync");
             SyncStatus("Checking connection to server");
@@ -4534,7 +4535,7 @@ namespace TBSMobile.Rest_Service
                 var lastchecked = Preferences.Get("townchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
@@ -4593,7 +4594,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SyncTownServerUpdate(host, database, domain, contact, SyncStatus);
+                            await SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                         else
                         {
@@ -4608,7 +4609,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SyncTownServerUpdate(host, database, domain, contact, SyncStatus);
+                        await SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                     }
                     else
                     {
@@ -4622,7 +4623,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SyncTownServerUpdate(host, database, domain, contact, SyncStatus);
+                    await SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
                 else
                 {
@@ -4633,7 +4634,7 @@ namespace TBSMobile.Rest_Service
 
             /* RE-SYNC REST */
 
-        public async Task ReSynContacts(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task ReSynContacts(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating retailer re-sync");
             SyncStatus("Checking connection to server");
@@ -4645,7 +4646,7 @@ namespace TBSMobile.Rest_Service
                 string apifile = "resync-contacts-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -4683,7 +4684,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await ReSynContacts(host, database, domain, contact, SyncStatus);
+                            await ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                 }
@@ -4694,7 +4695,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await ReSynContacts(host, database, domain, contact, SyncStatus);
+                        await ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
                     }
                 }
             }
@@ -4704,12 +4705,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await ReSynContacts(host, database, domain, contact, SyncStatus);
+                    await ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
         }
 
-        public async Task ReSyncRetailerOutlet(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task ReSyncRetailerOutlet(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating retailer outlet re-sync");
             SyncStatus("Checking connection to server");
@@ -4721,7 +4722,7 @@ namespace TBSMobile.Rest_Service
 
                 await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -4759,7 +4760,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await ReSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                            await ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                 }
@@ -4770,7 +4771,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await ReSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                        await ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                     }
                 }
             }
@@ -4780,12 +4781,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await ReSyncRetailerOutlet(host, database, domain, contact, SyncStatus);
+                    await ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
         }
 
-        public async Task ReSyncCAF(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task ReSyncCAF(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating coordinator activity form re-sync");
             SyncStatus("Checking connection to server");
@@ -4797,7 +4798,7 @@ namespace TBSMobile.Rest_Service
 
                 await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -4835,7 +4836,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await ReSyncCAF(host, database, domain, contact, SyncStatus);
+                            await ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                 }
@@ -4846,7 +4847,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await ReSyncCAF(host, database, domain, contact, SyncStatus);
+                        await ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                     }
                 }
             }
@@ -4856,12 +4857,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await ReSyncCAF(host, database, domain, contact, SyncStatus);
+                    await ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
         }
 
-        public async Task ReSyncCAFActivity(string host, string database, string domain, string contact, Action<string>SyncStatus)
+        public async Task ReSyncCAFActivity(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
             SyncStatus("Initiating coordinator activity re-sync");
             SyncStatus("Checking connection to server");
@@ -4873,7 +4874,7 @@ namespace TBSMobile.Rest_Service
 
                 await Constants.conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
 
                 try
                 {
@@ -4912,7 +4913,7 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await ReSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                            await ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                 }
@@ -4923,7 +4924,7 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await ReSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                        await ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                     }
                 }
             }
@@ -4933,13 +4934,13 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await ReSyncCAFActivity(host, database, domain, contact, SyncStatus);
+                    await ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
         }
 
             /* CHECK AUTO SYNC FUNCTION  */
-        public async Task CheckContactsData(string host, string database, string domain, string contact)
+        public async Task CheckContactsData(string contact)
         {
             var getcontactschanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var contactchangesresultCount = getcontactschanges.Result.Count;
@@ -4947,7 +4948,7 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("contactschanges", contactchangesresultCount.ToString(), "private_prefs");
         }
 
-        public async Task CheckRetailerOutletData(string host, string database, string domain, string contact)
+        public async Task CheckRetailerOutletData( string contact)
         {
             var getretaileroutletchanges = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
@@ -4955,7 +4956,7 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("retaileroutletchanges", retaileroutletchangesresultCount.ToString(), "private_prefs");
         }
 
-        public async Task CheckCAFData(string host, string database, string domain, string contact)
+        public async Task CheckCAFData(string contact)
         {
             var getcafchanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var cafchangesresultCount = getcafchanges.Result.Count;
@@ -4963,7 +4964,7 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("cafchanges", cafchangesresultCount.ToString(), "private_prefs");
         }
 
-        public async Task CheckCAFActivityData(string host, string database, string domain, string contact)
+        public async Task CheckCAFActivityData(string contact)
         {
             var getactchanges = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var actchangesresultCount = getactchanges.Result.Count;
@@ -4971,7 +4972,7 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("cafactivitychanges", actchangesresultCount.ToString(), "private_prefs");
         }
 
-        public async Task CheckEmailRecipientData(string host, string database, string domain, string contact)
+        public async Task CheckEmailRecipientData(string contact)
         {            
             var getemailchanges = Constants.conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
             var emailchangesresultCount = getemailchanges.Result.Count;
@@ -4979,7 +4980,7 @@ namespace TBSMobile.Rest_Service
             Preferences.Set("emailrecipientchanges", emailchangesresultCount.ToString(), "private_prefs");
         }
 
-        public async Task CheckAutoSync(string host, string database, string domain, string contact, Action<string> SyncStatus)
+        public async Task CheckAutoSync(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus)
         {
             var contactschanges = Preferences.Get("contactschanges", String.Empty, "private_prefs");
             var retaileroutletchanges = Preferences.Get("retaileroutletchanges", String.Empty, "private_prefs");
@@ -5013,13 +5014,13 @@ namespace TBSMobile.Rest_Service
 
             /* DIRECT SEND CAF TO SERVER REST */
 
-        public async Task SendCAFDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFDirectly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form to server");
 
             string apifile = "sync-caf-directly-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5072,9 +5073,9 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                            await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                            await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                         }
                         else
                         {
@@ -5082,13 +5083,13 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFDirectly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
 
                             }
                         }
@@ -5099,13 +5100,13 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SendCAFDirectly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                         }
                         else
                         {
-                            await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                            await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                            await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                         }
                     }
                 }
@@ -5115,13 +5116,13 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFDirectly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
             }
@@ -5132,24 +5133,24 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFDirectly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SendCAFMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia1Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form photo 1 to server");
 
             string apifile = "sync-caf-media-path-1-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5191,13 +5192,13 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia1Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
                     }
@@ -5208,13 +5209,13 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia1Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
                 
@@ -5226,24 +5227,24 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia1Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SendCAFMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia2Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form photo 2 to server");
 
             string apifile = "sync-caf-media-path-2-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5285,13 +5286,13 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia2Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
                     }
@@ -5302,13 +5303,13 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia2Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
             }
@@ -5319,24 +5320,24 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia2Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SendCAFMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia3Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form photo 3 to server");
 
             string apifile = "sync-caf-media-path-3-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5378,13 +5379,13 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia3Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
                     }
@@ -5395,13 +5396,13 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia3Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
             }
@@ -5412,24 +5413,24 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia3Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SendCAFMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia4Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Sending coordinator activity form video to server");
 
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5471,13 +5472,13 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia4Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
                     }
@@ -5488,13 +5489,13 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia4Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
             }
@@ -5505,18 +5506,18 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia4Directly(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SaveCAFToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
+        public async Task SaveCAFToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
             
@@ -5555,12 +5556,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
                 }
             }
         }
 
-        public async Task SaveRetailerOutletToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
+        public async Task SaveRetailerOutletToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet update to local database");
             
@@ -5575,16 +5576,16 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                 }
                 else
                 {
-                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                 }
             }
         }
 
-        public async Task SaveCAFActivityToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SaveCAFActivityToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Saving coordinator activity to local database");
             
@@ -5682,12 +5683,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
-        public async Task SaveCAFToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
+        public async Task SaveCAFToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
             
@@ -5725,12 +5726,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
                 }
             }
         }
 
-        public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
+        public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet update to local database");
 
@@ -5745,12 +5746,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                 }
             }
         }
 
-        public async Task SaveCAFActivityToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SaveCAFActivityToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
         {
             SyncStatus("Saving coordinator activity to local database");
 
@@ -5844,20 +5845,20 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
         }
 
         /* DIRECT SEND PROSPECT RETAILER TO SERVER REST */
 
-        public async Task SendProspectRetailerDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SendProspectRetailerDirectly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer to server");
 
             string apifile = "sync-prospect-directly-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -5912,7 +5913,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                            await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                         }
                         else
                         {
@@ -5920,11 +5921,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendProspectRetailerDirectly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SendProspectRetailerDirectly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                             else
                             {
-                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                         }
                     }
@@ -5934,11 +5935,11 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SendProspectRetailerDirectly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                            await SendProspectRetailerDirectly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                         }
                         else
                         {
-                            await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                            await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                         }
                     }
                 }
@@ -5948,11 +5949,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendProspectRetailerDirectly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SendProspectRetailerDirectly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                     else
                     {
-                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                 }
             }
@@ -5963,24 +5964,24 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendProspectRetailerDirectly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SendProspectRetailerDirectly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
 
                 }
             }            
         }
 
-        public async Task SendProspectRetailerMedia1Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SendProspectRetailerMedia1Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer photo 1 to server");
             
 
             string apifile = "sync-contact-media-path-1-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -6022,11 +6023,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendProspectRetailerMedia1Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SendProspectRetailerMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                             else
                             {
-                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                         }
                     }
@@ -6037,11 +6038,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendProspectRetailerMedia1Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SendProspectRetailerMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                     else
                     {
-                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                 }
 
@@ -6053,21 +6054,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendProspectRetailerMedia1Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SendProspectRetailerMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
-        public async Task SendProspectRetailerMedia2Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SendProspectRetailerMedia2Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer photo 2 to server");
             string apifile = "sync-contact-media-path-2-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -6109,11 +6110,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendProspectRetailerMedia2Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SendProspectRetailerMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                             else
                             {
-                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                         }
                     }
@@ -6124,11 +6125,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendProspectRetailerMedia2Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SendProspectRetailerMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                     else
                     {
-                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                 }
 
@@ -6140,22 +6141,22 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendProspectRetailerMedia2Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SendProspectRetailerMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
-        public async Task SendProspectRetailerMedia3Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SendProspectRetailerMedia3Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer photo 3 to server");
 
             string apifile = "sync-contact-media-path-3-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -6197,11 +6198,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendProspectRetailerMedia3Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SendProspectRetailerMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                             else
                             {
-                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                         }
                     }
@@ -6212,11 +6213,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendProspectRetailerMedia3Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SendProspectRetailerMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                     else
                     {
-                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                 }
 
@@ -6228,21 +6229,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendProspectRetailerMedia3Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SendProspectRetailerMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
-        public async Task SendProspectRetailerMedia4Directly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SendProspectRetailerMedia4Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Sending prospect retailer video to server");
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -6284,11 +6285,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendProspectRetailerMedia4Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SendProspectRetailerMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                             else
                             {
-                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                                await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                             }
                         }
                     }
@@ -6299,11 +6300,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendProspectRetailerMedia4Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SendProspectRetailerMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                     else
                     {
-                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                     }
                 }
             }
@@ -6314,16 +6315,16 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendProspectRetailerMedia4Directly(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SendProspectRetailerMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
-        public async Task SaveProspectRetailerToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SaveProspectRetailerToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Saving prospect retailer to local database");
 
@@ -6378,16 +6379,16 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
                 else
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
-        public async Task SaveProspectRetailerToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
+        public async Task SaveProspectRetailerToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string firstname, string middlename, string lastname, string fileas, string retailertype, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string date, string remarks, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, int employee, int customer, int deleted, string recordlog)
         {
             SyncStatus("Saving prospect retailer to local database");
 
@@ -6441,20 +6442,20 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                    await SaveProspectRetailerToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                 }
             }
         }
 
         /* DIRECT SEND RETAILER OUTLET TO SERVER REST */
 
-        public async Task SendRetailerOutletDirectly(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
+        public async Task SendRetailerOutletDirectly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
         {
             SyncStatus("Sending retailer outlet to server");
 
             string apifile = "sync-retailer-outlet-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/app_api/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
@@ -6494,7 +6495,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                         }
                         else
                         {
@@ -6502,11 +6503,11 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendRetailerOutletDirectly(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await SendRetailerOutletDirectly(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                             }
                             else
                             {
-                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                             }
                         }
                     }
@@ -6516,11 +6517,11 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SendRetailerOutletDirectly(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                            await SendRetailerOutletDirectly(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                         }
                         else
                         {
-                            await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                            await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                         }
                     }
                 }
@@ -6530,11 +6531,11 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendRetailerOutletDirectly(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                        await SendRetailerOutletDirectly(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                     }
                     else
                     {
-                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                     }
                 }
             }
@@ -6545,16 +6546,16 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendRetailerOutletDirectly(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                    await SendRetailerOutletDirectly(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                 }
                 else
                 {
-                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                 }
             }
         }
 
-        public async Task SaveRetailerOutletToLocalDatabaseSuccess(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
+        public async Task SaveRetailerOutletToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet to local database");
 
@@ -6592,16 +6593,16 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                 }
                 else
                 {
-                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                 }
             }
         }
 
-        public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
+        public async Task SaveRetailerOutletToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string id, string retailercode, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string deleted, string location, string recordlog)
         {
             SyncStatus("Saving retailer outlet to local database");
 
@@ -6638,14 +6639,14 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, id, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, deleted, location, recordlog);
                 }
             }
         }
 
         public async Task OnSyncComplete(string host, string database, string domain, string contact)
         {
-            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu(host, database, contact, domain));
+            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
         }
 
         public async Task OnSendComplete(string host, string database, string domain, string contact)

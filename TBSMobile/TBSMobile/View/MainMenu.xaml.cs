@@ -3,29 +3,24 @@ using Microsoft.AppCenter.Crashes;
 using Plugin.Connectivity;
 using Plugin.Geolocator;
 using System;
-using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Net.Http;
 
 namespace TBSMobile.View
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainMenu : ContentPage
     {
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
+        string host = Preferences.Get("host", String.Empty, "private_prefs");
+        string database = Preferences.Get("database", String.Empty, "private_prefs");
+        string domain = Preferences.Get("domain", String.Empty, "private_prefs");
+        string apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
 
-        public MainMenu(string host, string database, string contact, string ipaddress)
+        public MainMenu()
         {
             InitializeComponent();
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
 
             CheckConnectionContinuously();
         }
@@ -48,11 +43,11 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
+                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                        await App.TodoManager.CheckRetailerOutletData(contact);
+                        await App.TodoManager.CheckCAFData(contact);
+                        await App.TodoManager.CheckCAFActivityData(contact);
+                        await App.TodoManager.CheckEmailRecipientData(contact);
 
                         var isfirsttimesync = Preferences.Get("isfirsttimesync", String.Empty, "private_prefs");
                         if (isfirsttimesync == "1")
@@ -70,8 +65,8 @@ namespace TBSMobile.View
                             {
                                 Online_Text();
                                 Disable_UI();
-
-                                await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                                
+                                await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                                 Online_Text();
                                 Enable_UI();
@@ -132,7 +127,7 @@ namespace TBSMobile.View
                         else
                         {
                             Analytics.TrackEvent("Opened Field Activity Form");
-                            await Navigation.PushAsync(new FieldActivityForm(host, database, contact, ipaddress));
+                            await Navigation.PushAsync(new FieldActivityForm());
                         }
                     }
                     else
@@ -166,7 +161,7 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
                         Analytics.TrackEvent("Opened Add Prospect Retailer Form");
-                        await Navigation.PushAsync(new ProspectRetailerList(host, database, contact, ipaddress));
+                        await Navigation.PushAsync(new ProspectRetailerList());
                     }
                     else
                     {
@@ -199,7 +194,7 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
                         Analytics.TrackEvent("Opened Add Retailer Outlet Form");
-                        await Navigation.PushAsync(new RetailerList(host, database, contact, ipaddress));
+                        await Navigation.PushAsync(new RetailerList());
                     }
                     else
                     {
@@ -259,18 +254,18 @@ namespace TBSMobile.View
             {
                 CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
                 {
-                    await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                    await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
+                    await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                    await App.TodoManager.CheckRetailerOutletData(contact);
+                    await App.TodoManager.CheckCAFData(contact);
+                    await App.TodoManager.CheckCAFActivityData(contact);
+                    await App.TodoManager.CheckEmailRecipientData(contact);
 
                     if (CrossConnectivity.Current.IsConnected)
                     {
                         Online_Text();
                         Disable_UI();
-
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Online_Text();
                         Enable_UI();
@@ -306,7 +301,7 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        await Navigation.PushAsync(new UnsyncedData(host, database, contact, ipaddress));
+                        await Navigation.PushAsync(new UnsyncedData());
                     }
                     else
                     {
@@ -339,7 +334,7 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
                         Analytics.TrackEvent("Opened Activity History");
-                        await Navigation.PushAsync(new ActivityHistoryList(host, database, contact, ipaddress));
+                        await Navigation.PushAsync(new ActivityHistoryList());
                     }
                     else
                     {
@@ -362,21 +357,21 @@ namespace TBSMobile.View
                 if (CrossConnectivity.Current.IsConnected)
                 {
                     string action = await DisplayActionSheet("What data do you want to re-sync?", "Cancel", null, "All Data", "Retailer Data Only", "Retailer Outlet Data Only", "CAF Data Only", "CAF Activity Data Only");
-
+                    
                     if (action == "All Data")
                     {
                         Disable_UI();
 
-                        await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckEmailRecipientData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                        await App.TodoManager.CheckRetailerOutletData(contact);
+                        await App.TodoManager.CheckCAFData(contact);
+                        await App.TodoManager.CheckCAFActivityData(contact);
+                        await App.TodoManager.CheckEmailRecipientData(contact);
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Enable_UI();
                     }
@@ -384,9 +379,9 @@ namespace TBSMobile.View
                     {
                         Disable_UI();
 
-                        await App.TodoManager.ReSynContacts(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.CheckContactsData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Enable_UI();
                     }
@@ -394,9 +389,9 @@ namespace TBSMobile.View
                     {
                         Disable_UI();
 
-                        await App.TodoManager.ReSyncRetailerOutlet(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.CheckRetailerOutletData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.CheckRetailerOutletData(contact);
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Enable_UI();
                     }
@@ -404,9 +399,9 @@ namespace TBSMobile.View
                     {
                         Disable_UI();
 
-                        await App.TodoManager.ReSyncCAF(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.CheckCAFData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.CheckCAFData(contact);
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Enable_UI();
                     }
@@ -414,9 +409,9 @@ namespace TBSMobile.View
                     {
                         Disable_UI();
 
-                        await App.TodoManager.ReSyncCAFActivity(host, database, ipaddress, contact, SyncStatus);
-                        await App.TodoManager.CheckCAFActivityData(host, database, ipaddress, contact);
-                        await App.TodoManager.CheckAutoSync(host, database, ipaddress, contact, SyncStatus);
+                        await App.TodoManager.ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                        await App.TodoManager.CheckCAFActivityData(contact);
+                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                         Enable_UI();
                     }

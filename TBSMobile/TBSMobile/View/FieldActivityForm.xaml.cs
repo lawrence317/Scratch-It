@@ -1,9 +1,7 @@
 ﻿using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Plugin.Connectivity;
-using Plugin.DeviceInfo;
 using Plugin.Geolocator;
 using Plugin.Geolocator.Abstractions;
 using Plugin.Media;
@@ -11,10 +9,7 @@ using Plugin.Media.Abstractions;
 using Plugin.Messaging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -25,17 +20,15 @@ namespace TBSMobile.View
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FieldActivityForm : ContentPage
     {
-        string contact;
-        string host;
-        string database;
-        string ipaddress;
-        public FieldActivityForm(string host, string database, string contact, string ipaddress)
+        string host = Preferences.Get("host", String.Empty, "private_prefs");
+        string database = Preferences.Get("database", String.Empty, "private_prefs");
+        string domain = Preferences.Get("domain", String.Empty, "private_prefs");
+        string apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+        string contact = Preferences.Get("contactid", String.Empty, "private_prefs");
+
+        public FieldActivityForm()
         {
             InitializeComponent();
-            this.contact = contact;
-            this.host = host;
-            this.database = database;
-            this.ipaddress = ipaddress;
             
             Init();
         }
@@ -1337,23 +1330,23 @@ namespace TBSMobile.View
                                 sendstatusform.IsVisible = true;
 
                                 sendStatus.Text = "Checking internet connection";
-
+                                
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
-                                    await App.TodoManager.SendCAFDirectly(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.SendCAFMedia1Directly(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.SendCAFMedia2Directly(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.SendCAFMedia3Directly(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.SendCAFMedia4Directly(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.OnSendComplete(host, database, ipaddress, contact);
+                                    await App.TodoManager.SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.OnSendComplete(host, database, domain, contact);
                                     Send_email();
                                 }
                                 else
                                 {
-                                    await App.TodoManager.SaveCAFToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, startTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                    await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                    await App.TodoManager.SaveCAFActivityToLocalDatabaseFailed(host, database, ipaddress, contact, SyncStatus, caf, employeeNumber, recordlog, rekorida, merchandizing, tradecheck, others);
-                                    await App.TodoManager.OnSendComplete(host, database, ipaddress, contact);
+                                    await App.TodoManager.SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, startTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                    await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                    await App.TodoManager.SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeeNumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.OnSendComplete(host, database, domain, contact);
                                     Send_email();
                                 }
                             }
@@ -1494,7 +1487,7 @@ namespace TBSMobile.View
 
                         Analytics.TrackEvent("Opened Add Retailer Outlet");
 
-                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(host, database, contact, ipaddress, selected))
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new NavigationPage(new AddRetailerOutlet(selected))
                         {
                             BarBackgroundColor = Color.FromHex("#3498db")
                         });
