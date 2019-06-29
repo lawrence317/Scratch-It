@@ -34,43 +34,10 @@ namespace TBSMobile.View
                     if (isfirsttimesync == "1")
                     {
                         await App.TodoManager.FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.OnSyncComplete(host, database, domain, contact);
                     }
                     else
                     {
                         await App.TodoManager.SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.UpdateContacts(contact);
-                        await App.TodoManager.SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.UpdateCAF(contact);
-                        await App.TodoManager.SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
-                        await App.TodoManager.OnSyncComplete(host, database, domain, contact);
                     }
                 }
                 else

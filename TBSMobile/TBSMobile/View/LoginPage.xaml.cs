@@ -255,7 +255,7 @@ namespace TBSMobile.View
                 await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
             }
 
-            await DisplayAlert("Server Warning", "Warning:\nYou are now connected to " + server, "Ok");
+            await DisplayAlert("Connection To Server Warning", "Warning:\nYou are now connecting to " + server, "Ok");
 
             connectstack.IsVisible = false;
             loginstack.IsVisible = true;

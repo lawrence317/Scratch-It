@@ -235,7 +235,7 @@ namespace TBSMobile.Rest_Service
                 try
                 {
                     var response = await client.GetAsync(uri);
-
+                    
                     if (response.IsSuccessStatusCode)
                     {
                         var content = await response.Content.ReadAsStringAsync();
@@ -266,18 +266,45 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\n Error:\n\n The server returned a null value.", "Ok");
+                            var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Error:\n\nThe server returned a null value", "Yes", "No");
+
+                            if (retry)
+                            {
+                                await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                            }
+                            else
+                            {
+                                await Offline_Login(host, database, domain, apifolder, username, password);
+                            }
                         }
                     }
                     else
                     {
-                        await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\n Status Code:\n\n" + response.StatusCode, "Ok");
+                        var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+
+                        if (retry)
+                        {
+                            await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                        }
+                        else
+                        {
+                            await Offline_Login(host, database, domain, apifolder, username, password);
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\n Error:\n\n" + ex.Message, "Ok");
+                    var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                    if (retry)
+                    {
+                        await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                    }
+                    else
+                    {
+                        await Offline_Login(host, database, domain, apifolder, username, password);
+                    }
                 }
             }
             else
@@ -407,7 +434,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
                                 if (retry)
                                 {
                                     await Login(host, database, domain, apifolder, username, password);
@@ -664,7 +691,7 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
                             if (retry)
                             {
                                 await Login(host, database, domain, apifolder, username, password);
@@ -768,11 +795,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -781,13 +814,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -796,6 +830,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -810,6 +845,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -881,11 +917,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -894,13 +936,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -909,6 +952,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -923,6 +967,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1054,11 +1099,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1067,13 +1118,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1082,6 +1134,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1096,6 +1149,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1187,11 +1241,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1200,13 +1260,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1215,6 +1276,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1229,6 +1291,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1324,11 +1387,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("cafchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1337,13 +1406,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1352,6 +1422,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1366,6 +1437,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1429,11 +1501,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("cafactivitychangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1442,13 +1520,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1457,6 +1536,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1471,6 +1551,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1536,11 +1617,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("emailrecipientchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1549,13 +1636,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1564,6 +1652,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1578,6 +1667,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1641,11 +1731,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1654,13 +1750,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1669,6 +1766,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1683,6 +1781,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1749,11 +1848,17 @@ namespace TBSMobile.Rest_Service
 
                             Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+
+                            await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1762,13 +1867,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                            await Application.Current.MainPage.Navigation.PopToRootAsync();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1777,6 +1883,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
                     }
                 }
             }
@@ -1791,6 +1898,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PopToRootAsync();
                 }
             }
         }
@@ -1863,7 +1971,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -1872,13 +1980,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -1887,13 +1996,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -1902,6 +2012,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -1911,6 +2022,14 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.UpdateContacts(contact);
+                    await App.TodoManager.SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.UpdateContacts(contact);
+                    await App.TodoManager.SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -1924,14 +2043,22 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
 
         public async Task UpdateContacts(string contact)
         {
-            await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
-            await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            try
+            {
+                await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
+                await Constants.conn.QueryAsync<ContactsTable>("Update tblContacts SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         public async Task SyncContactsClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
@@ -2058,7 +2185,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2067,13 +2194,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2082,13 +2210,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2097,6 +2226,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2106,6 +2236,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2119,6 +2255,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2193,7 +2330,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2202,13 +2339,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2217,13 +2355,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2232,6 +2371,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2241,6 +2381,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2254,6 +2400,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2328,7 +2475,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2337,13 +2484,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2352,13 +2500,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2367,6 +2516,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2376,6 +2526,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2389,6 +2545,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2463,7 +2620,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2472,13 +2629,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2487,13 +2645,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2502,6 +2661,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2511,6 +2671,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2524,6 +2690,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2598,7 +2765,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2607,13 +2774,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2622,13 +2790,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Contacts Video Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Contacts Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2637,6 +2806,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2646,6 +2816,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2659,6 +2835,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2751,7 +2928,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2760,13 +2937,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
                                 
                                 if (retry)
                                 {
@@ -2775,13 +2953,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2790,6 +2969,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2799,6 +2979,14 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.UpdateCAF(contact);
+                    await App.TodoManager.SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.UpdateCAF(contact);
+                    await App.TodoManager.SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2812,6 +3000,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -2906,7 +3095,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2915,13 +3104,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2930,13 +3120,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2945,6 +3136,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -2954,6 +3146,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -2967,6 +3165,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3041,7 +3240,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3050,13 +3249,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3065,13 +3265,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3080,6 +3281,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3089,6 +3291,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3102,6 +3310,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3176,7 +3385,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3185,13 +3394,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3200,13 +3410,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3215,6 +3426,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3224,6 +3436,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3237,6 +3455,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3311,7 +3530,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3320,13 +3539,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3335,13 +3555,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3350,6 +3571,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3359,6 +3581,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3372,6 +3600,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3446,7 +3675,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3455,13 +3684,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3470,13 +3700,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3485,6 +3716,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3494,6 +3726,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3507,6 +3745,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3574,7 +3813,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3583,13 +3822,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3598,13 +3838,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3613,6 +3854,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3622,6 +3864,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3635,6 +3883,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3702,7 +3951,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3711,13 +3960,14 @@ namespace TBSMobile.Rest_Service
                                         else
                                         {
                                             Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3726,13 +3976,14 @@ namespace TBSMobile.Rest_Service
                                 else
                                 {
                                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3741,6 +3992,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3750,6 +4002,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await App.TodoManager.SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                 }
             }
             else
@@ -3763,6 +4021,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3833,33 +4092,45 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
                                             await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                                        }
+                                        else
+                                        {
+                                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
                                     await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                                }
+                                else
+                                {
+                                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
                                 await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                            }
+                            else
+                            {
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                     }
@@ -3869,6 +4140,12 @@ namespace TBSMobile.Rest_Service
                     int logdeleted = 0;
 
                     await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
+
+                    await App.TodoManager.OnSyncComplete(host, database, domain, contact);
+                }
+                else
+                {
+                    await App.TodoManager.OnSyncComplete(host, database, domain, contact);
                 }
             }
             else
@@ -3878,6 +4155,10 @@ namespace TBSMobile.Rest_Service
                 if (retry)
                 {
                     await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                }
+                else
+                {
+                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                 }
             }
         }
@@ -3950,11 +4231,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("userchangeslastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -3969,7 +4256,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4064,11 +4351,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("systemserialchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncContactsServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4083,7 +4376,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4238,11 +4531,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("contactschangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4257,7 +4556,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4372,11 +4671,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("retaileroutletchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4391,7 +4696,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4478,11 +4783,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("provincechangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4497,7 +4808,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4586,11 +4897,17 @@ namespace TBSMobile.Rest_Service
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contact, logType, log, DateTime.Parse(current_datetime), database, logdeleted, DateTime.Parse(current_datetime));
 
                             Preferences.Set("townchangelastcheck", current_datetime, "private_prefs");
+
+                            await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                        }
+                        else
+                        {
+                            await App.TodoManager.SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4605,7 +4922,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4680,7 +4997,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4691,7 +5008,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4756,7 +5073,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4767,7 +5084,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4832,7 +5149,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4843,7 +5160,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4909,7 +5226,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4920,7 +5237,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4942,42 +5259,107 @@ namespace TBSMobile.Rest_Service
             /* CHECK AUTO SYNC FUNCTION  */
         public async Task CheckContactsData(string contact)
         {
-            var getcontactschanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-            var contactchangesresultCount = getcontactschanges.Result.Count;
+            try
+            {
+                var getcontactschanges = Constants.conn.QueryAsync<ContactsTable>("SELECT * FROM tblContacts WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var contactchangesresultCount = getcontactschanges.Result.Count;
 
-            Preferences.Set("contactschanges", contactchangesresultCount.ToString(), "private_prefs");
+                Preferences.Set("contactschanges", contactchangesresultCount.ToString(), "private_prefs");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Error", "Checking retailer failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                if (retry)
+                {
+                    await CheckContactsData(contact);
+                }
+            }
         }
 
         public async Task CheckRetailerOutletData( string contact)
         {
-            var getretaileroutletchanges = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-            var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
+            try
+            {
+                var getretaileroutletchanges = Constants.conn.QueryAsync<RetailerGroupTable>("SELECT * FROM tblRetailerGroup WHERE Supervisor = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var retaileroutletchangesresultCount = getretaileroutletchanges.Result.Count;
 
-            Preferences.Set("retaileroutletchanges", retaileroutletchangesresultCount.ToString(), "private_prefs");
+                Preferences.Set("retaileroutletchanges", retaileroutletchangesresultCount.ToString(), "private_prefs");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Outlet Error", "Checking retailer outlet failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                if (retry)
+                {
+                    await CheckRetailerOutletData(contact);
+                }
+            }
         }
 
         public async Task CheckCAFData(string contact)
         {
-            var getcafchanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-            var cafchangesresultCount = getcafchanges.Result.Count;
+            try
+            {
+                var getcafchanges = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var cafchangesresultCount = getcafchanges.Result.Count;
 
-            Preferences.Set("cafchanges", cafchangesresultCount.ToString(), "private_prefs");
+                Preferences.Set("cafchanges", cafchangesresultCount.ToString(), "private_prefs");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Error", "Checking caf failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                if (retry)
+                {
+                    await CheckCAFData(contact);
+                }
+            }
         }
 
         public async Task CheckCAFActivityData(string contact)
         {
-            var getactchanges = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-            var actchangesresultCount = getactchanges.Result.Count;
+            try
+            {
+                var getactchanges = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var actchangesresultCount = getactchanges.Result.Count;
 
-            Preferences.Set("cafactivitychanges", actchangesresultCount.ToString(), "private_prefs");
+                Preferences.Set("cafactivitychanges", actchangesresultCount.ToString(), "private_prefs");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Activity Error", "Checking caf activity failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                if (retry)
+                {
+                    await CheckCAFActivityData(contact);
+                }
+            }
         }
 
         public async Task CheckEmailRecipientData(string contact)
         {            
-            var getemailchanges = Constants.conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
-            var emailchangesresultCount = getemailchanges.Result.Count;
+            try
+            {
+                var getemailchanges = Constants.conn.QueryAsync<UserEmailTable>("SELECT * FROM tblUserEmail WHERE ContactID = ? AND LastUpdated > LastSync AND Deleted != '1'", contact);
+                var emailchangesresultCount = getemailchanges.Result.Count;
 
-            Preferences.Set("emailrecipientchanges", emailchangesresultCount.ToString(), "private_prefs");
+                Preferences.Set("emailrecipientchanges", emailchangesresultCount.ToString(), "private_prefs");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Email Recipient Activity Error", "Checking email recipient failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+
+                if (retry)
+                {
+                    await CheckEmailRecipientData(contact);
+                }
+            }
         }
 
         public async Task CheckAutoSync(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus)
@@ -5079,7 +5461,7 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5096,7 +5478,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
 
                         if (retry)
                         {
@@ -5188,7 +5570,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5197,7 +5579,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                                 await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
@@ -5214,7 +5596,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                         await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
@@ -5232,7 +5614,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                     await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
@@ -5282,7 +5664,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5291,7 +5673,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                                 await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
@@ -5308,7 +5690,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                         await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
@@ -5325,7 +5707,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                     await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
@@ -5375,7 +5757,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5384,7 +5766,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                                 await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
@@ -5401,7 +5783,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                         await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
@@ -5418,7 +5800,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                     await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
@@ -5468,7 +5850,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5477,7 +5859,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                                 await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                             }
                         }
@@ -5494,7 +5876,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                         await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
@@ -5511,7 +5893,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                     await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
@@ -5917,7 +6299,7 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -5931,7 +6313,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
 
                         if (retry)
                         {
@@ -6019,7 +6401,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -6106,7 +6488,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -6194,7 +6576,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -6281,7 +6663,7 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -6499,7 +6881,7 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\n Do you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                             if (retry)
                             {
@@ -6513,7 +6895,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + content + "\n\n Do you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
 
                         if (retry)
                         {

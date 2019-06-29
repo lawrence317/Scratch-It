@@ -43,12 +43,6 @@ namespace TBSMobile.View
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
-                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
-                        await App.TodoManager.CheckRetailerOutletData(contact);
-                        await App.TodoManager.CheckCAFData(contact);
-                        await App.TodoManager.CheckCAFActivityData(contact);
-                        await App.TodoManager.CheckEmailRecipientData(contact);
-
                         var isfirsttimesync = Preferences.Get("isfirsttimesync", String.Empty, "private_prefs");
                         if (isfirsttimesync == "1")
                         {
@@ -63,9 +57,15 @@ namespace TBSMobile.View
                         {
                             if (CrossConnectivity.Current.IsConnected)
                             {
+                                await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                                await App.TodoManager.CheckRetailerOutletData(contact);
+                                await App.TodoManager.CheckCAFData(contact);
+                                await App.TodoManager.CheckCAFActivityData(contact);
+                                await App.TodoManager.CheckEmailRecipientData(contact);
+
                                 Online_Text();
                                 Disable_UI();
-                                
+
                                 await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
                                 Online_Text();
@@ -114,7 +114,6 @@ namespace TBSMobile.View
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
 
                         var locator = CrossGeolocator.Current;
-                        locator.DesiredAccuracy = 15;
 
                         if (!locator.IsGeolocationAvailable)
                         {
@@ -254,14 +253,14 @@ namespace TBSMobile.View
             {
                 CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
                 {
-                    await App.TodoManager.CheckContactsData(host, database, domain, contact);
-                    await App.TodoManager.CheckRetailerOutletData(contact);
-                    await App.TodoManager.CheckCAFData(contact);
-                    await App.TodoManager.CheckCAFActivityData(contact);
-                    await App.TodoManager.CheckEmailRecipientData(contact);
-
                     if (CrossConnectivity.Current.IsConnected)
                     {
+                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                        await App.TodoManager.CheckRetailerOutletData(contact);
+                        await App.TodoManager.CheckCAFData(contact);
+                        await App.TodoManager.CheckCAFActivityData(contact);
+                        await App.TodoManager.CheckEmailRecipientData(contact);
+
                         Online_Text();
                         Disable_UI();
                         
