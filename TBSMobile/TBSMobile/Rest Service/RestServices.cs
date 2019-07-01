@@ -5394,7 +5394,7 @@ namespace TBSMobile.Rest_Service
 
                 if (autosync == true)
                 {
-                    await Application.Current.MainPage.Navigation.PopAsync();
+                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
                 }
             }
             else

@@ -255,19 +255,25 @@ namespace TBSMobile.View
                 {
                     if (CrossConnectivity.Current.IsConnected)
                     {
-                        await App.TodoManager.CheckContactsData(host, database, domain, contact);
-                        await App.TodoManager.CheckRetailerOutletData(contact);
-                        await App.TodoManager.CheckCAFData(contact);
-                        await App.TodoManager.CheckCAFActivityData(contact);
-                        await App.TodoManager.CheckEmailRecipientData(contact);
+                        int index = Application.Current.MainPage.Navigation.NavigationStack.Count - 1;
+                        Page currentpage = Application.Current.MainPage.Navigation.NavigationStack[index];
 
-                        Online_Text();
-                        Disable_UI();
-                        
-                        await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
+                        if (currentpage.ToString().Equals("TBSMobile.View.MainMenu"))
+                        {
+                            await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                            await App.TodoManager.CheckRetailerOutletData(contact);
+                            await App.TodoManager.CheckCAFData(contact);
+                            await App.TodoManager.CheckCAFActivityData(contact);
+                            await App.TodoManager.CheckEmailRecipientData(contact);
 
-                        Online_Text();
-                        Enable_UI();
+                            Online_Text();
+                            Disable_UI();
+
+                            await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
+
+                            Online_Text();
+                            Enable_UI();
+                        }
                     }
                     else
                     {
