@@ -14,9 +14,9 @@ namespace TBSMobile.Rest_Service
             restService = service;
         }
 
-        public Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password)
+        public Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password, Action<string> LoginStatus)
         {
-            return restService.CheckVersion(host, database, domain, apifolder, apifile, username, password);
+            return restService.CheckVersion(host, database, domain, apifolder, apifile, username, password, LoginStatus);
         }
 
         public Task FirstTimeSyncUser(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)

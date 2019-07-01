@@ -5,7 +5,7 @@ namespace TBSMobile.Rest_Service
 {
     public interface IRestServices
     {
-        Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password);
+        Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password, Action<string> LoginStatus);
 
         Task FirstTimeSyncUser(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus);
         Task FirstTimeSyncSystemSerial(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus);

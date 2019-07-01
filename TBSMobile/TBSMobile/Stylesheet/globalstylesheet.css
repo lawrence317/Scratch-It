@@ -51,9 +51,15 @@
     margin-bottom: 10;
 }
 
-.lbl-login, .lbl-fieldform {
+.lbl-login, .lbl-fieldform, .lbl-login-status {
     color: #9797ab;
     font-size: 15;
+}
+
+.lbl-login-status {
+    text-align: center;
+    font-size: 13;
+    margin-bottom: 10;
 }
 
 .form-control, .fieldForm {
@@ -75,6 +81,7 @@
     font-size: 18;
     height: 50;
     margin-bottom: 15;
+    text-align: center;
 }
 
 .btn-connect {

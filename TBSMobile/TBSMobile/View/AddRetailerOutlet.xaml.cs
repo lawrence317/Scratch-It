@@ -522,7 +522,8 @@ namespace TBSMobile.View
                 {
                     outletnamevalidator.IsVisible = false;
                     OutletNameFrame.BorderColor = Color.FromHex("#e8eaed");
-                }            }
+                }
+            }
             else
             {
                 try

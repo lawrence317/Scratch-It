@@ -226,8 +226,9 @@ namespace TBSMobile.Rest_Service
 
         /* LOGIN REST */
 
-        public async Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password)
+        public async Task CheckVersion(string host, string database, string domain, string apifolder, string apifile, string username, string password, Action<string> LoginStatus)
         {
+            LoginStatus("0-Checking version please wait...");
             if (CrossConnectivity.Current.IsConnected)
             {
                 var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
@@ -249,7 +250,7 @@ namespace TBSMobile.Rest_Service
 
                             if (!message.Equals(VersionTracking.CurrentVersion))
                             {
-                                var answer = await App.Current.MainPage.DisplayAlert("Application Out-Of-Date", "Your application is out-of-date, please download the new version (" + message + ") to continue.", "Download And Install", "Cancel");
+                                var answer = await App.Current.MainPage.DisplayAlert("Application Out-Of-Date", "Your application is out-of-date, please download the new version (" + message + ") to continue.", "Download And Install", "Download");
                                 if (answer)
                                 {
                                     Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
@@ -258,36 +259,40 @@ namespace TBSMobile.Rest_Service
                                 {
                                     Device.OpenUri(new Uri("https://install.appcenter.ms/users/lawrenceagulto.317-gmail.com/apps/scratch-it/distribution_groups/public%20access"));
                                 }
+
+                                LoginStatus("1-Login");
                             }
                             else
                             {
-                                await Login(host, database, domain, apifolder, username, password);
+                                await Login(host, database, domain, apifolder, username, password, LoginStatus);
                             }
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Error:\n\nThe server returned a null value", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\nError:\n\nThe server returned a null value", "Yes", "Go Offline Mode");
 
                             if (retry)
                             {
-                                await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                                await CheckVersion(host, database, domain, apifolder, apifile, username, password, LoginStatus);
                             }
                             else
                             {
+                                LoginStatus("1-Login");
                                 await Offline_Login(host, database, domain, apifolder, username, password);
                             }
                         }
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\nStatus Code:\n\n" + response.StatusCode, "Yes", "Go Offline Mode");
 
                         if (retry)
                         {
-                            await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                            await CheckVersion(host, database, domain, apifolder, apifile, username, password, LoginStatus);
                         }
                         else
                         {
+                            LoginStatus("1-Login");
                             await Offline_Login(host, database, domain, apifolder, username, password);
                         }
                     }
@@ -295,176 +300,183 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Checking Version Error", "Checking version failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "Go Offline Mode");
 
                     if (retry)
                     {
-                        await CheckVersion(host, database, domain, apifolder, apifile, username, password);
+                        await CheckVersion(host, database, domain, apifolder, apifile, username, password, LoginStatus);
                     }
                     else
                     {
+                        LoginStatus("1-Login");
                         await Offline_Login(host, database, domain, apifolder, username, password);
                     }
                 }
             }
             else
             {
+                LoginStatus("1-Login");
                 await Offline_Login(host, database, domain, apifolder, username, password);
             }
         }
 
-        public async Task Login(string host, string database, string domain, string apifolder, string username, string password)
+        public async Task Login(string host, string database, string domain, string apifolder, string username, string password, Action<string> LoginStatus)
         {
+            LoginStatus("0-Checking login credentials please wait...");
+            string login_apifile = "login-api.php";
+            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+
             try
             {
-                string login_apifile = "login-api.php";
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
-                
-                try
+                var response = await client.GetAsync(uri);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    var response = await client.GetAsync(uri);
+                    var content = await response.Content.ReadAsStringAsync();
 
-                    if (response.IsSuccessStatusCode)
+                    if (!string.IsNullOrEmpty(content))
                     {
-                        var content = await response.Content.ReadAsStringAsync();
+                        var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
 
-                        if (!string.IsNullOrEmpty(content))
+                        var item = loginresult[0];
+                        var message = item.Message;
+
+                        if (message.Equals("Subscription Expired"))
                         {
-                            var loginresult = JsonConvert.DeserializeObject<List<ServerMessage>>(content, settings);
+                            await App.Current.MainPage.DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+                            LoginStatus("1-Login");
 
-                            var item = loginresult[0];
-                            var message = item.Message;
+                            var subject = "Subscription Expired: " + username + " - " + Constants.deviceID;
+                            var body = "Good Day!<br/><br/> " +
+                                "This user needs new product key.<br/><br/>" +
+                                "username: " + username + "<br/>" +
+                                "Device ID: " + Constants.deviceID + "<br/>";
 
-                            if (message.Equals("Subscription Expired"))
+                            var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                            if (emailMessenger.CanSendEmail)
                             {
-                                await App.Current.MainPage.DisplayAlert("Subscription Error", "Your subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                var emailsend = new EmailMessageBuilder()
+                                .To(Constants.email)
+                                .Subject(subject)
+                                .BodyAsHtml(body)
+                                .Build();
 
-                                var subject = "Subscription Expired: " + username + " - " + Constants.deviceID;
-                                var body = "Good Day!<br/><br/> " +
-                                    "This user needs new product key.<br/><br/>" +
-                                    "username: " + username + "<br/>" +
-                                    "Device ID: " + Constants.deviceID + "<br/>";
-
-                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                if (emailMessenger.CanSendEmail)
-                                {
-                                    var emailsend = new EmailMessageBuilder()
-                                    .To(Constants.email)
-                                    .Subject(subject)
-                                    .BodyAsHtml(body)
-                                    .Build();
-
-                                    emailMessenger.SendEmail(emailsend);
-                                }
+                                emailMessenger.SendEmail(emailsend);
                             }
-                            else if (message.Equals("Subscription Trial Expired"))
+                        }
+                        else if (message.Equals("Subscription Trial Expired"))
+                        {
+                            await App.Current.MainPage.DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+                            LoginStatus("1-Login");
+
+                            var subject = "Subscription Expired: " + username + " - " + Constants.deviceID;
+                            var body = "Good Day!<br/><br/> " +
+                                "This user needs new product key.<br/><br/>" +
+                                "username: " + username + "<br/>" +
+                                "Device ID: " + Constants.deviceID + "<br/>";
+
+                            var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                            if (emailMessenger.CanSendEmail)
                             {
-                                await App.Current.MainPage.DisplayAlert("Trial Subscription Error", "Your trial subscription has been expired, please contact your administrator to register your device", "Send Email");
+                                var emailsend = new EmailMessageBuilder()
+                                .To(Constants.email)
+                                .Subject(subject)
+                                .BodyAsHtml(body)
+                                .Build();
 
-                                var subject = "Subscription Expired: " + username + " - " + Constants.deviceID;
-                                var body = "Good Day!<br/><br/> " +
-                                    "This user needs new product key.<br/><br/>" +
-                                    "username: " + username + "<br/>" +
-                                    "Device ID: " + Constants.deviceID + "<br/>";
-
-                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                if (emailMessenger.CanSendEmail)
-                                {
-                                    var emailsend = new EmailMessageBuilder()
-                                    .To(Constants.email)
-                                    .Subject(subject)
-                                    .BodyAsHtml(body)
-                                    .Build();
-
-                                    emailMessenger.SendEmail(emailsend);
-                                }
+                                emailMessenger.SendEmail(emailsend);
                             }
-                            else if (message.Equals("Subscription Not Found"))
+                        }
+                        else if (message.Equals("Subscription Not Found"))
+                        {
+                            var trialsub = await App.Current.MainPage.DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
+
+                            if (trialsub == true)
                             {
-                                var trialsub = await App.Current.MainPage.DisplayAlert("Subscription Not Found", "Your device is not registered, please contact your administrator to register your device", "Activate Trial", "Send Email");
-
-                                if (trialsub == true)
-                                {
-                                    await Activate_Trial(host, database, domain, apifolder, username, password);
-                                }
-                                else
-                                {
-                                    var subject = "Register Device: " + username + " - " + Constants.deviceID;
-                                    var body = "Good Day!<br/><br/> " +
-                                        "This user needs to register the device.<br/><br/>" +
-                                        "username: " + username + "<br/>" +
-                                        "Device ID: " + Constants.deviceID + "<br/>";
-
-                                    var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                                    if (emailMessenger.CanSendEmail)
-                                    {
-                                        var emailsend = new EmailMessageBuilder()
-                                        .To(Constants.email)
-                                        .Subject(subject)
-                                        .BodyAsHtml(body)
-                                        .Build();
-
-                                        emailMessenger.SendEmail(emailsend);
-                                    }
-                                }
-                            }
-                            else if (message.Equals("Incorrect Login"))
-                            {
-                                await App.Current.MainPage.DisplayAlert("Login Error", "username or password is incorrect", "Ok");
-                            }
-                            else if (message.Equals("Credential Correct"))
-                            {
-                                var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
-
-                                var contactID = result[0].ContactID;
-
-                                var logType = "App Log";
-                                var log = "Logged in (<b>" + username + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
-                                int deleted = 0;
-
-                                await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contactID, logType, log, DateTime.Parse(current_datetime), database, deleted, DateTime.Parse(current_datetime));
-
-                                Save_Preferences(username, password, contactID);
-
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
-                            }
-                            else if (message.Equals("Not Connected"))
-                            {
-                                await App.Current.MainPage.DisplayAlert("Login Error", "Please check server and database name", "Ok");
+                                await Activate_Trial(host, database, domain, apifolder, username, password, LoginStatus);
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Login failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
-                                if (retry)
+                                LoginStatus("1-Login");
+
+                                var subject = "Register Device: " + username + " - " + Constants.deviceID;
+                                var body = "Good Day!<br/><br/> " +
+                                    "This user needs to register the device.<br/><br/>" +
+                                    "username: " + username + "<br/>" +
+                                    "Device ID: " + Constants.deviceID + "<br/>";
+
+                                var emailMessenger = CrossMessaging.Current.EmailMessenger;
+                                if (emailMessenger.CanSendEmail)
                                 {
-                                    await Login(host, database, domain, apifolder, username, password);
-                                }
-                                else
-                                {
-                                    await Offline_Login(host, database, domain, apifolder, username, password);
+                                    var emailsend = new EmailMessageBuilder()
+                                    .To(Constants.email)
+                                    .Subject(subject)
+                                    .BodyAsHtml(body)
+                                    .Build();
+
+                                    emailMessenger.SendEmail(emailsend);
                                 }
                             }
                         }
+                        else if (message.Equals("Incorrect Login"))
+                        {
+                            await App.Current.MainPage.DisplayAlert("Login Error", "username or password is incorrect", "Ok");
+                            LoginStatus("1-Login");
+                        }
+                        else if (message.Equals("Credential Correct"))
+                        {
+                            LoginStatus("1-Login");
+
+                            var result = JsonConvert.DeserializeObject<List<ServerMessage>>(content);
+
+                            var contactID = result[0].ContactID;
+
+                            var logType = "App Log";
+                            var log = "Logged in (<b>" + username + "</b>) <br/>" + "App Version: <b>" + Constants.appversion + "</b><br/> Device ID: <b>" + Constants.deviceID + "</b>";
+                            int deleted = 0;
+
+                            await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", contactID, logType, log, DateTime.Parse(current_datetime), database, deleted, DateTime.Parse(current_datetime));
+
+                            Save_Preferences(username, password, contactID);
+
+                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                        }
+                        else if (message.Equals("Not Connected"))
+                        {
+                            LoginStatus("1-Login");
+                            await App.Current.MainPage.DisplayAlert("Login Error", "Please check server and database name", "Ok");
+                        }
                         else
                         {
-                            await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\n Error:\n\n The server returned a null value.", "Ok");
+                            var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Login failed.\n\nError:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
+                            if (retry)
+                            {
+                                await Login(host, database, domain, apifolder, username, password, LoginStatus);
+                            }
+                            else
+                            {
+                                LoginStatus("1-Login");
+                                await Offline_Login(host, database, domain, apifolder, username, password);
+                            }
                         }
                     }
                     else
                     {
-                        await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\n Status Code:\n\n" + response.StatusCode, "Ok");
+                        await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\nError:\n\n The server returned a null value.", "Ok");
+                        LoginStatus("1-Login");
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Crashes.TrackError(ex);
-                    await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\n Error:\n\n" + ex.Message, "Ok");
+                    await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\nStatus Code:\n\n" + response.StatusCode, "Ok");
+                    LoginStatus("1-Login");
                 }
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\n Error:\n\n" + ex.Message, "Ok");
+                await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\nError:\n\n" + ex.Message, "Ok");
+                LoginStatus("1-Login");
             }
         }
 
@@ -549,7 +561,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                         else if (Trials == "3")
@@ -583,7 +595,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                         else if (Trials == "4")
@@ -617,7 +629,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 Preferences.Set("username", username, "private_prefs");
-                                await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                             }
                         }
                         else
@@ -646,7 +658,7 @@ namespace TBSMobile.Rest_Service
                             Preferences.Set("password", password, "private_prefs");
                             Preferences.Set("contact", contactID, "private_prefs");
 
-                            await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
                         }
                     }
                 }                
@@ -654,12 +666,13 @@ namespace TBSMobile.Rest_Service
             catch(Exception ex)
             {
                 Crashes.TrackError(ex);
-                await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\n Error:\n\n" + ex.Message, "Ok");
+                await App.Current.MainPage.DisplayAlert("Login Error", "Login failed.\n\nError:\n\n" + ex.Message, "Ok");
             }
         }
 
-        public async Task Activate_Trial(string host, string database, string domain, string apifolder, string username, string password)
+        public async Task Activate_Trial(string host, string database, string domain, string apifolder, string username, string password, Action<string> LoginStatus)
         {
+            LoginStatus("0-Activating trial please wait...");
             string trialapifile = "activate-trial-api.php";
             var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + trialapifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&RegistrationCode=" + Constants.deviceID, string.Empty));
 
@@ -687,35 +700,40 @@ namespace TBSMobile.Rest_Service
 
                             await Constants.conn.QueryAsync<UserLogsTable>("INSERT INTO tblUserLogs (ContactID, LogType, Log, LogDate, DatabaseName, Deleted, LastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?)", trialcontactid, logType, log, DateTime.Parse(current_datetime), database, deleted, DateTime.Parse(current_datetime));
 
+                            LoginStatus("1-Login");
                             await App.Current.MainPage.DisplayAlert("Trial Activated", "You activated trial for 30 days", "Ok");
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Activating trial failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Application Error", "Activating trial failed.\n\nError:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
                             if (retry)
                             {
-                                await Login(host, database, domain, apifolder, username, password);
+                                await Login(host, database, domain, apifolder, username, password, LoginStatus);
                             }
                             else
                             {
+                                LoginStatus("1-Login");
                                 await Offline_Login(host, database, domain, apifolder, username, password);
                             }
                         }
                     }
                     else
                     {
-                        await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\n Error:\n\n The server returned a null value.", "Ok");
+                        LoginStatus("1-Login");
+                        await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\nError:\n\n The server returned a null value.", "Ok");
                     }
                 }
                 else
                 {
-                    await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\n Status Code:\n\n" + response.StatusCode, "Ok");
+                    LoginStatus("1-Login");
+                    await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\nStatus Code:\n\n" + response.StatusCode, "Ok");
                 }
             }
             catch (Exception ex)
             {
+
                 Crashes.TrackError(ex);
-                await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\n Error:\n\n" + ex.Message, "Ok");
+                await App.Current.MainPage.DisplayAlert("Activate Trial Error", "Activate trial failed.\n\nError:\n\n" + ex.Message, "Ok");
             }
         }
 
@@ -805,7 +823,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -821,7 +839,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -927,7 +945,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -943,7 +961,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1109,7 +1127,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1125,7 +1143,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1251,7 +1269,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1267,7 +1285,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1397,7 +1415,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1413,7 +1431,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1511,7 +1529,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1527,7 +1545,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1627,7 +1645,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1643,7 +1661,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1741,7 +1759,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1757,7 +1775,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1858,7 +1876,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -1874,7 +1892,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -1971,7 +1989,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -1987,7 +2005,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2003,7 +2021,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2185,7 +2203,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2201,7 +2219,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2217,7 +2235,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2330,7 +2348,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2346,7 +2364,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2362,7 +2380,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2475,7 +2493,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2491,7 +2509,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2507,7 +2525,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2620,7 +2638,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2636,7 +2654,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2652,7 +2670,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2765,7 +2783,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2781,7 +2799,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -2797,7 +2815,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Contacts Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Contacts Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -2928,7 +2946,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -2944,7 +2962,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
                                 
                                 if (retry)
                                 {
@@ -2960,7 +2978,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3095,7 +3113,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3111,7 +3129,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3127,7 +3145,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3240,7 +3258,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3256,7 +3274,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3272,7 +3290,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 1 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3385,7 +3403,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3401,7 +3419,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3417,7 +3435,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3530,7 +3548,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3546,7 +3564,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3562,7 +3580,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3675,7 +3693,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3691,7 +3709,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3707,7 +3725,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3813,7 +3831,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3829,7 +3847,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3845,7 +3863,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -3951,7 +3969,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -3967,7 +3985,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -3983,7 +4001,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -4092,7 +4110,7 @@ namespace TBSMobile.Rest_Service
                                     }
                                     else
                                     {
-                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                                        var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
 
                                         if (retry)
                                         {
@@ -4107,7 +4125,7 @@ namespace TBSMobile.Rest_Service
                             }
                             else
                             {
-                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                                 if (retry)
                                 {
@@ -4122,7 +4140,7 @@ namespace TBSMobile.Rest_Service
                         catch (Exception ex)
                         {
                             Crashes.TrackError(ex);
-                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                             if (retry)
                             {
@@ -4241,7 +4259,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4256,7 +4274,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4361,7 +4379,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4376,7 +4394,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4541,7 +4559,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4556,7 +4574,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4681,7 +4699,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4696,7 +4714,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4793,7 +4811,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4808,7 +4826,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4907,7 +4925,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -4922,7 +4940,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -4997,7 +5015,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -5008,7 +5026,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -5073,7 +5091,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -5084,7 +5102,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -5149,7 +5167,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -5160,7 +5178,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -5226,7 +5244,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\n Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry?\n\nStatus Code:\n\n" + response.StatusCode, "Yes", "No");
 
                         if (retry)
                         {
@@ -5237,7 +5255,7 @@ namespace TBSMobile.Rest_Service
                 catch (Exception ex)
                 {
                     Crashes.TrackError(ex);
-                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                     if (retry)
                     {
@@ -5269,7 +5287,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Error", "Checking retailer failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Error", "Checking retailer failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5290,7 +5308,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Outlet Error", "Checking retailer outlet failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Retailer Outlet Error", "Checking retailer outlet failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5311,7 +5329,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Error", "Checking caf failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Error", "Checking caf failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5332,7 +5350,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Activity Error", "Checking caf activity failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Checking CAF Activity Error", "Checking caf activity failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5353,7 +5371,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Checking Email Recipient Activity Error", "Checking email recipient failed.\n\nDo you want to retry? \n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Checking Email Recipient Activity Error", "Checking email recipient failed.\n\nDo you want to retry? \n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5455,13 +5473,13 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
                             await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                             await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await App.TodoManager.SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -5470,7 +5488,7 @@ namespace TBSMobile.Rest_Service
                             else
                             {
                                 await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                                await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                                await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                                 await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
 
                             }
@@ -5478,7 +5496,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\nError:\n\n" + content + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                         if (retry)
                         {
@@ -5487,14 +5505,14 @@ namespace TBSMobile.Rest_Service
                         else
                         {
                             await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                            await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                            await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                             await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                         }
                     }
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -5503,7 +5521,7 @@ namespace TBSMobile.Rest_Service
                     else
                     {
                         await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                        await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                        await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                         await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                     }
                 }
@@ -5511,7 +5529,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -5520,7 +5538,7 @@ namespace TBSMobile.Rest_Service
                 else
                 {
                     await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
-                    await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
+                    await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
                     await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
                 }
             }
@@ -5568,9 +5586,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -5587,7 +5609,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -5605,7 +5627,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 1 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -5662,9 +5684,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -5681,7 +5707,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -5698,7 +5724,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 2 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -5755,9 +5781,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -5774,7 +5804,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -5791,7 +5821,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Photo 3 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -5848,9 +5878,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -5867,7 +5901,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -5884,7 +5918,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending CAF Video Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -5934,7 +5968,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -5954,7 +5988,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6061,7 +6095,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Activity Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Activity Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6104,7 +6138,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6124,7 +6158,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6223,7 +6257,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Activity Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving CAF Activity Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6295,11 +6329,11 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                            await App.TodoManager.SendProspectRetailerMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6313,7 +6347,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\nError:\n\n" + content + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                         if (retry)
                         {
@@ -6327,7 +6361,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6342,7 +6376,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6399,9 +6433,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendProspectRetailerMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6416,7 +6454,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6432,7 +6470,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 1 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6486,9 +6524,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendProspectRetailerMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6503,7 +6545,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6519,7 +6561,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 2 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6576,7 +6618,11 @@ namespace TBSMobile.Rest_Service
 
                         if (!datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await App.TodoManager.SendProspectRetailerMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6591,7 +6637,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6607,7 +6653,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Photo 3 Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6661,9 +6707,13 @@ namespace TBSMobile.Rest_Service
                         var dataitem = dataresult[0];
                         var datamessage = dataitem.Message;
 
-                        if (!datamessage.Equals("Inserted"))
+                        if (datamessage.Equals("Inserted"))
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            await SaveProspectRetailerToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, id, firstname, middlename, lastname, fileas, retailertype, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, date, remarks, starttime, endtime, photo1url, photo2url, photo3url, videourl, employee, customer, deleted, recordlog);
+                        }
+                        else
+                        {
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6678,7 +6728,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6693,7 +6743,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Prospect Retailer Video Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6757,7 +6807,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving Prospect Retailer Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving Prospect Retailer Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6820,7 +6870,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving Prospect Retailer Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving Prospect Retailer Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -6881,7 +6931,7 @@ namespace TBSMobile.Rest_Service
                         }
                         else
                         {
-                            var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "No");
+                            var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\nError:\n\n" + datamessage + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                             if (retry)
                             {
@@ -6895,7 +6945,7 @@ namespace TBSMobile.Rest_Service
                     }
                     else
                     {
-                        var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + content + "\n\nDo you want to retry?", "Yes", "No");
+                        var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\nError:\n\n" + content + "\n\nDo you want to retry?", "Yes", "Save Data Offline");
 
                         if (retry)
                         {
@@ -6909,7 +6959,7 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "No");
+                    var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed. Status Code:\n\n" + response.StatusCode, "Yes", "Save Data Offline");
 
                     if (retry)
                     {
@@ -6924,7 +6974,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Sending Retailer Outlet Error", "Sending failed.\n\nError:\n\n" + ex.Message, "Yes", "Save Data Offline");
 
                 if (retry)
                 {
@@ -6971,7 +7021,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving Retailer Outlet Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving Retailer Outlet Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {
@@ -7017,7 +7067,7 @@ namespace TBSMobile.Rest_Service
             catch (Exception ex)
             {
                 Crashes.TrackError(ex);
-                var retry = await App.Current.MainPage.DisplayAlert("Saving Retailer Outlet Error", "Saving failed.\n\n Error:\n\n" + ex.Message, "Yes", "No");
+                var retry = await App.Current.MainPage.DisplayAlert("Saving Retailer Outlet Error", "Saving failed.\n\nError:\n\n" + ex.Message, "Yes", "No");
 
                 if (retry)
                 {

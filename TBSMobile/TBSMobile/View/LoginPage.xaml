@@ -176,6 +176,13 @@
                                         </local:CustomEntry>
                                     </StackLayout>
                                 </Frame>
+                                <Label StyleClass="lbl-login-status" IsVisible="False" x:Name="lblstatus" HorizontalOptions="Fill">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String">
+                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                        </OnPlatform>
+                                    </Label.FontFamily>
+                                </Label>
                                 <Grid>
                                     <Button Text="Login" Grid.Column="0" Grid.Row="0" Clicked="btnLogin_Clicked" StyleClass="btn-login" x:Name="btnLogin" BorderRadius="6">
                                         <Button.FontFamily>

@@ -191,7 +191,7 @@ namespace TBSMobile.View
             }
             else
             {
-                await App.TodoManager.CheckVersion(host, database, domain, apifolder, apifile, userName, password);
+                await App.TodoManager.CheckVersion(host, database, domain, apifolder, apifile, userName, password, LoginStatus);
             }
         }
 
@@ -282,6 +282,28 @@ namespace TBSMobile.View
         {
             connectstack.IsVisible = true;
             loginstack.IsVisible = false;
+        }
+
+        private void LoginStatus(string status)
+        {
+            Device.BeginInvokeOnMainThread(() => {
+                string[] loginstatus = status.Split(new char[] { '-' });
+                string type = loginstatus[0];
+                string message = loginstatus[1];
+
+                lblstatus.Text = message;
+
+                if (type == "0")
+                {
+                    btnLogin.IsEnabled = false;
+                    lblstatus.IsVisible = true;
+                }
+                else if(type == "1")
+                {
+                    btnLogin.IsEnabled = true;
+                    lblstatus.IsVisible = false;
+                }
+            });
         }
     }
 }
