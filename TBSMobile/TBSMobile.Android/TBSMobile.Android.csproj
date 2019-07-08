@@ -36,8 +36,7 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <EnableProguard>false</EnableProguard>
     <AndroidEnableSGenConcurrent>false</AndroidEnableSGenConcurrent>
-    <AndroidSupportedAbis>
-    </AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64</AndroidSupportedAbis>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <AndroidTlsProvider>
     </AndroidTlsProvider>

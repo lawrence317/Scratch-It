@@ -1925,7 +1925,7 @@ namespace TBSMobile.Rest_Service
 
         public async Task SyncUserClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
         {
-            SyncStatus("Initiating client update user uync");
+            SyncStatus("Initiating client update user sync");
             SyncStatus("Checking connection to server");
             
             if (CrossConnectivity.Current.IsConnected)

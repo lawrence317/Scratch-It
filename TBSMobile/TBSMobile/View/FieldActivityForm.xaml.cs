@@ -29,16 +29,13 @@ namespace TBSMobile.View
         public FieldActivityForm()
         {
             InitializeComponent();
-            
+            SetCAFNo();
             Init();
         }
          
         void Init()
         {
             tpTime.Text = DateTime.Now.ToString("HH:mm:ss");
-            SetCAFNo();
-            getRecipients();
-            GetGPS();
             entEmployeeNumber.Text = contact;
             dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
             ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.FromHex("#3498db");
@@ -136,13 +133,16 @@ namespace TBSMobile.View
 
             var finalString = new String(stringChars);
             entCafNo.Text = "AF" + finalString;
+
+            GetGPS();
         }
 
         public async void GetGPS()
         {
-            Position position = null;
             try
             {
+                Position position = null;
+
                 var locator = CrossGeolocator.Current;
                 locator.DesiredAccuracy = 300;
 
@@ -162,6 +162,8 @@ namespace TBSMobile.View
                     entOnsiteLocation.Text = location;
                     entLocation.Text = location;
                 }
+
+                getRecipients();
             }
             catch (Exception ex)
             {
