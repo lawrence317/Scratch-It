@@ -3,6 +3,7 @@ using Microsoft.AppCenter.Crashes;
 using Plugin.Connectivity;
 using Plugin.Geolocator;
 using System;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -42,7 +43,7 @@ namespace TBSMobile.View
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
                         Preferences.Set("appdatetime", DateTime.Now.ToString(), "private_prefs");
-
+                        
                         var isfirsttimesync = Preferences.Get("isfirsttimesync", String.Empty, "private_prefs");
                         if (isfirsttimesync == "1")
                         {

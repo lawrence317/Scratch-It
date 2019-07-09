@@ -61,7 +61,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -144,7 +144,7 @@ namespace TBSMobile.View
                 Position position = null;
 
                 var locator = CrossGeolocator.Current;
-                locator.DesiredAccuracy = 300;
+                locator.DesiredAccuracy = 200;
 
                 if (!locator.IsGeolocationAvailable)
                 {
@@ -156,11 +156,22 @@ namespace TBSMobile.View
                 }
                 else
                 {
-                    position = await locator.GetPositionAsync(TimeSpan.FromMinutes(10), null, true);
-                    
-                    string location = position.Latitude + "," + position.Longitude;
-                    entOnsiteLocation.Text = location;
-                    entLocation.Text = location;
+                    position = await locator.GetLastKnownLocationAsync();
+
+                    if (position != null)
+                    {
+                        string location = position.Latitude + "," + position.Longitude;
+                        entOnsiteLocation.Text = location;
+                        entLocation.Text = location;
+                    }
+                    else
+                    {
+                        position = await locator.GetPositionAsync(TimeSpan.FromMinutes(1), null, false);
+
+                        string location = position.Latitude + "," + position.Longitude;
+                        entOnsiteLocation.Text = location;
+                        entLocation.Text = location;
+                    }
                 }
 
                 getRecipients();

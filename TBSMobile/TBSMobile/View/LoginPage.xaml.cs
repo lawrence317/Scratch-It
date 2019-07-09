@@ -1,7 +1,9 @@
 ﻿using Microsoft.AppCenter.Crashes;
 using Plugin.Connectivity;
 using Plugin.DeviceInfo;
+using Plugin.Geolocator;
 using System;
+using System.Threading.Tasks;
 using TBSMobile.Data;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -33,6 +35,7 @@ namespace TBSMobile.View
                 {
                     if (DateTime.Now >= DateTime.Parse(Preferences.Get("appdatetime", String.Empty, "private_prefs")))
                     {
+                        await StartListening();
                         btnLogin.IsEnabled = true;
                     }
                     else
@@ -304,6 +307,14 @@ namespace TBSMobile.View
                     lblstatus.IsVisible = false;
                 }
             });
+        }
+
+        async Task StartListening()
+        {
+            if (!CrossGeolocator.Current.IsListening)
+            {
+                await CrossGeolocator.Current.StartListeningAsync(TimeSpan.FromSeconds(30), 200, false);
+            }
         }
     }
 }
