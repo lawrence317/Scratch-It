@@ -233,7 +233,7 @@ namespace TBSMobile.Rest_Service
             {
                 try
                 {
-                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&Version=" + VersionTracking.CurrentVersion, string.Empty));
 
                     var response = await client.GetAsync(uri);
                     
