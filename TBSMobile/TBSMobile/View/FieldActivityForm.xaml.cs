@@ -77,11 +77,18 @@ namespace TBSMobile.View
         {
             Device.BeginInvokeOnMainThread(async () =>
             {
-                var result = await this.DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
-
-                if (result == true)
+                try
                 {
-                    await this.Navigation.PopAsync();
+                    var result = await this.DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
+
+                    if (result == true)
+                    {
+                        await Navigation.PopAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             });
 
@@ -113,28 +120,35 @@ namespace TBSMobile.View
 
         public void SetCAFNo()
         {
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var numbers = "0123456789";
-            var stringChars = new char[10];
-            var random = new Random();
-
-            for (int i = 0; i < 2; i++)
+            try
             {
-                stringChars[i] = chars[random.Next(numbers.Length)];
-            }
-            for (int i = 2; i < 6; i++)
-            {
-                stringChars[i] = numbers[random.Next(numbers.Length)];
-            }
-            for (int i = 6; i < 10; i++)
-            {
-                stringChars[i] = chars[random.Next(numbers.Length)];
-            }
+                var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                var numbers = "0123456789";
+                var stringChars = new char[10];
+                var random = new Random();
 
-            var finalString = new String(stringChars);
-            entCafNo.Text = "AF" + finalString;
+                for (int i = 0; i < 2; i++)
+                {
+                    stringChars[i] = chars[random.Next(numbers.Length)];
+                }
+                for (int i = 2; i < 6; i++)
+                {
+                    stringChars[i] = numbers[random.Next(numbers.Length)];
+                }
+                for (int i = 6; i < 10; i++)
+                {
+                    stringChars[i] = chars[random.Next(numbers.Length)];
+                }
 
-            GetGPS();
+                var finalString = new String(stringChars);
+                entCafNo.Text = "AF" + finalString;
+
+                GetGPS();
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         public async void GetGPS()
@@ -683,7 +697,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -1576,13 +1590,20 @@ namespace TBSMobile.View
 
         private void townPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (townPicker.SelectedIndex > -1)
+            try
             {
-                var pickedTown = townPicker.Items[townPicker.SelectedIndex];
-                string[] picked = pickedTown.Split(new char[] { '/' });
-                string tid = picked[0];
+                if (townPicker.SelectedIndex > -1)
+                {
+                    var pickedTown = townPicker.Items[townPicker.SelectedIndex];
+                    string[] picked = pickedTown.Split(new char[] { '/' });
+                    string tid = picked[0];
 
-                entTownCode.Text = tid;
+                    entTownCode.Text = tid;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -1704,154 +1725,168 @@ namespace TBSMobile.View
 
         public void Send_email()
         {
-            var caf = entCafNo.Text;
-            var retailerCode = entRetailerCode.Text;
-            var employeeNumber = entEmployeeNumber.Text;
-            var street = entStreet.Text;
-            var barangay = entBarangay.Text;
-            var town = entTownCode.Text;
-            var province = entProvinceCode.Text;
-            var district = entDistrict.Text;
-            var country = entCountry.Text;
-            var landmark = entLandmark.Text;
-            var telephone1 = entTelephone1.Text;
-            var telephone2 = entTelephone2.Text;
-            var mobile = entMobile.Text;
-            var email = entEmail.Text;
-            var location = entLocation.Text;
-            var date = dpDate.Text;
-            var startTime = tpTime.Text;
-            var endTime = DateTime.Now.ToString("HH:mm:ss");
-            var photo1url = entPhoto1Url.Text;
-            var photo2url = entPhoto2Url.Text;
-            var photo3url = entPhoto3Url.Text;
-            var videourl = entVideoUrl.Text;
-            var otherconcern = entOthers.Text;
-            var remarks = entRemarks.Text;
-            string rekorida;
-            string merchandizing;
-            string tradecheck;
-            string others;
-            var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var recipients = entrecipient.Text;
-            var emailMessenger = CrossMessaging.Current.EmailMessenger;
+            try
+            {
+                var caf = entCafNo.Text;
+                var retailerCode = entRetailerCode.Text;
+                var employeeNumber = entEmployeeNumber.Text;
+                var street = entStreet.Text;
+                var barangay = entBarangay.Text;
+                var town = entTownCode.Text;
+                var province = entProvinceCode.Text;
+                var district = entDistrict.Text;
+                var country = entCountry.Text;
+                var landmark = entLandmark.Text;
+                var telephone1 = entTelephone1.Text;
+                var telephone2 = entTelephone2.Text;
+                var mobile = entMobile.Text;
+                var email = entEmail.Text;
+                var location = entLocation.Text;
+                var date = dpDate.Text;
+                var startTime = tpTime.Text;
+                var endTime = DateTime.Now.ToString("HH:mm:ss");
+                var photo1url = entPhoto1Url.Text;
+                var photo2url = entPhoto2Url.Text;
+                var photo3url = entPhoto3Url.Text;
+                var videourl = entVideoUrl.Text;
+                var otherconcern = entOthers.Text;
+                var remarks = entRemarks.Text;
+                string rekorida;
+                string merchandizing;
+                string tradecheck;
+                string others;
+                var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                var recipients = entrecipient.Text;
+                var emailMessenger = CrossMessaging.Current.EmailMessenger;
 
-            if (swRekorida.IsToggled == true)
-            {
-                rekorida = "True";
-            }
-            else
-            {
-                rekorida = "False";
-            }
-
-            if (swMerchandizing.IsToggled == true)
-            {
-                merchandizing = "True";
-            }
-            else
-            {
-                merchandizing = "False";
-            }
-
-            if (swTradeCheck.IsToggled == true)
-            {
-                tradecheck = "True";
-            }
-            else
-            {
-                tradecheck = "False";
-            }
-
-            if (swOthers.IsToggled == true)
-            {
-                others = "True";
-            }
-            else
-            {
-                others = "False";
-            }
-
-            if (!string.IsNullOrEmpty(recipients))
-            {
-                List<string> arrayfromEntry = new List<string>();
-                if (recipients.Contains(" ") == true)
+                if (swRekorida.IsToggled == true)
                 {
-                    arrayfromEntry = recipients.Split(new char[] { ' ' }).ToList();
+                    rekorida = "True";
                 }
                 else
                 {
-                    arrayfromEntry = recipients.Split(new char[] { ',' }).ToList();
+                    rekorida = "False";
                 }
 
-                for (int i = 0; i < arrayfromEntry.Count(); i++)
+                if (swMerchandizing.IsToggled == true)
                 {
-                    arrayfromEntry[i] = '"' + arrayfromEntry[i] + '"';
+                    merchandizing = "True";
+                }
+                else
+                {
+                    merchandizing = "False";
                 }
 
-                string f = (string.Join(", ", arrayfromEntry));
-                f = f.Remove(f.Count() - 1, 1);
-                f = f + '"';
-
-                var subject = "Field Activity Form - " + caf + " as of " + date;
-                var body = "Good Day! Field Activity Form details has been sent to you.<br/><br/>" +
-                    "<b>Retailer:</b> " + NameSearch.Text + "<br/>" +
-                    "<b>Retailer Code:</b> " + retailerCode + "<br/>" +
-                    "<b>Employee:</b> " + employeeNumber + "<br/>" +
-                    "<b>Street:</b> " + street + "<br/>" +
-                    "<b>Barangay:</b> " + barangay + "<br/>" +
-                    "<b>Town/City/Municipality:</b> " + town + "<br/>" +
-                    "<b>Province:</b> " + province + "<br/>" +
-                    "<b>District:</b> " + district + "<br/>" +
-                    "<b>Country:</b> " + country + "<br/>" +
-                    "<b>On-site Location:</b> " + location + "<br/>" +
-                    "<b>Activity Date:</b> " + date + "<br/>" +
-                    "<b>Activity Start Time:</b> " + startTime + "<br/>" +
-                    "<b>Activity End Time:</b> " + endTime + "<br/>" +
-                    "<b>Rekorida:</b> " + rekorida + "<br/>" +
-                    "<b>Merchandizing:</b> " + merchandizing + "<br/>" +
-                    "<b>Trade Check:</b> " + tradecheck + "<br/>" +
-                    "<b>Others:</b> " + others + "<br/>" +
-                    "<b>Other Concern:</b> " + otherconcern + "<br/>" +
-                    "<b>Remarks:</b> " + remarks;
-
-                if (emailMessenger.CanSendEmail)
+                if (swTradeCheck.IsToggled == true)
                 {
-                    if (!string.IsNullOrEmpty(videourl))
+                    tradecheck = "True";
+                }
+                else
+                {
+                    tradecheck = "False";
+                }
+
+                if (swOthers.IsToggled == true)
+                {
+                    others = "True";
+                }
+                else
+                {
+                    others = "False";
+                }
+
+                if (!string.IsNullOrEmpty(recipients))
+                {
+                    List<string> arrayfromEntry = new List<string>();
+                    if (recipients.Contains(" ") == true)
                     {
-                        var emailsend = new EmailMessageBuilder()
-                        .To(f)
-                        .Subject(subject)
-                        .BodyAsHtml(body)
-                        .WithAttachment(photo1url, "image/png")
-                        .WithAttachment(photo2url, "image/png")
-                        .WithAttachment(photo3url, "image/png")
-                        .WithAttachment(videourl, "video/mp4")
-                        .Build();
-
-                        emailMessenger.SendEmail(emailsend);
+                        arrayfromEntry = recipients.Split(new char[] { ' ' }).ToList();
                     }
                     else
                     {
-                        var emailsend = new EmailMessageBuilder()
-                        .To(f)
-                        .Subject(subject)
-                        .BodyAsHtml(body)
-                        .WithAttachment(photo1url, "image/png")
-                        .WithAttachment(photo2url, "image/png")
-                        .WithAttachment(photo3url, "image/png")
-                        .Build();
+                        arrayfromEntry = recipients.Split(new char[] { ',' }).ToList();
+                    }
 
-                        emailMessenger.SendEmail(emailsend);
+                    for (int i = 0; i < arrayfromEntry.Count(); i++)
+                    {
+                        arrayfromEntry[i] = '"' + arrayfromEntry[i] + '"';
+                    }
+
+                    string f = (string.Join(", ", arrayfromEntry));
+                    f = f.Remove(f.Count() - 1, 1);
+                    f = f + '"';
+
+                    var subject = "Field Activity Form - " + caf + " as of " + date;
+                    var body = "Good Day! Field Activity Form details has been sent to you.<br/><br/>" +
+                        "<b>Retailer:</b> " + NameSearch.Text + "<br/>" +
+                        "<b>Retailer Code:</b> " + retailerCode + "<br/>" +
+                        "<b>Employee:</b> " + employeeNumber + "<br/>" +
+                        "<b>Street:</b> " + street + "<br/>" +
+                        "<b>Barangay:</b> " + barangay + "<br/>" +
+                        "<b>Town/City/Municipality:</b> " + town + "<br/>" +
+                        "<b>Province:</b> " + province + "<br/>" +
+                        "<b>District:</b> " + district + "<br/>" +
+                        "<b>Country:</b> " + country + "<br/>" +
+                        "<b>On-site Location:</b> " + location + "<br/>" +
+                        "<b>Activity Date:</b> " + date + "<br/>" +
+                        "<b>Activity Start Time:</b> " + startTime + "<br/>" +
+                        "<b>Activity End Time:</b> " + endTime + "<br/>" +
+                        "<b>Rekorida:</b> " + rekorida + "<br/>" +
+                        "<b>Merchandizing:</b> " + merchandizing + "<br/>" +
+                        "<b>Trade Check:</b> " + tradecheck + "<br/>" +
+                        "<b>Others:</b> " + others + "<br/>" +
+                        "<b>Other Concern:</b> " + otherconcern + "<br/>" +
+                        "<b>Remarks:</b> " + remarks;
+
+                    if (emailMessenger.CanSendEmail)
+                    {
+                        if (!string.IsNullOrEmpty(videourl))
+                        {
+                            var emailsend = new EmailMessageBuilder()
+                            .To(f)
+                            .Subject(subject)
+                            .BodyAsHtml(body)
+                            .WithAttachment(photo1url, "image/png")
+                            .WithAttachment(photo2url, "image/png")
+                            .WithAttachment(photo3url, "image/png")
+                            .WithAttachment(videourl, "video/mp4")
+                            .Build();
+
+                            emailMessenger.SendEmail(emailsend);
+                        }
+                        else
+                        {
+                            var emailsend = new EmailMessageBuilder()
+                            .To(f)
+                            .Subject(subject)
+                            .BodyAsHtml(body)
+                            .WithAttachment(photo1url, "image/png")
+                            .WithAttachment(photo2url, "image/png")
+                            .WithAttachment(photo3url, "image/png")
+                            .Build();
+
+                            emailMessenger.SendEmail(emailsend);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
         private void SyncStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                sendStatus.Text = status;
+                try
+                {
+                    sendStatus.Text = status;
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             });
         }
     }

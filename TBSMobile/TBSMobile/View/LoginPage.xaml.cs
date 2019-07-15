@@ -54,67 +54,74 @@ namespace TBSMobile.View
 
         void Init() 
         {
-            CreateTableAsync();
-            
-            lblDomain.Text = Constants.domain;
-            lblHost.Text = Constants.hostname;
-
-            Preferences.Set("domain", Constants.domain, "private_prefs");
-            Preferences.Set("host", Constants.hostname, "private_prefs");
-
-            var server = Preferences.Get("server", String.Empty, "private_prefs");
-
-            if (String.IsNullOrEmpty(server))
+            try
             {
-                lblServer.Text = "Connected: Live Server";
-                serverPicker.SelectedIndex = 0;
+                CreateTableAsync();
 
-                lblDatabase.Text = Constants.livedatabase;
-                lblApi.Text = Constants.liveapifolder;
+                lblDomain.Text = Constants.domain;
+                lblHost.Text = Constants.hostname;
 
-                Preferences.Set("database", Constants.livedatabase, "private_prefs");
-                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+                Preferences.Set("domain", Constants.domain, "private_prefs");
+                Preferences.Set("host", Constants.hostname, "private_prefs");
+
+                var server = Preferences.Get("server", String.Empty, "private_prefs");
+
+                if (String.IsNullOrEmpty(server))
+                {
+                    lblServer.Text = "Connected: Live Server";
+                    serverPicker.SelectedIndex = 0;
+
+                    lblDatabase.Text = Constants.livedatabase;
+                    lblApi.Text = Constants.liveapifolder;
+
+                    Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                    Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+                }
+                else if (server.Equals("Live Server"))
+                {
+                    lblServer.Text = "Connected: " + server;
+                    serverPicker.SelectedIndex = 0;
+
+                    lblDatabase.Text = Constants.livedatabase;
+                    lblApi.Text = Constants.liveapifolder;
+
+                    Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                    Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+                }
+                else if (server.Equals("Test Server"))
+                {
+                    lblServer.Text = "Connected: " + server;
+                    serverPicker.SelectedIndex = 1;
+
+                    lblDatabase.Text = Constants.testdatabase;
+                    lblApi.Text = Constants.testapifolder;
+
+                    Preferences.Set("database", Constants.testdatabase, "private_prefs");
+                    Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
+                }
+
+                var userName = Preferences.Get("username", String.Empty, "private_prefs");
+                var password = Preferences.Get("password", String.Empty, "private_prefs");
+
+                entUser.Text = userName;
+                entPassword.Text = password;
+
+                entUser.Completed += (s, e) => entPassword.Focus();
+                entPassword.Completed += (s, e) => Check_Version();
+
+                lblVersion.Text = Constants.appversion;
+                lblRegistrationCode.Text = "Device ID: " + CrossDeviceInfo.Current.Id;
+
+                var firstLaunch = VersionTracking.IsFirstLaunchEver;
+
+                if (firstLaunch)
+                {
+                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                }
             }
-            else if (server.Equals("Live Server"))
+            catch (Exception ex)
             {
-                lblServer.Text = "Connected: " + server;
-                serverPicker.SelectedIndex = 0;
-
-                lblDatabase.Text = Constants.livedatabase;
-                lblApi.Text = Constants.liveapifolder;
-
-                Preferences.Set("database", Constants.livedatabase, "private_prefs");
-                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
-            }
-            else if(server.Equals("Test Server"))
-            {
-                lblServer.Text = "Connected: " + server;
-                serverPicker.SelectedIndex = 1;
-
-                lblDatabase.Text = Constants.testdatabase;
-                lblApi.Text = Constants.testapifolder;
-
-                Preferences.Set("database", Constants.testdatabase, "private_prefs");
-                Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
-            }
-
-            var userName = Preferences.Get("username", String.Empty, "private_prefs");
-            var password = Preferences.Get("password", String.Empty, "private_prefs");
-
-            entUser.Text = userName;
-            entPassword.Text = password;
-
-            entUser.Completed += (s, e) => entPassword.Focus();
-            entPassword.Completed += (s, e) => Check_Version();
-
-            lblVersion.Text = Constants.appversion;
-            lblRegistrationCode.Text = "Device ID: " + CrossDeviceInfo.Current.Id;
-
-            var firstLaunch = VersionTracking.IsFirstLaunchEver;
-
-            if (firstLaunch)
-            {
-                Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                Crashes.TrackError(ex);
             }
         }
 
@@ -161,40 +168,47 @@ namespace TBSMobile.View
 
         public async void Check_Version()
         {
-            var userName = entUser.Text;
-            var password = entPassword.Text;
-
-            var host = Preferences.Get("host", String.Empty, "private_prefs");
-            var database = Preferences.Get("database", String.Empty, "private_prefs");
-            var domain = Preferences.Get("domain", String.Empty, "private_prefs");
-            var apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
-            string apifile = "check-version-api.php";
-
-            if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+            try
             {
-                if (string.IsNullOrEmpty(userName))
+                var userName = entUser.Text;
+                var password = entPassword.Text;
+
+                var host = Preferences.Get("host", String.Empty, "private_prefs");
+                var database = Preferences.Get("database", String.Empty, "private_prefs");
+                var domain = Preferences.Get("domain", String.Empty, "private_prefs");
+                var apifolder = Preferences.Get("apifolder", String.Empty, "private_prefs");
+                string apifile = "check-version-api.php";
+
+                if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
                 {
-                    usernameFrame.BorderColor = Color.FromHex("#e74c3c");
+                    if (string.IsNullOrEmpty(userName))
+                    {
+                        usernameFrame.BorderColor = Color.FromHex("#e74c3c");
+                    }
+                    else
+                    {
+                        usernameFrame.BorderColor = Color.FromHex("#f2f2f5");
+                    }
+
+                    if (string.IsNullOrEmpty(password))
+                    {
+                        passwordFrame.BorderColor = Color.FromHex("#e74c3c");
+                    }
+                    else
+                    {
+                        passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
+                    }
+
+                    await DisplayAlert("Login Error", "Please enter your username and password", "Ok");
                 }
                 else
                 {
-                    usernameFrame.BorderColor = Color.FromHex("#f2f2f5");
+                    await App.TodoManager.CheckVersion(host, database, domain, apifolder, apifile, userName, password, LoginStatus);
                 }
-
-                if (string.IsNullOrEmpty(password))
-                {
-                    passwordFrame.BorderColor = Color.FromHex("#e74c3c");
-                }
-                else
-                {
-                    passwordFrame.BorderColor = Color.FromHex("#f2f2f5");
-                }
-
-                await DisplayAlert("Login Error", "Please enter your username and password", "Ok");
             }
-            else
+            catch (Exception ex)
             {
-                await App.TodoManager.CheckVersion(host, database, domain, apifolder, apifile, userName, password, LoginStatus);
+                Crashes.TrackError(ex);
             }
         }
 
@@ -234,50 +248,64 @@ namespace TBSMobile.View
 
         public async void Save()
         {
-            var picker = serverPicker;
-            int selectedIndex = picker.SelectedIndex;
-            string server = (string)picker.ItemsSource[selectedIndex];
-
-            Preferences.Set("server", server, "private_prefs");
-
-            lblServer.Text = "Connected: " + server;
-
-            if (selectedIndex == 0)
+            try
             {
-                Preferences.Set("database", Constants.livedatabase, "private_prefs");
-                Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+                var picker = serverPicker;
+                int selectedIndex = picker.SelectedIndex;
+                string server = (string)picker.ItemsSource[selectedIndex];
+
+                Preferences.Set("server", server, "private_prefs");
+
+                lblServer.Text = "Connected: " + server;
+
+                if (selectedIndex == 0)
+                {
+                    Preferences.Set("database", Constants.livedatabase, "private_prefs");
+                    Preferences.Set("apifolder", Constants.liveapifolder, "private_prefs");
+                }
+                else if (selectedIndex == 1)
+                {
+                    Preferences.Set("database", Constants.testdatabase, "private_prefs");
+                    Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
+                }
+
+                if (!CrossConnectivity.Current.IsConnected)
+                {
+                    await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
+                }
+
+                await DisplayAlert("Connection To Server Warning", "Warning:\nYou are now connecting to " + server, "Ok");
+
+                connectstack.IsVisible = false;
+                loginstack.IsVisible = true;
             }
-            else if (selectedIndex == 1)
+            catch (Exception ex)
             {
-                Preferences.Set("database", Constants.testdatabase, "private_prefs");
-                Preferences.Set("apifolder", Constants.testapifolder, "private_prefs");
+                Crashes.TrackError(ex);
             }
-
-            if (!CrossConnectivity.Current.IsConnected)
-            {
-                await DisplayAlert("Connection Error", "Connection error, switching to offline mode", "Ok");
-            }
-
-            await DisplayAlert("Connection To Server Warning", "Warning:\nYou are now connecting to " + server, "Ok");
-
-            connectstack.IsVisible = false;
-            loginstack.IsVisible = true;
         }
 
         private void ServerPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var picker = (Picker)sender;
-            int selectedIndex = picker.SelectedIndex;
-            
-            if(selectedIndex == 0)
+            try
             {
-                lblDatabase.Text = Constants.livedatabase;
-                lblApi.Text = Constants.liveapifolder;
+                var picker = (Picker)sender;
+                int selectedIndex = picker.SelectedIndex;
+
+                if (selectedIndex == 0)
+                {
+                    lblDatabase.Text = Constants.livedatabase;
+                    lblApi.Text = Constants.liveapifolder;
+                }
+                else if (selectedIndex == 1)
+                {
+                    lblDatabase.Text = Constants.testdatabase;
+                    lblApi.Text = Constants.testapifolder;
+                }
             }
-            else if (selectedIndex == 1)
+            catch (Exception ex)
             {
-                lblDatabase.Text = Constants.testdatabase;
-                lblApi.Text = Constants.testapifolder;
+                Crashes.TrackError(ex);
             }
         }
 
@@ -290,30 +318,44 @@ namespace TBSMobile.View
         private void LoginStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                string[] loginstatus = status.Split(new char[] { '-' });
-                string type = loginstatus[0];
-                string message = loginstatus[1];
-
-                lblstatus.Text = message;
-
-                if (type == "0")
+                try
                 {
-                    btnLogin.IsEnabled = false;
-                    lblstatus.IsVisible = true;
+                    string[] loginstatus = status.Split(new char[] { '-' });
+                    string type = loginstatus[0];
+                    string message = loginstatus[1];
+
+                    lblstatus.Text = message;
+
+                    if (type == "0")
+                    {
+                        btnLogin.IsEnabled = false;
+                        lblstatus.IsVisible = true;
+                    }
+                    else if (type == "1")
+                    {
+                        btnLogin.IsEnabled = true;
+                        lblstatus.IsVisible = false;
+                    }
                 }
-                else if(type == "1")
+                catch (Exception ex)
                 {
-                    btnLogin.IsEnabled = true;
-                    lblstatus.IsVisible = false;
+                    Crashes.TrackError(ex);
                 }
             });
         }
 
         async Task StartListening()
         {
-            if (!CrossGeolocator.Current.IsListening)
+            try
             {
-                await CrossGeolocator.Current.StartListeningAsync(TimeSpan.FromSeconds(30), 200, false);
+                if (!CrossGeolocator.Current.IsListening)
+                {
+                    await CrossGeolocator.Current.StartListeningAsync(TimeSpan.FromSeconds(30), 200, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
     }

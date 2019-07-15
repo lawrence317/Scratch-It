@@ -78,11 +78,19 @@ namespace TBSMobile.View
         protected override bool OnBackButtonPressed()
         {
             Device.BeginInvokeOnMainThread(async () => {
-                var result = await this.DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
 
-                if (result == true)
+                try
                 {
-                    await this.Navigation.PopModalAsync();
+                    var result = await this.DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
+
+                    if (result == true)
+                    {
+                        await this.Navigation.PopModalAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             });
 
@@ -174,26 +182,33 @@ namespace TBSMobile.View
 
         public void SetTempRetailerCode()
         {
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var numbers = "0123456789";
-            var stringChars = new char[10];
-            var random = new Random();
+            try
+            {
+                var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                var numbers = "0123456789";
+                var stringChars = new char[10];
+                var random = new Random();
 
-            for (int i = 0; i < 2; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
-            for (int i = 2; i < 6; i++)
-            {
-                stringChars[i] = numbers[random.Next(numbers.Length)];
-            }
-            for (int i = 6; i < 10; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
+                for (int i = 0; i < 2; i++)
+                {
+                    stringChars[i] = chars[random.Next(chars.Length)];
+                }
+                for (int i = 2; i < 6; i++)
+                {
+                    stringChars[i] = numbers[random.Next(numbers.Length)];
+                }
+                for (int i = 6; i < 10; i++)
+                {
+                    stringChars[i] = chars[random.Next(chars.Length)];
+                }
 
-            var finalString = new String(stringChars);
-            entRetailerCode.Text = "TP-" + finalString;
+                var finalString = new String(stringChars);
+                entRetailerCode.Text = "TP-" + finalString;
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         private void NameSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -359,13 +374,20 @@ namespace TBSMobile.View
 
         private void townPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (townPicker.SelectedIndex > -1)
+            try
             {
-                var pickedTown = townPicker.Items[townPicker.SelectedIndex];
-                string[] picked = pickedTown.Split(new char[] { '/' });
-                string tid = picked[0];
+                if (townPicker.SelectedIndex > -1)
+                {
+                    var pickedTown = townPicker.Items[townPicker.SelectedIndex];
+                    string[] picked = pickedTown.Split(new char[] { '/' });
+                    string tid = picked[0];
 
-                entTownCode.Text = tid;
+                    entTownCode.Text = tid;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -537,7 +559,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -687,7 +709,14 @@ namespace TBSMobile.View
         private void SyncStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                sendStatus.Text = status;
+                try
+                {
+                    sendStatus.Text = status;
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             });
         }
     }

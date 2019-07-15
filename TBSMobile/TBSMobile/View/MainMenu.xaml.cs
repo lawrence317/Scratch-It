@@ -288,7 +288,6 @@ namespace TBSMobile.View
                 Crashes.TrackError(ex);
                 await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
-
         }
 
         private async void btnUI_Clicked(object sender, EventArgs e)
@@ -437,7 +436,14 @@ namespace TBSMobile.View
         private void SyncStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                lblStatus.Text = status;
+                try
+                {
+                    lblStatus.Text = status;
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             });
         }
 

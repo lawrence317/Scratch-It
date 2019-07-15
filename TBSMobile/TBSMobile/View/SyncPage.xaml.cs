@@ -63,7 +63,15 @@ namespace TBSMobile.View
         private void SyncStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                syncStatus.Text = status;
+
+                try
+                {
+                    syncStatus.Text = status;
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             });
         }
 
@@ -74,14 +82,28 @@ namespace TBSMobile.View
 
         private async void btnContinue_Clicked(object sender, EventArgs e)
         {
-            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+            try
+            {
+                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         private async void btnBack_Clicked(object sender, EventArgs e)
         {
-            Preferences.Set("username", String.Empty, "private_prefs");
-            Preferences.Set("password", String.Empty, "private_prefs");
-            await Navigation.PopToRootAsync();
+            try
+            {
+                Preferences.Set("username", String.Empty, "private_prefs");
+                Preferences.Set("password", String.Empty, "private_prefs");
+                await Navigation.PopToRootAsync();
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
     }
 }

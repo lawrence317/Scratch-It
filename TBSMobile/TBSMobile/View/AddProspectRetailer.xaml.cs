@@ -29,8 +29,15 @@ namespace TBSMobile.View
 
         void Init()
         {
-            dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
-            tpTime.Text = DateTime.Now.ToString("HH:mm:ss");
+            try
+            {
+                dpDate.Text = DateTime.Now.ToString("yyyy/MM/dd");
+                tpTime.Text = DateTime.Now.ToString("HH:mm:ss");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         protected async override void OnAppearing()
@@ -68,11 +75,18 @@ namespace TBSMobile.View
         protected override bool OnBackButtonPressed()
         {
             Device.BeginInvokeOnMainThread(async () => {
-                var result = await this.DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
-
-                if (result == true)
+                try
                 {
-                    await this.Navigation.PopModalAsync();
+                    var result = await DisplayAlert("Confirm", "Are you sure you want to discard this form?", "Yes", "No");
+
+                    if (result == true)
+                    {
+                        await Navigation.PopModalAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             });
 
@@ -316,21 +330,28 @@ namespace TBSMobile.View
 
         public void SetTempId()
         {
-            var numbers = "0123456789";
-            var stringChars = new char[5];
-            var random = new Random();
-
-            for (int i = 0; i < 2; i++)
+            try
             {
-                stringChars[i] = numbers[random.Next(numbers.Length)];
-            }
-            for (int i = 2; i < 5; i++)
-            {
-                stringChars[i] = numbers[random.Next(numbers.Length)];
-            }
+                var numbers = "0123456789";
+                var stringChars = new char[5];
+                var random = new Random();
 
-            var finalString = new String(stringChars);
-            entTempID.Text = "PR-" + finalString;
+                for (int i = 0; i < 2; i++)
+                {
+                    stringChars[i] = numbers[random.Next(numbers.Length)];
+                }
+                for (int i = 2; i < 5; i++)
+                {
+                    stringChars[i] = numbers[random.Next(numbers.Length)];
+                }
+
+                var finalString = new String(stringChars);
+                entTempID.Text = "PR-" + finalString;
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         private async void btnAddContacts_Clicked(object sender, EventArgs e)
@@ -501,13 +522,20 @@ namespace TBSMobile.View
 
         private void townPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (townPicker.SelectedIndex > -1)
+            try
             {
-                var pickedTown = townPicker.Items[townPicker.SelectedIndex];
-                string[] picked = pickedTown.Split(new char[] { '/' });
-                string tid = picked[0];
+                if (townPicker.SelectedIndex > -1)
+                {
+                    var pickedTown = townPicker.Items[townPicker.SelectedIndex];
+                    string[] picked = pickedTown.Split(new char[] { '/' });
+                    string tid = picked[0];
 
-                entTownCode.Text = tid;
+                    entTownCode.Text = tid;
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -906,7 +934,14 @@ namespace TBSMobile.View
         private void SyncStatus(string status)
         {
             Device.BeginInvokeOnMainThread(() => {
-                sendStatus.Text = status;
+                try
+                {
+                    sendStatus.Text = status;
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                }
             });
         }
     }

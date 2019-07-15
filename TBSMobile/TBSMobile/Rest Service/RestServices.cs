@@ -231,10 +231,10 @@ namespace TBSMobile.Rest_Service
             LoginStatus("0-Checking version please wait...");
             if (CrossConnectivity.Current.IsConnected)
             {
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                     var response = await client.GetAsync(uri);
                     
                     if (response.IsSuccessStatusCode)
@@ -324,10 +324,11 @@ namespace TBSMobile.Rest_Service
         {
             LoginStatus("0-Checking login credentials please wait...");
             string login_apifile = "login-api.php";
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
-
+            
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + login_apifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&Password=" + password + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+
                 var response = await client.GetAsync(uri);
 
                 if (response.IsSuccessStatusCode)
@@ -674,10 +675,11 @@ namespace TBSMobile.Rest_Service
         {
             LoginStatus("0-Activating trial please wait...");
             string trialapifile = "activate-trial-api.php";
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + trialapifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&RegistrationCode=" + Constants.deviceID, string.Empty));
 
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + trialapifile + "?Host=" + host + "&Database=" + database + "&Username=" + username + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+
                 var response = await client.GetAsync(uri);
 
                 if (response.IsSuccessStatusCode)
@@ -739,10 +741,17 @@ namespace TBSMobile.Rest_Service
 
         public void Save_Preferences(string username, string password, string contactID)
         {
-            Preferences.Set("username", username, "private_prefs");
-            Preferences.Set("password", password, "private_prefs");
+            try
+            {
+                Preferences.Set("username", username, "private_prefs");
+                Preferences.Set("password", password, "private_prefs");
 
-            Preferences.Set("contactid", contactID, "private_prefs");
+                Preferences.Set("contactid", contactID, "private_prefs");
+            }
+            catch(Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         /* SYNC REST */
@@ -759,10 +768,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-user-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting user data from server");
 
                     var response = await client.GetAsync(uri);
@@ -854,16 +863,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncUser(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -878,10 +894,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-system-serial-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID, string.Empty));
+
                     SyncStatus("Getting system serial data from server");
 
                     var response = await client.GetAsync(uri);
@@ -976,16 +992,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time System Serial Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncSystemSerial(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1000,10 +1023,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-contacts-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting retailer data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1158,16 +1181,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncContacts(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1182,10 +1212,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-retailer-outlet-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting retailer outlet data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1300,16 +1330,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1324,10 +1361,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-caf-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting coordinator activity form data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1446,16 +1483,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1470,10 +1514,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-caf-activity-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     var response = await client.GetAsync(uri);
 
                     if (response.IsSuccessStatusCode)
@@ -1560,16 +1604,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1584,10 +1635,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-email-recipient-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting email recipient data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1676,16 +1727,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Email Recipient Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncEmailRecipient(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1700,10 +1758,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-province-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                     SyncStatus("Getting province data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1790,16 +1848,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Province Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncProvince(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1814,10 +1879,10 @@ namespace TBSMobile.Rest_Service
                 string apifile = "first-time-sync-town-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                 try
                 {
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                     SyncStatus("Getting town data from server");
 
                     var response = await client.GetAsync(uri);
@@ -1907,16 +1972,23 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("First-time Town Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await FirstTimeSyncTown(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "1", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "1", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PopToRootAsync();
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -1944,11 +2016,11 @@ namespace TBSMobile.Rest_Service
                     for (int i = 0; i < changesresultCount; i++)
                     {
                         SyncStatus("Sending user changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
-
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
+                        
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var userid = result.UserID;
                             var usrpassword = result.UsrPassword;
@@ -2046,22 +2118,36 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.UpdateContacts(contact);
-                    await App.TodoManager.SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.UpdateContacts(contact);
+                        await App.TodoManager.SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncUserClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2101,10 +2187,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactID = result.ContactID;
                             var fileAs = result.FileAs;
@@ -2259,21 +2345,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncContactsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2300,10 +2400,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactID = result.ContactID;
                             var mobilePhoto1 = result.MobilePhoto1;
@@ -2404,21 +2504,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 1 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncContactsMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2445,10 +2559,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactID = result.ContactID;
                             var mobilePhoto2 = result.MobilePhoto2;
@@ -2549,21 +2663,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 2 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncContactsMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2590,10 +2718,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactID = result.ContactID;
                             var mobilePhoto3 = result.MobilePhoto3;
@@ -2694,21 +2822,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Photo 3 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncContactsMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2735,10 +2877,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactID = result.ContactID;
                             var mobileVideo = result.MobileVideo;
@@ -2839,21 +2981,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Video Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncContactsMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -2880,10 +3036,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending retailer outlet changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var retailerCode = result.RetailerCode;
                             var contactID = result.ContactID;
@@ -3003,30 +3159,51 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.UpdateCAF(contact);
-                    await App.TodoManager.SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.UpdateCAF(contact);
+                        await App.TodoManager.SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncRetailerOutletClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
 
         public async Task UpdateCAF(string contact)
         {
-            await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
-            await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            try
+            {
+                await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND Deleted != '1'", 1, 1, 1, 1, 1, contact);
+                await Constants.conn.QueryAsync<CAFTable>("Update tblCAF SET ThisSynced = ?, Media1Synced = ?, Media2Synced = ?, Media3Synced = ?, Media4Synced = ?  WHERE EmployeeID = ? AND LastUpdated > LastSync AND Deleted != '1'", 0, 0, 0, 0, 0, contact);
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         public async Task SyncCAFClientUpdate(string host, string database, string domain, string apifolder, string contact, Action<string>SyncStatus)
@@ -3051,10 +3228,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var employeeID = result.EmployeeID;
@@ -3169,21 +3346,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncCAFMedia1ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncCAFClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -3210,10 +3401,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form photo 1 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var mobilePhoto1 = result.MobilePhoto1;
@@ -3354,11 +3545,11 @@ namespace TBSMobile.Rest_Service
                     for (int i = 0; i < changesresultCount; i++)
                     {
                         SyncStatus("Sending coordinator activity form photo 2 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
-
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
+                        
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var mobilePhoto2 = result.MobilePhoto2;
@@ -3459,21 +3650,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 2 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncCAFMedia2ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -3499,11 +3704,11 @@ namespace TBSMobile.Rest_Service
                     for (int i = 0; i < changesresultCount; i++)
                     {
                         SyncStatus("Sending coordinator activity form photo 3 changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
-
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
+                        
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var mobilePhoto3 = result.MobilePhoto3;
@@ -3604,21 +3809,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Photo 3 Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncCAFMedia3ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -3645,10 +3864,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity form video changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var mobileVideo = result.MobileVideo;
@@ -3749,21 +3968,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Video Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncCAFMedia4ClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -3790,10 +4023,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending coordinator activity changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var cafNo = result.CAFNo;
                             var contactid = result.ContactID;
@@ -3887,21 +4120,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncCAFActivityClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -3928,10 +4175,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending email recipient changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactsID = result.ContactID;
                             var email = result.Email;
@@ -4025,21 +4272,35 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    try
+                    {
+                        await App.TodoManager.SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update Email Recipient Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncEmailRecipientClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4066,10 +4327,10 @@ namespace TBSMobile.Rest_Service
                     {
                         SyncStatus("Sending user logs changes to server\n (" + clientupdate + " out of " + changesresultCount + ")");
 
-                        var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
                         try
                         {
+                            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                             var result = datachanges.Result[i];
                             var contactsID = result.ContactID;
                             var logtype = result.LogType;
@@ -4163,20 +4424,34 @@ namespace TBSMobile.Rest_Service
                 }
                 else
                 {
-                    await App.TodoManager.OnSyncComplete(host, database, domain, contact);
+                    try
+                    {
+                        await App.TodoManager.OnSyncComplete(host, database, domain, contact);
+                    }
+                    catch (Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                    }
                 }
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Client Update User Logs Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncUserLogsClientUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4191,14 +4466,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-user-server-update-api.php";
-                var lastchecked = Preferences.Get("userchangeslastcheck", String.Empty, "private_prefs");
-
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("userchangeslastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting user data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4288,15 +4562,22 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update User Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncUserServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4309,13 +4590,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-system-serial-server-update-api.php";
-                var lastchecked = Preferences.Get("systemserialchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("systemserialchangelastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&RegistrationCode=" + Constants.deviceID + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting system serial data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4408,15 +4689,22 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update System Serial Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncSystemSerialServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4429,13 +4717,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-contacts-server-update-api.php";
-                var lastchecked = Preferences.Get("contactschangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("contactschangelastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting retailer data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4609,13 +4897,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-retailer-outlet-server-update-api.php";
-                var lastchecked = Preferences.Get("retaileroutletchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("retaileroutletchangelastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting retailer outlet data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4728,15 +5016,22 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncRetailerOutletServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4749,13 +5044,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-province-server-update-api.php";
-                var lastchecked = Preferences.Get("provincechangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("provincechangelastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting province data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4840,15 +5135,22 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Province Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncProvinceServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4861,13 +5163,13 @@ namespace TBSMobile.Rest_Service
             if (CrossConnectivity.Current.IsConnected)
             {
                 string apifile = "sync-town-server-update-api.php";
-                var lastchecked = Preferences.Get("townchangelastcheck", String.Empty, "private_prefs");
                 int count = 0;
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
 
                 try
                 {
+                    var lastchecked = Preferences.Get("townchangelastcheck", String.Empty, "private_prefs");
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&LastChecked=" + lastchecked, string.Empty));
+
                     SyncStatus("Getting town data from server");
 
                     var response = await client.GetAsync(uri);
@@ -4954,15 +5256,22 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+                try
+                {
+                    var retry = await App.Current.MainPage.DisplayAlert("Server Update Town Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
 
-                if (retry)
-                {
-                    await SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    if (retry)
+                    {
+                        await SyncTownServerUpdate(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                    else
+                    {
+                        Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Preferences.Set("isfirsttimesync", "0", "private_prefs");
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -4976,15 +5285,14 @@ namespace TBSMobile.Rest_Service
 
             if (CrossConnectivity.Current.IsConnected)
             {
-                await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
-
                 string apifile = "resync-contacts-api.php";
                 int count = 0;
 
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    await Constants.conn.QueryAsync<ContactsTable>("UPDATE tblContacts SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting retailer data from server");
 
                     var response = await client.GetAsync(uri);
@@ -5036,11 +5344,18 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                if (retry)
+                try
                 {
-                    await ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Contacts Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry)
+                    {
+                        await ReSynContacts(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -5055,12 +5370,11 @@ namespace TBSMobile.Rest_Service
                 string apifile = "resync-retailer-outlet-api.php";
                 int count = 0;
 
-                await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    await Constants.conn.QueryAsync<RetailerGroupTable>("UPDATE tblRetailerGroup SET Existed = ? WHERE Supervisor = ?", 0, contact);
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting retailer outlet data from server");
 
                     var response = await client.GetAsync(uri);
@@ -5112,11 +5426,18 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                if (retry)
+                try
                 {
-                    await ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync Retailer Outlet Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry)
+                    {
+                        await ReSyncRetailerOutlet(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -5131,12 +5452,11 @@ namespace TBSMobile.Rest_Service
                 string apifile = "resync-caf-api.php";
                 int count = 0;
 
-                await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    await Constants.conn.QueryAsync<CAFTable>("UPDATE tblCaf SET Existed = ? WHERE EmployeeID = ?", 0, contact);
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting coordinator activity form data from server");
 
                     var response = await client.GetAsync(uri);
@@ -5188,11 +5508,18 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                if (retry)
+                try
                 {
-                    await ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry)
+                    {
+                        await ReSyncCAF(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -5207,12 +5534,11 @@ namespace TBSMobile.Rest_Service
                 string apifile = "resync-caf-activity-api.php";
                 int count = 0;
 
-                await Constants.conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
-
-                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
-
                 try
                 {
+                    await Constants.conn.QueryAsync<ActivityTable>("UPDATE tblActivity SET Existed = ? WHERE ContactID = ?", 0, contact);
+                    var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database + "&ContactID=" + contact, string.Empty));
+
                     SyncStatus("Getting coordinator activity data from server");
 
                     var response = await client.GetAsync(uri);
@@ -5265,11 +5591,18 @@ namespace TBSMobile.Rest_Service
             }
             else
             {
-                var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
-
-                if (retry)
+                try
                 {
-                    await ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                    var retry = await App.Current.MainPage.DisplayAlert("Re-sync CAF Activity Sync Error", "Syncing failed. Please connect to the internet to sync your data. Do you want to retry?", "Yes", "No");
+
+                    if (retry)
+                    {
+                        await ReSyncCAFActivity(host, database, domain, apifolder, contact, SyncStatus);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
                 }
             }
         }
@@ -5382,31 +5715,38 @@ namespace TBSMobile.Rest_Service
 
         public async Task CheckAutoSync(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus)
         {
-            var contactschanges = Preferences.Get("contactschanges", String.Empty, "private_prefs");
-            var retaileroutletchanges = Preferences.Get("retaileroutletchanges", String.Empty, "private_prefs");
-            var cafchanges = Preferences.Get("cafchanges", String.Empty, "private_prefs");
-            var cafactivitychanges = Preferences.Get("cafactivitychanges", String.Empty, "private_prefs");
-            var emailrecipientchanges = Preferences.Get("emailrecipientchanges", String.Empty, "private_prefs");
-
-            if(Convert.ToInt32(contactschanges) > 0 || Convert.ToInt32(retaileroutletchanges) > 0 || Convert.ToInt32(cafchanges) > 0 || Convert.ToInt32(cafactivitychanges) > 0 || Convert.ToInt32(emailrecipientchanges) > 0)
+            try
             {
-                var autosync = await App.Current.MainPage.DisplayAlert("Auto-sync Notification", "Do you want to sync the data?", "Yes", "No");
+                var contactschanges = Preferences.Get("contactschanges", String.Empty, "private_prefs");
+                var retaileroutletchanges = Preferences.Get("retaileroutletchanges", String.Empty, "private_prefs");
+                var cafchanges = Preferences.Get("cafchanges", String.Empty, "private_prefs");
+                var cafactivitychanges = Preferences.Get("cafactivitychanges", String.Empty, "private_prefs");
+                var emailrecipientchanges = Preferences.Get("emailrecipientchanges", String.Empty, "private_prefs");
 
-                if (autosync == true)
+                if (Convert.ToInt32(contactschanges) > 0 || Convert.ToInt32(retaileroutletchanges) > 0 || Convert.ToInt32(cafchanges) > 0 || Convert.ToInt32(cafactivitychanges) > 0 || Convert.ToInt32(emailrecipientchanges) > 0)
                 {
-                    await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
-                }
-            }
-            else
-            {
-                if (CrossConnectivity.Current.IsConnected)
-                {
-                    SyncStatus("Online - Connected to server");
+                    var autosync = await App.Current.MainPage.DisplayAlert("Auto-sync Notification", "Do you want to sync the data?", "Yes", "No");
+
+                    if (autosync == true)
+                    {
+                        await Application.Current.MainPage.Navigation.PushAsync(new SyncPage());
+                    }
                 }
                 else
                 {
-                    SyncStatus("Offline - Connect to internet");
+                    if (CrossConnectivity.Current.IsConnected)
+                    {
+                        SyncStatus("Online - Connected to server");
+                    }
+                    else
+                    {
+                        SyncStatus("Offline - Connect to internet");
+                    }
                 }
+            }
+            catch(Exception ex)
+            {
+                Crashes.TrackError(ex);
             }
         }
 
@@ -5420,10 +5760,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-caf-directly-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject json = new JObject
                 {
                     { "CAFNo", caf },
@@ -5549,11 +5889,11 @@ namespace TBSMobile.Rest_Service
             SyncStatus("Sending coordinator activity form photo 1 to server");
 
             string apifile = "sync-caf-media-path-1-client-update-api.php";
-
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
+            
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo1url);
 
@@ -5648,10 +5988,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-caf-media-path-2-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo2url);
 
@@ -5745,10 +6085,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-caf-media-path-3-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo3url);
 
@@ -5842,10 +6182,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(videourl);
 
@@ -6274,10 +6614,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-prospect-directly-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject json = new JObject
                 {
                     { "ContactID", id },
@@ -6394,13 +6734,12 @@ namespace TBSMobile.Rest_Service
         {
             SyncStatus("Sending prospect retailer photo 1 to server");
             
-
             string apifile = "sync-contact-media-path-1-client-update-api.php";
-
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
 
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo1url);
 
@@ -6488,10 +6827,10 @@ namespace TBSMobile.Rest_Service
             SyncStatus("Sending prospect retailer photo 2 to server");
             string apifile = "sync-contact-media-path-2-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo2url);
 
@@ -6580,10 +6919,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-contact-media-path-3-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(photo3url);
 
@@ -6671,10 +7010,10 @@ namespace TBSMobile.Rest_Service
             SyncStatus("Sending prospect retailer video to server");
             string apifile = "sync-caf-media-path-4-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject pathjson;
                 bool pathdoesExist = File.Exists(videourl);
 
@@ -6887,10 +7226,10 @@ namespace TBSMobile.Rest_Service
 
             string apifile = "sync-retailer-outlet-client-update-api.php";
 
-            var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
-
             try
             {
+                var uri = new Uri(string.Format("http://" + domain + "/TBSApp/" + apifolder + "/" + apifile + "?Host=" + host + "&Database=" + database, string.Empty));
+
                 JObject json = new JObject
                 {
                     { "ContactID", id },
@@ -7078,19 +7417,40 @@ namespace TBSMobile.Rest_Service
 
         public async Task OnSyncComplete(string host, string database, string domain, string contact)
         {
-            await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+            try
+            {
+                await Application.Current.MainPage.Navigation.PushAsync(new MainMenu());
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         public async Task OnSendComplete(string host, string database, string domain, string contact)
         {
-            await Application.Current.MainPage.Navigation.PopAsync();
-            await Application.Current.MainPage.DisplayAlert("Saving Data Success", "Data saved successfully", "Ok");
+            try
+            {
+                await Application.Current.MainPage.Navigation.PopAsync();
+                await Application.Current.MainPage.DisplayAlert("Saving Data Success", "Data saved successfully", "Ok");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
 
         public async Task OnSendCompleteModal(string host, string database, string domain, string contact)
         {
-            await Application.Current.MainPage.Navigation.PopModalAsync();
-            await Application.Current.MainPage.DisplayAlert("Saving Data Success", "Data saved successfully", "Ok");
+            try
+            {
+                await Application.Current.MainPage.Navigation.PopModalAsync();
+                await Application.Current.MainPage.DisplayAlert("Saving Data Success", "Data saved successfully", "Ok");
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+            }
         }
     }
 }
