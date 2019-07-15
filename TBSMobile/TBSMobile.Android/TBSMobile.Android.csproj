@@ -41,8 +41,7 @@
     <AndroidTlsProvider>
     </AndroidTlsProvider>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
-    <AndroidLinkSkip>
-    </AndroidLinkSkip>
+    <AndroidLinkSkip>Newtonsoft.Json</AndroidLinkSkip>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
