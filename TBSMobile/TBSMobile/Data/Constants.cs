@@ -16,7 +16,7 @@ namespace TBSMobile.Data
 
         public static string deviceID = CrossDeviceInfo.Current.Id;
         public static string appversion = "Version: " + VersionTracking.CurrentVersion;
-        public static string email = "lawrenceagulto.317@gmail.com";
+        public static string email = "mcstech001@gmail.com";
 
         public static readonly ISQLiteDB db = DependencyService.Get<ISQLiteDB>();
         public static readonly SQLite.SQLiteAsyncConnection conn = db.GetConnection();
