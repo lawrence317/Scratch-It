@@ -497,7 +497,21 @@
                                         <RowDefinition Height="30"/>
                                         <RowDefinition Height="30"/>
                                         <RowDefinition Height="30"/>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="85*"/>
+                                        <ColumnDefinition Width="15*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Rekorida -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="0" Grid.Column="0" Text="Rekorida" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -506,6 +520,8 @@
                                         </Label.FontFamily>
                                     </Label>
                                     <Switch Grid.Row="0" Grid.Column="1" VerticalOptions="Center" x:Name="swRekorida" Toggled="Activity_Toggled"/>
+
+                                    <!-- Merchandizing -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="1" Grid.Column="0" Text="Merchandizing" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -513,8 +529,9 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-
                                     <Switch Grid.Row="1" Grid.Column="1" VerticalOptions="Center" x:Name="swMerchandizing" Toggled="Activity_Toggled"/>
+
+                                    <!-- Trade Check -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="2" Grid.Column="0" Text="Trade Check" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
@@ -524,39 +541,85 @@
                                     </Label>
                                     <Switch Grid.Row="2" Grid.Column="1" VerticalOptions="Center" x:Name="swTradeCheck" Toggled="Activity_Toggled"/>
 
-                                    <Label VerticalTextAlignment="Center" Grid.Row="3" Grid.Column="0" Text="Others" StyleClass="lbl-fieldform">
+                                    <!-- Rapport -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="3" Grid.Column="0" Text="Rapport Building" StyleClass="lbl-fieldform">
                                         <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="3" Grid.Column="1" VerticalOptions="Center" x:Name="swOthers" Toggled="swOthers_Toggled"/>
-                                </Grid>
-                                <Label Text="Please choose an activity" x:Name="activityvalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
+                                    <Switch Grid.Row="3" Grid.Column="1" VerticalOptions="Center" x:Name="swRapport" Toggled="Activity_Toggled"/>
 
-                                <Frame StyleClass="fieldFrame" x:Name="OthersFrame" CornerRadius="4" BorderColor="#e8eaed" IsVisible="False" HasShadow="False">
-                                    <local:CustomEntry PlaceholderColor="#DED8D5" Unfocused="entOthers_Unfocused" x:Name="entOthers" StyleClass="fieldForm">
-                                        <local:CustomEntry.FontFamily>
+                                    <!-- Out of stock -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="4" Grid.Column="0" Text="Out of stock" StyleClass="lbl-fieldform">
+                                        <Label.FontFamily>
                                             <OnPlatform x:TypeArguments="x:String">
                                                 <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
                                             </OnPlatform>
-                                        </local:CustomEntry.FontFamily>
-                                    </local:CustomEntry>
-                                </Frame>
-                                <Label Text="This field is required" x:Name="othersvalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
+                                        </Label.FontFamily>
+                                    </Label>
+                                    <Switch Grid.Row="4" Grid.Column="1" VerticalOptions="Center" x:Name="swStock" Toggled="Activity_Toggled"/>
+
+                                    <!-- Replenish -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="5" Grid.Column="0" Text="Replenished Merchandizing Collateral" StyleClass="lbl-fieldform">
+                                        <Label.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </Label.FontFamily>
+                                    </Label>
+                                    <Switch Grid.Row="5" Grid.Column="1" VerticalOptions="Center" x:Name="swReplenish" Toggled="Activity_Toggled"/>
+
+                                    <!-- Retouch -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="6" Grid.Column="0" Text="Retouched Merchandizing Collateral" StyleClass="lbl-fieldform">
+                                        <Label.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </Label.FontFamily>
+                                    </Label>
+                                    <Switch Grid.Row="6" Grid.Column="1" VerticalOptions="Center" x:Name="swRetouch" Toggled="Activity_Toggled"/>
+
+                                    <!-- Feedback -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="7" Grid.Column="0" Text="Feedback" StyleClass="lbl-fieldform">
+                                        <Label.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </Label.FontFamily>
+                                    </Label>
+                                    <Switch Grid.Row="7" Grid.Column="1" VerticalOptions="Center" x:Name="swFeedback" Toggled="SwFeedback_Toggled"/>
+                                    <Frame Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" StyleClass="fieldFrame" x:Name="FeedbackFrame" CornerRadius="4" BackgroundColor="#e8eaed" BorderColor="#e8eaed" HasShadow="False">
+                                        <local:CustomEntry PlaceholderColor="#DED8D5" IsEnabled="False" x:Name="entFeedback" StyleClass="fieldForm">
+                                            <local:CustomEntry.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </local:CustomEntry.FontFamily>
+                                        </local:CustomEntry>
+                                    </Frame>
+
+                                    <!-- Others -->
+                                    <Label VerticalTextAlignment="Center" Grid.Row="9" Grid.Column="0" Text="Others" StyleClass="lbl-fieldform">
+                                        <Label.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String">
+                                                <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                            </OnPlatform>
+                                        </Label.FontFamily>
+                                    </Label>
+                                    <Switch Grid.Row="9" Grid.Column="1" VerticalOptions="Center" x:Name="swOthers" Toggled="swOthers_Toggled"/>
+                                    <Frame  Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" StyleClass="fieldFrame" x:Name="OthersFrame" CornerRadius="4" BackgroundColor="#e8eaed" BorderColor="#e8eaed" HasShadow="False">
+                                        <local:CustomEntry PlaceholderColor="#DED8D5" IsEnabled="False" x:Name="entOthers" StyleClass="fieldForm">
+                                            <local:CustomEntry.FontFamily>
+                                                <OnPlatform x:TypeArguments="x:String">
+                                                    <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
+                                                </OnPlatform>
+                                            </local:CustomEntry.FontFamily>
+                                        </local:CustomEntry>
+                                    </Frame>
+                                </Grid>
+
                                 <Label Text="Remarks" StyleClass="lbl-fieldform">
                                     <Label.FontFamily>
                                         <OnPlatform x:TypeArguments="x:String">

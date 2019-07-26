@@ -24,7 +24,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC", contact);
+                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID = ? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 20", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)
@@ -103,7 +103,7 @@ namespace TBSMobile.View
         {
             try
             {
-                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 200", contact);
+                var getActivity = Constants.conn.QueryAsync<CAFTable>("SELECT * FROM tblCaf WHERE EmployeeID=? AND LastSync >= LastUpdated ORDER BY CAFDate DESC, StartTime DESC LIMIT 20", contact);
                 var resultCount = getActivity.Result.Count;
 
                 if (resultCount > 0)

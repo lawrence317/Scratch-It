@@ -460,27 +460,54 @@ namespace TBSMobile.View
             
         }
 
-        private void swOthers_Toggled(object sender, ToggledEventArgs e)
+        private async void swOthers_Toggled(object sender, ToggledEventArgs e)
         {
             if (swOthers.IsToggled == true)
             {
-                OthersFrame.IsVisible = true;
-                activityvalidator.IsVisible = false;
+                entOthers.IsEnabled = true;
                 entOthers.Focus();
+                OthersFrame.BackgroundColor = Color.FromHex("#fbfbfc");
+                OthersFrame.BorderColor = Color.FromHex("#e8eaed");
             }
             else
             {
-                OthersFrame.IsVisible = false;
-                othersvalidator.IsVisible = false;
+                entOthers.IsEnabled = false;
+                OthersFrame.BackgroundColor = Color.FromHex("#e8eaed");
+                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false)
+                {
+                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
+                }
+            }
+        }
 
-                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false)
+        private async void SwFeedback_Toggled(object sender, ToggledEventArgs e)
+        {
+            if (swFeedback.IsToggled == true)
+            {
+                entFeedback.IsEnabled = true;
+                entFeedback.Focus();
+
+                FeedbackFrame.BackgroundColor = Color.FromHex("#fbfbfc");
+                FeedbackFrame.BorderColor = Color.FromHex("#e8eaed");
+            }
+            else
+            {
+                entFeedback.IsEnabled = false;
+
+                FeedbackFrame.BackgroundColor = Color.FromHex("#e8eaed");
+
+                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swOthers.IsToggled == false)
                 {
-                    activityvalidator.IsVisible = true;
+                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
                 }
-                else
-                {
-                    activityvalidator.IsVisible = false;
-                }
+            }
+        }
+
+        private async void Activity_Toggled(object sender, ToggledEventArgs e)
+        {
+            if (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false)
+            {
+                await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
             }
         }
 
@@ -1146,28 +1173,31 @@ namespace TBSMobile.View
 
         private async void BtnGotoPage6_Clicked(object sender, EventArgs e)
         {
-            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)))
+            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)) || (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text)))
             {
                 await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
-                if (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false)
+                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swOthers.IsToggled == false && swFeedback.IsToggled == false)
                 {
-                    activityvalidator.IsVisible = true;
-                }
-                else
-                {
-                    activityvalidator.IsVisible = false;
+                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
                 }
 
                 if (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text))
                 {
-                    othersvalidator.IsVisible = true;
                     OthersFrame.BorderColor = Color.FromHex("#e74c3c");
                 }
                 else
                 {
-                    othersvalidator.IsVisible = false;
                     OthersFrame.BorderColor = Color.FromHex("#e8eaed");
+                }
+
+                if (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text))
+                {
+                    FeedbackFrame.BorderColor = Color.FromHex("#e74c3c");
+                }
+                else
+                {
+                    FeedbackFrame.BorderColor = Color.FromHex("#e8eaed");
                 }
             }
             else
@@ -1183,7 +1213,7 @@ namespace TBSMobile.View
                     }
                     else
                     {
-                       await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
+                        await DisplayAlert("Application Error", "It appears you change the time/date of your phone. You will be logged out. Please restore the correct time/date", "Ok");
                         await Navigation.PopToRootAsync();
                     }
                 }
@@ -1305,10 +1335,16 @@ namespace TBSMobile.View
                                 var videourl = entVideoUrl.Text;
                                 var otherconcern = entOthers.Text;
                                 var remarks = entRemarks.Text;
+                                var feedback = entFeedback.Text;
                                 string rekorida;
                                 string merchandizing;
                                 string tradecheck;
                                 string others;
+                                string rapport;
+                                string stock;
+                                string replenish;
+                                string retouch;
+                                string feed;
                                 var current_datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                                 var getUsername = Constants.conn.QueryAsync<UserTable>("SELECT UserID FROM tblUser WHERE ContactID = ? AND Deleted != '1'", contact);
@@ -1353,6 +1389,51 @@ namespace TBSMobile.View
                                     others = "";
                                 }
 
+                                if (swRapport.IsToggled == true)
+                                {
+                                    rapport = "ACT00005";
+                                }
+                                else
+                                {
+                                    rapport = "";
+                                }
+
+                                if (swStock.IsToggled == true)
+                                {
+                                    stock = "ACT00006";
+                                }
+                                else
+                                {
+                                    stock = "";
+                                }
+
+                                if (swReplenish.IsToggled == true)
+                                {
+                                    replenish = "ACT00007";
+                                }
+                                else
+                                {
+                                    replenish = "";
+                                }
+
+                                if (swRetouch.IsToggled == true)
+                                {
+                                    retouch = "ACT00008";
+                                }
+                                else
+                                {
+                                    retouch = "";
+                                }
+
+                                if (swFeedback.IsToggled == true)
+                                {
+                                    feed = "ACT00009";
+                                }
+                                else
+                                {
+                                    feed = "";
+                                }
+
                                 fafPage7.IsVisible = false;
                                 sendstatusform.IsVisible = true;
 
@@ -1360,15 +1441,18 @@ namespace TBSMobile.View
                                 
                                 if (CrossConnectivity.Current.IsConnected)
                                 {
-                                    await App.TodoManager.SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                    await App.TodoManager.SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, endTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
+
                                     await App.TodoManager.OnSendComplete(host, database, domain, contact);
                                     Send_email();
                                 }
                                 else
                                 {
-                                    await App.TodoManager.SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, startTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                    await App.TodoManager.SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailerCode, employeeNumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, startTime, startTime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                     await App.TodoManager.SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailerCode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                    await App.TodoManager.SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeeNumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                    await App.TodoManager.SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeeNumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
                                     await App.TodoManager.OnSendComplete(host, database, domain, contact);
                                     Send_email();
                                 }
@@ -1461,32 +1545,6 @@ namespace TBSMobile.View
             {
                 countryvalidator.IsVisible = false;
                 CountryFrame.BorderColor = Color.FromHex("#e8eaed");
-            }
-        }
-
-        private void Activity_Toggled(object sender, ToggledEventArgs e)
-        {
-            if (swRekorida.IsToggled == true || swMerchandizing.IsToggled == true || swTradeCheck.IsToggled == true || swOthers.IsToggled == true)
-            {
-                activityvalidator.IsVisible = false;
-            }
-            else
-            {
-                activityvalidator.IsVisible = true;
-            }
-        }
-
-        private void entOthers_Unfocused(object sender, FocusEventArgs e)
-        {
-            if (string.IsNullOrEmpty(entOthers.Text))
-            {
-                othersvalidator.IsVisible = true;
-                OthersFrame.BorderColor = Color.FromHex("#e74c3c");
-            }
-            else
-            {
-                othersvalidator.IsVisible = false;
-                OthersFrame.BorderColor = Color.FromHex("#e8eaed");
             }
         }
 

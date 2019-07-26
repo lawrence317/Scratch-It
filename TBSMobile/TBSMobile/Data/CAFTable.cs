@@ -30,6 +30,8 @@ namespace TBSMobile.Data
         [MaxLength(2000)]
         public string OtherConcern { get; set; }
         [MaxLength(2000)]
+        public string Feedback { get; set; }
+        [MaxLength(2000)]
         public string GPSCoordinates { get; set; }
         [MaxLength(100)]
         public string RecordLog { get; set; }

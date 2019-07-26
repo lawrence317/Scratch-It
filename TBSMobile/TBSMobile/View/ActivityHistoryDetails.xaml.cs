@@ -18,6 +18,11 @@ namespace TBSMobile.View
             GetMerchandizing(item.CAFNo);
             GetTradeCheck(item.CAFNo);
             GetOthers(item.CAFNo);
+            GetRapport(item.CAFNo);
+            GetStock(item.CAFNo);
+            GetReplenish(item.CAFNo);
+            GetRetouch(item.CAFNo);
+            GetFeed(item.CAFNo);
             GetLocation(item.CustomerID);
             GetRetailerName(item.CustomerID);
         }
@@ -69,8 +74,34 @@ namespace TBSMobile.View
                     lblDate.Text = contactResult.CAFDate.ToString("MM/dd/yyyy");
                     lblStartTime.Text = contactResult.StartTime.ToString("hh:mm:ss");
                     lblEndTime.Text = contactResult.EndTime.ToString("hh:mm:ss");
-                    lblOtherConcern.Text = contactResult.OtherConcern;
-                    lblRemarks.Text = contactResult.Remarks;
+
+                    if (String.IsNullOrEmpty(contactResult.Remarks))
+                    {
+                        lblRemarks.Text = "none";
+                    }
+                    else
+                    {
+                        lblRemarks.Text = contactResult.Remarks;
+                    }
+
+                    if (String.IsNullOrEmpty(contactResult.OtherConcern))
+                    {
+                        lblOtherConcern.Text = "none";
+                    }
+                    else
+                    {
+                        lblOtherConcern.Text = contactResult.OtherConcern;
+                    }
+
+                    if (String.IsNullOrEmpty(contactResult.Feedback))
+                    {
+                        lblFeedback.Text = "none";
+                    }
+                    else
+                    {
+                        lblFeedback.Text = contactResult.Feedback;
+                    }
+
                     lblActivityLocation.Text = contactResult.GPSCoordinates;
                     lblLastUpdated.Text = contactResult.LastUpdated.ToString("MM/dd/yyyy HH:mm:ss");
                     lblLastSync.Text = contactResult.LastSync.ToString("MM/dd/yyyy HH:mm:ss");
@@ -166,6 +197,121 @@ namespace TBSMobile.View
                 else
                 {
                     lblOthers.Text = "False";
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+        }
+
+        public async void GetRapport(string caf)
+        {
+            try
+            {
+                var getCaf = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00005'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    lblRaport.Text = "True";
+                }
+                else
+                {
+                    lblRaport.Text = "False";
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+        }
+
+        public async void GetStock(string caf)
+        {
+            try
+            {
+                var getCaf = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00006'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    lblStock.Text = "True";
+                }
+                else
+                {
+                    lblStock.Text = "False";
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+        }
+
+        public async void GetReplenish(string caf)
+        {
+            try
+            {
+                var getCaf = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00007'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    lblReplenish.Text = "True";
+                }
+                else
+                {
+                    lblReplenish.Text = "False";
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+        }
+
+        public async void GetRetouch(string caf)
+        {
+            try
+            {
+                var getCaf = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00008'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    lblRetouch.Text = "True";
+                }
+                else
+                {
+                    lblRetouch.Text = "False";
+                }
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+            }
+        }
+
+        public async void GetFeed(string caf)
+        {
+            try
+            {
+                var getCaf = Constants.conn.QueryAsync<ActivityTable>("SELECT * FROM tblActivity WHERE CAFNo=? AND ActivityID = 'ACT00009'", caf);
+                var contactResultCount = getCaf.Result.Count;
+
+                if (contactResultCount > 0)
+                {
+                    lblFeed.Text = "True";
+                }
+                else
+                {
+                    lblFeed.Text = "False";
                 }
             }
             catch (Exception ex)

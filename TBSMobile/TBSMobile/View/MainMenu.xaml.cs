@@ -23,7 +23,7 @@ namespace TBSMobile.View
         {
             InitializeComponent();
 
-            CheckConnectionContinuously();
+            CheckConnectionContinuously("");
         }
 
         protected async override void OnAppearing()
@@ -58,6 +58,7 @@ namespace TBSMobile.View
                         {
                             if (CrossConnectivity.Current.IsConnected)
                             {
+                                CheckConnectionContinuously("1");
                                 await App.TodoManager.CheckContactsData(host, database, domain, contact);
                                 await App.TodoManager.CheckRetailerOutletData(contact);
                                 await App.TodoManager.CheckCAFData(contact);
@@ -248,45 +249,48 @@ namespace TBSMobile.View
             }
         }
 
-        public async void CheckConnectionContinuously()
+        public async void CheckConnectionContinuously(string check)
         {
-            try
+            if (String.IsNullOrEmpty(check))
             {
-                CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
+                try
                 {
-                    if (CrossConnectivity.Current.IsConnected)
+                    CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
                     {
-                        int index = Application.Current.MainPage.Navigation.NavigationStack.Count - 1;
-                        Page currentpage = Application.Current.MainPage.Navigation.NavigationStack[index];
-
-                        if (currentpage.ToString().Equals("TBSMobile.View.MainMenu"))
+                        if (CrossConnectivity.Current.IsConnected)
                         {
-                            await App.TodoManager.CheckContactsData(host, database, domain, contact);
-                            await App.TodoManager.CheckRetailerOutletData(contact);
-                            await App.TodoManager.CheckCAFData(contact);
-                            await App.TodoManager.CheckCAFActivityData(contact);
-                            await App.TodoManager.CheckEmailRecipientData(contact);
+                            int index = Application.Current.MainPage.Navigation.NavigationStack.Count - 1;
+                            Page currentpage = Application.Current.MainPage.Navigation.NavigationStack[index];
 
-                            Online_Text();
-                            Disable_UI();
+                            if (currentpage.ToString().Equals("TBSMobile.View.MainMenu"))
+                            {
+                                await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                                await App.TodoManager.CheckRetailerOutletData(contact);
+                                await App.TodoManager.CheckCAFData(contact);
+                                await App.TodoManager.CheckCAFActivityData(contact);
+                                await App.TodoManager.CheckEmailRecipientData(contact);
 
-                            await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
+                                Online_Text();
+                                Disable_UI();
 
-                            Online_Text();
+                                await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
+
+                                Online_Text();
+                                Enable_UI();
+                            }
+                        }
+                        else
+                        {
+                            Offline_Text();
                             Enable_UI();
                         }
-                    }
-                    else
-                    {
-                        Offline_Text();
-                        Enable_UI();
-                    }
-                };
-            }
-            catch(Exception ex)
-            {
-                Crashes.TrackError(ex);
-                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+                    };
+                }
+                catch (Exception ex)
+                {
+                    Crashes.TrackError(ex);
+                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
+                }
             }
         }
 

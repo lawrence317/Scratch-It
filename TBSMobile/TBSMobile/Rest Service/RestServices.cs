@@ -141,6 +141,7 @@ namespace TBSMobile.Rest_Service
             public string MobileVideo { get; set; }
             public string Remarks { get; set; }
             public string OtherConcern { get; set; }
+            public string Feedback { get; set; }
             public string GPSCoordinates { get; set; }
             public string RecordLog { get; set; }
             public DateTime LastSync { get; set; }
@@ -1400,6 +1401,7 @@ namespace TBSMobile.Rest_Service
                                 var gpsCoordinates = item.GPSCoordinates;
                                 var remarks = item.Remarks;
                                 var otherConcern = item.OtherConcern;
+                                var feedback = item.Feedback;
                                 var recordLog = item.RecordLog;
                                 var lastSync = DateTime.Parse(current_datetime);
                                 var lastUpdated = item.LastUpdated;
@@ -1424,6 +1426,7 @@ namespace TBSMobile.Rest_Service
                                     GPSCoordinates = gpsCoordinates,
                                     Remarks = remarks,
                                     OtherConcern = otherConcern,
+                                    Feedback = feedback,
                                     RecordLog = recordLog,
                                     LastSync = lastSync,
                                     Deleted = deleted,
@@ -3246,6 +3249,7 @@ namespace TBSMobile.Rest_Service
                             var gpsLocation = result.GPSCoordinates;
                             var remarks = result.Remarks;
                             var otherConcern = result.OtherConcern;
+                            var feedback = result.Feedback;
                             var recordLog = result.RecordLog;
                             var deleted = result.Deleted;
                             var lastUpdated = result.LastUpdated;
@@ -3265,6 +3269,7 @@ namespace TBSMobile.Rest_Service
                                 { "GPSCoordinates", gpsLocation },
                                 { "Remarks", remarks },
                                 { "OtherConcern", otherConcern },
+                                { "Feedback", feedback },
                                 { "RecordLog", recordLog },
                                 { "Deleted", deleted },
                                 { "LastUpdated", lastUpdated }
@@ -5754,7 +5759,7 @@ namespace TBSMobile.Rest_Service
 
             /* DIRECT SEND CAF TO SERVER REST */
 
-        public async Task SendCAFDirectly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFDirectly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed, string feedback)
         {
             SyncStatus("Sending coordinator activity form to server");
 
@@ -5795,6 +5800,12 @@ namespace TBSMobile.Rest_Service
                     { "Others", others },
                     { "OtherConcern", otherconcern },
                     { "Remarks", remarks },
+                    { "Rapport", rapport },
+                    { "Stock", stock },
+                    { "Replenish", replenish },
+                    { "Retouch", retouch },
+                    { "Feed", feed },
+                    { "Feedback", feedback },
                     { "RecordLog", recordlog },
                     { "LastUpdated", DateTime.Parse(current_datetime) }
                 };
@@ -5814,8 +5825,10 @@ namespace TBSMobile.Rest_Service
                         if (datamessage.Equals("Inserted"))
                         {
                             await SaveRetailerOutletToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                            await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
-                            await App.TodoManager.SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                            await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
+                            await App.TodoManager.SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                         }
                         else
                         {
@@ -5823,13 +5836,15 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                 await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
 
                             }
                         }
@@ -5840,13 +5855,16 @@ namespace TBSMobile.Rest_Service
 
                         if (retry)
                         {
-                            await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                         }
                         else
                         {
-                            await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                            await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                             await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                            await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                            await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                         }
                     }
                 }
@@ -5856,13 +5874,16 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                         await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                        await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                     }
                 }
             }
@@ -5873,18 +5894,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFDirectly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                     await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                 }
             }
         }
 
-        public async Task SendCAFMedia1Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia1Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed, string feedback)
         {
             SyncStatus("Sending coordinator activity form photo 1 to server");
 
@@ -5928,7 +5952,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await App.TodoManager.SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await App.TodoManager.SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                         }
                         else
                         {
@@ -5936,13 +5960,16 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                 await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                             }
                         }
                     }
@@ -5953,13 +5980,16 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                         await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                        await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                     }
                 }
                 
@@ -5971,18 +6001,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia1Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                     await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                 }
             }
         }
 
-        public async Task SendCAFMedia2Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia2Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed, string feedback)
         {
             SyncStatus("Sending coordinator activity form photo 2 to server");
 
@@ -6026,7 +6059,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await App.TodoManager.SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await App.TodoManager.SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                         }
                         else
                         {
@@ -6034,13 +6067,16 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                 await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                             }
                         }
                     }
@@ -6051,13 +6087,16 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                         await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                        await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                     }
                 }
             }
@@ -6068,18 +6107,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia2Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                     await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                 }
             }
         }
 
-        public async Task SendCAFMedia3Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia3Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed, string feedback)
         {
             SyncStatus("Sending coordinator activity form photo 3 to server");
 
@@ -6123,7 +6165,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await App.TodoManager.SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                            await App.TodoManager.SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                         }
                         else
                         {
@@ -6131,13 +6173,16 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                 await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                             }
                         }
                     }
@@ -6148,13 +6193,16 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                         await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                        await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                     }
                 }
             }
@@ -6165,18 +6213,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia3Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                     await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                 }
             }
         }
 
-        public async Task SendCAFMedia4Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SendCAFMedia4Directly(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed, string feedback)
         {
             SyncStatus("Sending coordinator activity form video to server");
 
@@ -6220,7 +6271,7 @@ namespace TBSMobile.Rest_Service
 
                         if (datamessage.Equals("Inserted"))
                         {
-                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                            await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
                         }
                         else
                         {
@@ -6228,13 +6279,16 @@ namespace TBSMobile.Rest_Service
 
                             if (retry)
                             {
-                                await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                                await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                             }
                             else
                             {
-                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                                await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                                 await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                                await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                                await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                             }
                         }
                     }
@@ -6245,13 +6299,16 @@ namespace TBSMobile.Rest_Service
 
                     if (retry)
                     {
-                        await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                        await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                     }
                     else
                     {
-                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                        await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                         await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                        await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                        await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                     }
                 }
             }
@@ -6262,18 +6319,21 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SendCAFMedia4Directly(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed, feedback);
                 }
                 else
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
+
                     await SaveRetailerOutletToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, retailercode, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, recordlog);
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
+
                 }
             }
         }
 
-        public async Task SaveCAFToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
+        public async Task SaveCAFToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string feedback, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
             
@@ -6298,6 +6358,7 @@ namespace TBSMobile.Rest_Service
                     GPSCoordinates = actlocation,
                     Remarks = remarks,
                     OtherConcern = otherconcern,
+                    Feedback = feedback,
                     RecordLog = recordlog,
                     LastSync = DateTime.Parse(current_datetime),
                     LastUpdated = DateTime.Parse(current_datetime)
@@ -6312,7 +6373,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
                 }
             }
         }
@@ -6341,7 +6402,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SaveCAFActivityToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SaveCAFActivityToLocalDatabaseSuccess(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed)
         {
             SyncStatus("Saving coordinator activity to local database");
             
@@ -6355,7 +6416,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var rekorida_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6365,7 +6426,7 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(rekorida_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
 
@@ -6376,7 +6437,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var merchandizing_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6386,7 +6447,7 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(merchandizing_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
 
@@ -6397,7 +6458,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var trade_check_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6407,7 +6468,7 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(trade_check_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
 
@@ -6418,7 +6479,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var others_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6428,7 +6489,112 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(others_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(rapport))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00005'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00005",
+                            RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(stock))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00006'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00006",
+                            RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(replenish))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00007'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00007",
+                            RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(retouch))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00008'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00008",
+                            RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(feed))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00009'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00009",
+                            RecordLog = recordlog,
+                            LastSync = DateTime.Parse(current_datetime),
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
             }
@@ -6439,12 +6605,12 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFActivityToLocalDatabaseSuccess(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
                 }
             }
         }
 
-        public async Task SaveCAFToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string recordlog)
+        public async Task SaveCAFToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string retailercode, string employeenumber, string street, string barangay, string town, string district, string province, string country, string landmark, string telephone1, string telephone2, string mobile, string email, string location, string date, string starttime, string endtime, string photo1url, string photo2url, string photo3url, string videourl, string actlocation, string otherconcern, string remarks, string feedback, string recordlog)
         {
             SyncStatus("Saving coordinator activity form to local database");
             
@@ -6469,6 +6635,7 @@ namespace TBSMobile.Rest_Service
                     GPSCoordinates = actlocation,
                     Remarks = remarks,
                     OtherConcern = otherconcern,
+                    Feedback = feedback,
                     RecordLog = recordlog,
                     LastUpdated = DateTime.Parse(current_datetime)
                 };
@@ -6482,7 +6649,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, recordlog);
+                    await SaveCAFToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, retailercode, employeenumber, street, barangay, town, district, province, country, landmark, telephone1, telephone2, mobile, email, location, date, starttime, endtime, photo1url, photo2url, photo3url, videourl, actlocation, otherconcern, remarks, feedback, recordlog);
                 }
             }
         }
@@ -6507,7 +6674,7 @@ namespace TBSMobile.Rest_Service
             }
         }
 
-        public async Task SaveCAFActivityToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others)
+        public async Task SaveCAFActivityToLocalDatabaseFailed(string host, string database, string domain, string apifolder, string contact, Action<string> SyncStatus, string caf, string employeenumber, string recordlog, string rekorida, string merchandizing, string tradecheck, string others, string rapport, string stock, string replenish, string retouch, string feed)
         {
             SyncStatus("Saving coordinator activity to local database");
 
@@ -6519,9 +6686,9 @@ namespace TBSMobile.Rest_Service
                     var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00001'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
-                    if(result == 0)
+                    if (result == 0)
                     {
-                        var rekorida_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6530,8 +6697,8 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(rekorida_insert);
-                    }                   
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
                 }
 
                 if (!String.IsNullOrEmpty(merchandizing))
@@ -6541,7 +6708,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var merchandizing_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6550,7 +6717,7 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(merchandizing_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
 
@@ -6561,7 +6728,7 @@ namespace TBSMobile.Rest_Service
 
                     if (result == 0)
                     {
-                        var trade_check_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6570,18 +6737,18 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(trade_check_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
 
                 if (!String.IsNullOrEmpty(others))
                 {
-                    var getCount = Constants.conn.QueryAsync<ActivityTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00004'", caf, employeenumber);
                     var result = getCount.Result.Count;
 
                     if (result == 0)
                     {
-                        var others_insert = new ActivityTable
+                        var insert = new ActivityTable
                         {
                             CAFNo = caf,
                             ContactID = employeenumber,
@@ -6590,7 +6757,107 @@ namespace TBSMobile.Rest_Service
                             LastUpdated = DateTime.Parse(current_datetime)
                         };
 
-                        await Constants.conn.InsertOrReplaceAsync(others_insert);
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(rapport))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00005'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00005",
+                            RecordLog = recordlog,
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(stock))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00006'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00006",
+                            RecordLog = recordlog,
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(replenish))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00007'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00007",
+                            RecordLog = recordlog,
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(retouch))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00008'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00008",
+                            RecordLog = recordlog,
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(feed))
+                {
+                    var getCount = Constants.conn.QueryAsync<UserTable>("SELECT CAFNo FROM tblActivity WHERE CAFNo = ? AND ContactID = ? AND ActivityID='ACT00009'", caf, employeenumber);
+                    var result = getCount.Result.Count;
+
+                    if (result == 0)
+                    {
+                        var insert = new ActivityTable
+                        {
+                            CAFNo = caf,
+                            ContactID = employeenumber,
+                            ActivityID = "ACT00009",
+                            RecordLog = recordlog,
+                            LastUpdated = DateTime.Parse(current_datetime)
+                        };
+
+                        await Constants.conn.InsertOrReplaceAsync(insert);
                     }
                 }
             }
@@ -6601,7 +6868,7 @@ namespace TBSMobile.Rest_Service
 
                 if (retry)
                 {
-                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others);
+                    await SaveCAFActivityToLocalDatabaseFailed(host, database, domain, apifolder, contact, SyncStatus, caf, employeenumber, recordlog, rekorida, merchandizing, tradecheck, others, rapport, stock, replenish, retouch, feed);
                 }
             }
         }
