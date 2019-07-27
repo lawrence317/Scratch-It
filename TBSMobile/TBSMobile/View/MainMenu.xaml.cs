@@ -251,46 +251,40 @@ namespace TBSMobile.View
 
         public async void CheckConnectionContinuously(string check)
         {
-            if (String.IsNullOrEmpty(check))
+            try
             {
-                try
+                CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
                 {
-                    CrossConnectivity.Current.ConnectivityChanged += async (sender, args) =>
+                    if (String.IsNullOrEmpty(check))
                     {
                         if (CrossConnectivity.Current.IsConnected)
                         {
-                            int index = Application.Current.MainPage.Navigation.NavigationStack.Count - 1;
-                            Page currentpage = Application.Current.MainPage.Navigation.NavigationStack[index];
+                            await App.TodoManager.CheckContactsData(host, database, domain, contact);
+                            await App.TodoManager.CheckRetailerOutletData(contact);
+                            await App.TodoManager.CheckCAFData(contact);
+                            await App.TodoManager.CheckCAFActivityData(contact);
+                            await App.TodoManager.CheckEmailRecipientData(contact);
 
-                            if (currentpage.ToString().Equals("TBSMobile.View.MainMenu"))
-                            {
-                                await App.TodoManager.CheckContactsData(host, database, domain, contact);
-                                await App.TodoManager.CheckRetailerOutletData(contact);
-                                await App.TodoManager.CheckCAFData(contact);
-                                await App.TodoManager.CheckCAFActivityData(contact);
-                                await App.TodoManager.CheckEmailRecipientData(contact);
+                            Online_Text();
+                            Disable_UI();
 
-                                Online_Text();
-                                Disable_UI();
+                            await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
 
-                                await App.TodoManager.CheckAutoSync(host, database, domain, apifolder, contact, SyncStatus);
-
-                                Online_Text();
-                                Enable_UI();
-                            }
+                            Online_Text();
+                            Enable_UI();
                         }
                         else
                         {
                             Offline_Text();
                             Enable_UI();
                         }
-                    };
-                }
-                catch (Exception ex)
-                {
-                    Crashes.TrackError(ex);
-                    await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
-                }
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex);
+                await DisplayAlert("Application Error", "Error:\n\n" + ex.Message.ToString() + "\n\n Please contact your administrator", "Ok");
             }
         }
 
