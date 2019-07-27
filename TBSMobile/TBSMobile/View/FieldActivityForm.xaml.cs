@@ -1175,7 +1175,7 @@ namespace TBSMobile.View
 
         private async void BtnGotoPage6_Clicked(object sender, EventArgs e)
         {
-            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)) || (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text)))
+            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) && (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)) && (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text)))
             {
                 await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
 
