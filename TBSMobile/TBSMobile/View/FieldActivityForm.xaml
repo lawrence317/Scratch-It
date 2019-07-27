@@ -519,7 +519,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="0" Grid.Column="1" VerticalOptions="Center" x:Name="swRekorida" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="0" Grid.Column="1" VerticalOptions="Center" x:Name="swRekorida"/>
 
                                     <!-- Merchandizing -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="1" Grid.Column="0" Text="Merchandizing" StyleClass="lbl-fieldform">
@@ -529,7 +529,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="1" Grid.Column="1" VerticalOptions="Center" x:Name="swMerchandizing" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="1" Grid.Column="1" VerticalOptions="Center" x:Name="swMerchandizing"/>
 
                                     <!-- Trade Check -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="2" Grid.Column="0" Text="Trade Check" StyleClass="lbl-fieldform">
@@ -539,7 +539,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="2" Grid.Column="1" VerticalOptions="Center" x:Name="swTradeCheck" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="2" Grid.Column="1" VerticalOptions="Center" x:Name="swTradeCheck"/>
 
                                     <!-- Rapport -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="3" Grid.Column="0" Text="Rapport Building" StyleClass="lbl-fieldform">
@@ -549,7 +549,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="3" Grid.Column="1" VerticalOptions="Center" x:Name="swRapport" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="3" Grid.Column="1" VerticalOptions="Center" x:Name="swRapport"/>
 
                                     <!-- Out of stock -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="4" Grid.Column="0" Text="Out of stock" StyleClass="lbl-fieldform">
@@ -559,7 +559,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="4" Grid.Column="1" VerticalOptions="Center" x:Name="swStock" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="4" Grid.Column="1" VerticalOptions="Center" x:Name="swStock"/>
 
                                     <!-- Replenish -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="5" Grid.Column="0" Text="Replenished Merchandizing Collateral" StyleClass="lbl-fieldform">
@@ -569,7 +569,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="5" Grid.Column="1" VerticalOptions="Center" x:Name="swReplenish" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="5" Grid.Column="1" VerticalOptions="Center" x:Name="swReplenish"/>
 
                                     <!-- Retouch -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="6" Grid.Column="0" Text="Retouched Merchandizing Collateral" StyleClass="lbl-fieldform">
@@ -579,7 +579,7 @@
                                             </OnPlatform>
                                         </Label.FontFamily>
                                     </Label>
-                                    <Switch Grid.Row="6" Grid.Column="1" VerticalOptions="Center" x:Name="swRetouch" Toggled="Activity_Toggled"/>
+                                    <Switch Grid.Row="6" Grid.Column="1" VerticalOptions="Center" x:Name="swRetouch"/>
 
                                     <!-- Feedback -->
                                     <Label VerticalTextAlignment="Center" Grid.Row="7" Grid.Column="0" Text="Feedback" StyleClass="lbl-fieldform">
@@ -726,14 +726,6 @@
                                     </Button>
                                     <Image StyleClass="thumbnail" x:Name="vidthumb" Grid.Row="3" Grid.Column="1" IsVisible="False"/>
                                 </Grid>
-
-                                <Label Text="Please capture a photo" x:Name="photovideovalidator" StyleClass="validation" IsVisible="False">
-                                    <Label.FontFamily>
-                                        <OnPlatform x:TypeArguments="x:String">
-                                            <On Platform="Android" Value="HelveticaNeueLTPro-Lt.otf#HelveticaNeueLTPro-Lt"/>
-                                        </OnPlatform>
-                                    </Label.FontFamily>
-                                </Label>
 
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto1Url"/>
                                 <Entry IsVisible="False" IsEnabled="False" x:Name="entPhoto2Url"/>

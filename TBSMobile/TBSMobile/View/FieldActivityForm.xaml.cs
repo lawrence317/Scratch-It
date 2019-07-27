@@ -460,7 +460,7 @@ namespace TBSMobile.View
             
         }
 
-        private async void swOthers_Toggled(object sender, ToggledEventArgs e)
+        private void swOthers_Toggled(object sender, ToggledEventArgs e)
         {
             if (swOthers.IsToggled == true)
             {
@@ -474,14 +474,11 @@ namespace TBSMobile.View
                 entOthers.Text = "";
                 entOthers.IsEnabled = false;
                 OthersFrame.BackgroundColor = Color.FromHex("#e8eaed");
-                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false)
-                {
-                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
-                }
+                OthersFrame.BorderColor = Color.FromHex("#e8eaed");
             }
         }
 
-        private async void SwFeedback_Toggled(object sender, ToggledEventArgs e)
+        private void SwFeedback_Toggled(object sender, ToggledEventArgs e)
         {
             if (swFeedback.IsToggled == true)
             {
@@ -497,19 +494,7 @@ namespace TBSMobile.View
                 entFeedback.Text = "";
 
                 FeedbackFrame.BackgroundColor = Color.FromHex("#e8eaed");
-
-                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swOthers.IsToggled == false)
-                {
-                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
-                }
-            }
-        }
-
-        private async void Activity_Toggled(object sender, ToggledEventArgs e)
-        {
-            if (swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false)
-            {
-                await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
+                OthersFrame.BorderColor = Color.FromHex("#e8eaed");
             }
         }
 
@@ -552,7 +537,6 @@ namespace TBSMobile.View
                         file.Dispose();
                         return stream;
                     });
-                    photovideovalidator.IsVisible = false;
                 }
             }
             catch (Exception ex)
@@ -600,7 +584,6 @@ namespace TBSMobile.View
                         file.Dispose();
                         return stream;
                     });
-                    photovideovalidator.IsVisible = false;
                 }
             }
             catch (Exception ex)
@@ -648,7 +631,6 @@ namespace TBSMobile.View
                         file.Dispose();
                         return stream;
                     });
-                    photovideovalidator.IsVisible = false;
                 }
             }
             catch (Exception ex)
@@ -1175,14 +1157,9 @@ namespace TBSMobile.View
 
         private async void BtnGotoPage6_Clicked(object sender, EventArgs e)
         {
-            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false) && (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)) && (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text)))
+            if ((swRekorida.IsToggled == false && swMerchandizing.IsToggled == false && swTradeCheck.IsToggled == false && swOthers.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false) || (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text)) || (swFeedback.IsToggled == true && string.IsNullOrEmpty(entFeedback.Text)))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
-
-                if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swOthers.IsToggled == false && swFeedback.IsToggled == false)
-                {
-                    await DisplayAlert("CAF Error", "Please choose an activity", "Ok");
-                }
+                await DisplayAlert("Form Required", "Please choose atleast one(1) activity and fill-up the required field(s)", "Ok");
 
                 if (swOthers.IsToggled == true && string.IsNullOrEmpty(entOthers.Text))
                 {
@@ -1230,34 +1207,7 @@ namespace TBSMobile.View
         {
             if (string.IsNullOrEmpty(entPhoto1Url.Text) || string.IsNullOrEmpty(entPhoto2Url.Text) || string.IsNullOrEmpty(entPhoto3Url.Text))
             {
-                await DisplayAlert("Form Required", "Please fill-up the required field", "Ok");
-
-                if (string.IsNullOrEmpty(entPhoto1Url.Text))
-                {
-                    photovideovalidator.IsVisible = true;
-                }
-                else
-                {
-                    photovideovalidator.IsVisible = false;
-                }
-
-                if (string.IsNullOrEmpty(entPhoto2Url.Text))
-                {
-                    photovideovalidator.IsVisible = true;
-                }
-                else
-                {
-                    photovideovalidator.IsVisible = false;
-                }
-
-                if (string.IsNullOrEmpty(entPhoto3Url.Text))
-                {
-                    photovideovalidator.IsVisible = true;
-                }
-                else
-                {
-                    photovideovalidator.IsVisible = false;
-                }
+                await DisplayAlert("Form Required", "Please capture three(3) photos", "Ok");
             }
             else
             {
@@ -1269,7 +1219,6 @@ namespace TBSMobile.View
 
                         fafPage6.IsVisible = false;
                         fafPage7.IsVisible = true;
-                        photovideovalidator.IsVisible = false;
                     }
                     else
                     {
