@@ -471,6 +471,7 @@ namespace TBSMobile.View
             }
             else
             {
+                entOthers.Text = "";
                 entOthers.IsEnabled = false;
                 OthersFrame.BackgroundColor = Color.FromHex("#e8eaed");
                 if (swRekorida.IsToggled == false && swTradeCheck.IsToggled == false && swMerchandizing.IsToggled == false && swRapport.IsToggled == false && swStock.IsToggled == false && swReplenish.IsToggled == false && swRetouch.IsToggled == false && swFeedback.IsToggled == false)
@@ -493,6 +494,7 @@ namespace TBSMobile.View
             else
             {
                 entFeedback.IsEnabled = false;
+                entFeedback.Text = "";
 
                 FeedbackFrame.BackgroundColor = Color.FromHex("#e8eaed");
 
@@ -1333,9 +1335,9 @@ namespace TBSMobile.View
                                 var photo2url = entPhoto2Url.Text;
                                 var photo3url = entPhoto3Url.Text;
                                 var videourl = entVideoUrl.Text;
-                                var otherconcern = entOthers.Text;
                                 var remarks = entRemarks.Text;
-                                var feedback = entFeedback.Text;
+                                string otherconcern;
+                                string feedback;
                                 string rekorida;
                                 string merchandizing;
                                 string tradecheck;
@@ -1382,10 +1384,12 @@ namespace TBSMobile.View
 
                                 if (swOthers.IsToggled == true)
                                 {
+                                    otherconcern = entOthers.Text;
                                     others = "ACT00004";
                                 }
                                 else
                                 {
+                                    otherconcern = "";
                                     others = "";
                                 }
 
@@ -1427,10 +1431,12 @@ namespace TBSMobile.View
 
                                 if (swFeedback.IsToggled == true)
                                 {
+                                    feedback = entFeedback.Text;
                                     feed = "ACT00009";
                                 }
                                 else
                                 {
+                                    feedback = "";
                                     feed = "";
                                 }
 
